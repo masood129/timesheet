@@ -33,6 +33,11 @@ class Messages extends Translations {
       "arrival_time_hint": "ساعت ورود (مثلاً 08:00)",
       "leave_time_hint": "ساعت خروج (مثلاً 17:00)",
       "tasks": "تسک‌ها:",
+      "go_cost": "هزینه رفت",
+      "return_cost": "هزینه آمد",
+      "total_cost": "جمع هزینه‌ها",
+      "total": "جمع",
+      "calculate_total_cost": "محاسبه جمع هزینه‌ها",
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -63,7 +68,12 @@ class Messages extends Translations {
       "and": "and",
       "arrival_time_hint": "Arrival time (e.g. 08:00)",
       "leave_time_hint": "Leave time (e.g. 17:00)",
-      "tasks": "Tasks:"
-    }
+      "tasks": "Tasks:",
+      "go_cost": "go cost",
+      "return_cost": "return cost",
+      "total_cost": "total cost",
+      "total": "total",
+      "calculate_total_cost": "calculate total cost",
+    },
   };
 }
