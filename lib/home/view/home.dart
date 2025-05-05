@@ -8,7 +8,7 @@ import '../controller/home_controller.dart';
 class CalendarView extends StatelessWidget {
   CalendarView({super.key});
 
-  final CalendarController calendarController = Get.put(CalendarController());
+  final HomeController homeController = Get.put(HomeController());
   final themeController = Get.find<ThemeController>();
 
   @override
@@ -16,19 +16,19 @@ class CalendarView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
-          final year = calendarController.currentYear.value;
-          final month = calendarController.currentMonth.value;
+          final year = homeController.currentYear.value;
+          final month = homeController.currentMonth.value;
           final monthName = Jalali(year, month).formatter.mN;
           return Text('${'calendar_title'.tr}: $monthName $year');
         }),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: calendarController.previousMonth,
+            onPressed: homeController.previousMonth,
           ),
           IconButton(
             icon: const Icon(Icons.arrow_forward),
-            onPressed: calendarController.nextMonth,
+            onPressed: homeController.nextMonth,
           ),
           Obx(() => Switch(
             value: themeController.isDark.value,
@@ -47,16 +47,16 @@ class CalendarView extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        final year = calendarController.currentYear.value;
-        final month = calendarController.currentMonth.value;
-        final daysInMonth = calendarController.daysInMonth;
+        final year = homeController.currentYear.value;
+        final month = homeController.currentMonth.value;
+        final daysInMonth = homeController.daysInMonth;
 
         return ListView.builder(
           itemCount: daysInMonth,
           itemBuilder: (context, index) {
             final day = index + 1;
             final date = Jalali(year, month, day);
-            final note = calendarController.getNoteForDate(date) ?? 'no_note'.tr;
+            final note = homeController.getNoteForDate(date) ?? 'no_note'.tr;
             final isFriday = date.weekDay == 7;
 
             return Padding(
@@ -85,29 +85,21 @@ class CalendarView extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
-                  onTap: () => _showNoteDialog(context, date),
+                  onTap: () => showModalBottomSheet(
+                    isScrollControlled: true,
+                    context: context,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (_) => NoteDialog(date: date),
+                  ),
                 ),
               ),
             );
           },
         );
       }),
-    );
-  }
-
-  void _showNoteDialog(BuildContext context, Jalali date) {
-    final leaveType = ''.obs; // RxString
-
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) {
-        return NoteDialog(date: date, leaveType: leaveType);
-      },
     );
   }
 }

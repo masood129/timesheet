@@ -1,9 +1,7 @@
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-import '../model/home_model.dart';
-import '../model/task_model.dart';
 
-class CalendarController extends GetxController {
+class HomeController extends GetxController {
   final CalendarModel calendarModel = CalendarModel();
 
   var currentMonth = Jalali.now().month.obs;
@@ -36,10 +34,20 @@ class CalendarController extends GetxController {
       currentMonth.value -= 1;
     }
   }
-  final List<Project> availableProjects = [
-    Project(code: 'PRJ001', name: 'سامانه حضور و غیاب'),
-    Project(code: 'PRJ002', name: 'اپلیکیشن تقویم شمسی'),
-    Project(code: 'PRJ003', name: 'داشبورد مدیریت پروژه'),
-  ];
+}
 
+class CalendarModel {
+  final Map<String, String> _notes = {};
+
+  int getDaysInMonth(int year, int month) {
+    return Jalali(year, month).monthLength;
+  }
+
+  void setNoteForDate(Jalali date, String note) {
+    _notes[date.toString()] = note;
+  }
+
+  String? getNoteForDate(Jalali date) {
+    return _notes[date.toString()];
+  }
 }
