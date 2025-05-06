@@ -47,6 +47,11 @@ class Messages extends Translations {
       'personal_car_cost': 'هزینه خودرو شخصی',
       'invalid_cost': 'هزینه نمی‌تواند منفی باشد',
       'disabled_for_non_working_leave': 'برای مرخصی‌های غیرکاری غیرفعال است', // کلید جدید
+      'light_theme': 'تم روشن', // جدید
+      'dark_theme': 'تم تاریک', // جدید
+      'persian': 'فارسی', // جدید
+      'english': 'انگلیسی', // جدید
+      'settings': 'تنظیمات', // جدید
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -92,6 +97,11 @@ class Messages extends Translations {
       'personal_car_cost': 'Personal car cost',
       'invalid_cost': 'Cost cannot be negative',
       'disabled_for_non_working_leave': 'Disabled for non-working leave types', // کلید جدید
+      'light_theme': 'Light Theme', // جدید
+      'dark_theme': 'Dark Theme', // جدید
+      'persian': 'Persian', // جدید
+      'english': 'English', // جدید
+      'settings': 'Settings', // جدید
     },
   };
 }

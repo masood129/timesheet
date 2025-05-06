@@ -13,6 +13,8 @@ class CalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
@@ -30,21 +32,58 @@ class CalendarView extends StatelessWidget {
             icon: const Icon(Icons.arrow_forward),
             onPressed: homeController.nextMonth,
           ),
-          Obx(() => Switch(
-            value: themeController.isDark.value,
-            onChanged: themeController.toggleTheme,
-            activeColor: Theme.of(context).colorScheme.secondary,
-          )),
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () {
-              final newLocale = Get.locale!.languageCode == 'fa'
-                  ? const Locale('en')
-                  : const Locale('fa');
-              Get.updateLocale(newLocale);
-            },
-          ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+              ),
+              child: Text(
+                'settings'.tr,
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.brightness_6,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                themeController.isDark.value ? 'light_theme'.tr : 'dark_theme'.tr,
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
+              onTap: () {
+                themeController.toggleTheme(!themeController.isDark.value);
+                Navigator.pop(context); // بستن منو پس از انتخاب
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.language,
+                color: colorScheme.primary,
+              ),
+              title: Text(
+                Get.locale!.languageCode == 'fa' ? 'english'.tr : 'persian'.tr,
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
+              onTap: () {
+                final newLocale = Get.locale!.languageCode == 'fa'
+                    ? const Locale('en')
+                    : const Locale('fa');
+                Get.updateLocale(newLocale);
+                Navigator.pop(context); // بستن منو پس از انتخاب
+              },
+            ),
+          ],
+        ),
       ),
       body: Obx(() {
         final year = homeController.currentYear.value;
@@ -64,25 +103,25 @@ class CalendarView extends StatelessWidget {
               child: Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                    backgroundColor: colorScheme.primary.withOpacity(0.8),
                     child: Text(
                       '$day',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
                   ),
                   title: Text(
                     '${date.formatter.wN} ${date.day} ${date.formatter.mN} ${date.year}',
                     style: TextStyle(
-                      color: isFriday ? Theme.of(context).colorScheme.error : null,
+                      color: isFriday ? colorScheme.error : null,
                       fontWeight: isFriday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   subtitle: Text(
                     note,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   onTap: () => showModalBottomSheet(
