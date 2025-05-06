@@ -46,12 +46,19 @@ class Messages extends Translations {
       'failed_to_save_task': 'ذخیره وظیفه ناموفق بود',
       'personal_car_cost': 'هزینه خودرو شخصی',
       'invalid_cost': 'هزینه نمی‌تواند منفی باشد',
-      'disabled_for_non_working_leave': 'برای مرخصی‌های غیرکاری غیرفعال است', // کلید جدید
-      'light_theme': 'تم روشن', // جدید
-      'dark_theme': 'تم تاریک', // جدید
-      'persian': 'فارسی', // جدید
-      'english': 'انگلیسی', // جدید
-      'settings': 'تنظیمات', // جدید
+      'disabled_for_non_working_leave': 'برای مرخصی‌های غیرکاری غیرفعال است',
+      'light_theme': 'تم روشن',
+      'dark_theme': 'تم تاریک',
+      'persian': 'فارسی',
+      'english': 'انگلیسی',
+      'settings': 'تنظیمات',
+      'projects': 'پروژه‌ها',
+      'add_project': 'افزودن پروژه',
+      'edit_project': 'ویرایش پروژه',
+      'project_name': 'نام پروژه',
+      'security_level': 'سطح امنیتی',
+      'id': 'شناسه',
+      'cancel': 'لغو',
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -96,12 +103,19 @@ class Messages extends Translations {
       'failed_to_save_task': 'Failed to save task',
       'personal_car_cost': 'Personal car cost',
       'invalid_cost': 'Cost cannot be negative',
-      'disabled_for_non_working_leave': 'Disabled for non-working leave types', // کلید جدید
-      'light_theme': 'Light Theme', // جدید
-      'dark_theme': 'Dark Theme', // جدید
-      'persian': 'Persian', // جدید
-      'english': 'English', // جدید
-      'settings': 'Settings', // جدید
+      'disabled_for_non_working_leave': 'Disabled for non-working leave types',
+      'light_theme': 'Light Theme',
+      'dark_theme': 'Dark Theme',
+      'persian': 'Persian',
+      'english': 'English',
+      'settings': 'Settings',
+      'projects': 'Projects',
+      'add_project': 'Add Project',
+      'edit_project': 'Edit Project',
+      'project_name': 'Project Name',
+      'security_level': 'Security Level',
+      'id': 'ID',
+      'cancel': 'Cancel',
     },
   };
 }

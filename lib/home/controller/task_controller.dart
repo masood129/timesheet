@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:timesheet/home/api/home_api.dart';
 import '../model/task_model.dart';
 
 class TaskController extends GetxController {
@@ -19,8 +20,10 @@ class TaskController extends GetxController {
   final personalCarCostController = TextEditingController(); // کنترلر جدید
 
   final RxList<Rx<Project?>> selectedProjects = <Rx<Project?>>[].obs;
-  final RxList<TextEditingController> durationControllers = <TextEditingController>[].obs;
-  final RxList<TextEditingController> descriptionControllers = <TextEditingController>[].obs;
+  final RxList<TextEditingController> durationControllers =
+      <TextEditingController>[].obs;
+  final RxList<TextEditingController> descriptionControllers =
+      <TextEditingController>[].obs;
 
   @override
   void onInit() {
@@ -31,7 +34,9 @@ class TaskController extends GetxController {
 
   Future<void> fetchProjects() async {
     try {
-      projects.value = await taskService.fetchProjects();
+      var a  = await HomeApi().getProjects().then((value) {
+      projects.addAll(value) ;
+      });
     } catch (e) {
       Get.snackbar('error'.tr, 'failed_to_fetch_projects'.tr);
     }
@@ -44,18 +49,25 @@ class TaskController extends GetxController {
         leaveType.value = currentTask.value!.leaveType;
         arrivalTimeController.text = currentTask.value!.arrivalTime ?? '';
         leaveTimeController.text = currentTask.value!.leaveTime ?? '';
-        personalTimeController.text = currentTask.value!.personalTime?.toString() ?? '';
+        personalTimeController.text =
+            currentTask.value!.personalTime?.toString() ?? '';
         descriptionController.text = currentTask.value!.description ?? '';
         goCostController.text = currentTask.value!.goCost?.toString() ?? '';
-        returnCostController.text = currentTask.value!.returnCost?.toString() ?? '';
-        personalCarCostController.text = currentTask.value!.personalCarCost?.toString() ?? ''; // فیلد جدید
+        returnCostController.text =
+            currentTask.value!.returnCost?.toString() ?? '';
+        personalCarCostController.text =
+            currentTask.value!.personalCarCost?.toString() ?? ''; // فیلد جدید
         selectedProjects.clear();
         durationControllers.clear();
         descriptionControllers.clear();
         for (var task in currentTask.value!.tasks) {
           selectedProjects.add(Rx<Project?>(task.project));
-          durationControllers.add(TextEditingController(text: task.duration?.toString()));
-          descriptionControllers.add(TextEditingController(text: task.description));
+          durationControllers.add(
+            TextEditingController(text: task.duration?.toString()),
+          );
+          descriptionControllers.add(
+            TextEditingController(text: task.description),
+          );
         }
       }
     } catch (e) {
@@ -73,7 +85,10 @@ class TaskController extends GetxController {
     try {
       final parts = time.split(':');
       if (parts.length == 2) {
-        return Duration(hours: int.parse(parts[0]), minutes: int.parse(parts[1]));
+        return Duration(
+          hours: int.parse(parts[0]),
+          minutes: int.parse(parts[1]),
+        );
       }
     } catch (_) {}
     return null;
@@ -86,7 +101,8 @@ class TaskController extends GetxController {
     int totalTaskMinutes = durationControllers.fold(0, (sum, controller) {
       return sum + (int.tryParse(controller.text) ?? 0);
     });
-    final totalCost = (int.tryParse(goCostController.text) ?? 0) +
+    final totalCost =
+        (int.tryParse(goCostController.text) ?? 0) +
         (int.tryParse(returnCostController.text) ?? 0) +
         (int.tryParse(personalCarCostController.text) ?? 0);
 
@@ -99,7 +115,8 @@ class TaskController extends GetxController {
         content: Column(
           children: [
             Text(
-                '${'presence_duration'.tr}: ${presence.inHours} ${'hour'.tr} ${'and'.tr} ${presence.inMinutes % 60} ${'minute'.tr}'),
+              '${'presence_duration'.tr}: ${presence.inHours} ${'hour'.tr} ${'and'.tr} ${presence.inMinutes % 60} ${'minute'.tr}',
+            ),
             Text('${'effective_work'.tr}: $effective ${'minute'.tr}'),
             Text('${'task_total_time'.tr}: $totalTaskMinutes ${'minute'.tr}'),
             Text('${'total_cost'.tr}: $totalCost'), // نمایش مجموع هزینه‌ها
@@ -116,27 +133,39 @@ class TaskController extends GetxController {
     try {
       final task = Task(
         date: date,
-        arrivalTime: arrivalTimeController.text.isEmpty ? null : arrivalTimeController.text,
-        leaveTime: leaveTimeController.text.isEmpty ? null : leaveTimeController.text,
+        arrivalTime:
+            arrivalTimeController.text.isEmpty
+                ? null
+                : arrivalTimeController.text,
+        leaveTime:
+            leaveTimeController.text.isEmpty ? null : leaveTimeController.text,
         personalTime: int.tryParse(personalTimeController.text),
         leaveType: leaveType.value,
         tasks: List.generate(selectedProjects.length, (i) {
           return TaskDetail(
             project: selectedProjects[i].value,
             duration: int.tryParse(durationControllers[i].text),
-            description: descriptionControllers[i].text.isEmpty ? null : descriptionControllers[i].text,
+            description:
+                descriptionControllers[i].text.isEmpty
+                    ? null
+                    : descriptionControllers[i].text,
           );
         }),
-        description: descriptionController.text.isEmpty ? null : descriptionController.text,
+        description:
+            descriptionController.text.isEmpty
+                ? null
+                : descriptionController.text,
         goCost: int.tryParse(goCostController.text),
         returnCost: int.tryParse(returnCostController.text),
-        personalCarCost: int.tryParse(personalCarCostController.text), // فیلد جدید
+        personalCarCost: int.tryParse(
+          personalCarCostController.text,
+        ), // فیلد جدید
       );
       await taskService.saveTask(task);
       Get.back();
       Get.snackbar('success'.tr, 'وظیفه با موفقیت ذخیره شد'.tr);
     } catch (e) {
       Get.snackbar('error'.tr, 'failed_to_save_task'.tr);
-      }
-      }
+    }
+  }
 }

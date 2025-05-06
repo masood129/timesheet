@@ -128,7 +128,7 @@ class NoteDialog extends StatelessWidget {
                                       value: project,
                                       enabled: isEnabled,
                                       child: Text(
-                                        project.toString(),
+                                        project.projectName,
                                         style: TextStyle(
                                           color: isEnabled ? colorScheme.onSurface : disabledColor,
                                         ),

@@ -2,38 +2,34 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shamsi_date/shamsi_date.dart';
 
-
-class TaskModel {
-  final Jalali date;
-  final Map<String, String> fields; // داده‌های فیلدهای سفارشی
-
-  TaskModel({
-    required this.date,
-    required this.fields,
-  });
-}
-
 class Project {
-  final String code;
-  final String name;
+  final int id;
+  final String projectName;
+  final int securityLevel;
 
-  Project({required this.code, required this.name});
+  Project({
+    required this.id,
+    required this.projectName,
+    required this.securityLevel,
+  });
 
   factory Project.fromJson(Map<String, dynamic> json) {
     return Project(
-      code: json['code'],
-      name: json['name'],
+      id: json['Id'],
+      projectName: json['ProjectName'],
+      securityLevel: json['securityLevel'],
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'code': code,
-    'name': name,
-  };
-
-  @override
-  String toString() => name;
+  Map<String, dynamic> toJson() {
+    return {
+      'Id': id,
+      'ProjectName': projectName,
+      'securityLevel': securityLevel,
+    };
+  }
 }
+
 
 class Task {
   final Jalali date;
@@ -153,4 +149,14 @@ class TaskService {
       throw Exception('Failed to save task');
     }
   }
+}
+
+class TaskModel {
+  final Jalali date;
+  final Map<String, String> fields; // داده‌های فیلدهای سفارشی
+
+  TaskModel({
+    required this.date,
+    required this.fields,
+  });
 }
