@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-
 import '../model/task_model.dart';
 
 class TaskController extends GetxController {
@@ -17,6 +16,7 @@ class TaskController extends GetxController {
   final descriptionController = TextEditingController();
   final goCostController = TextEditingController();
   final returnCostController = TextEditingController();
+  final personalCarCostController = TextEditingController(); // کنترلر جدید
 
   final RxList<Rx<Project?>> selectedProjects = <Rx<Project?>>[].obs;
   final RxList<TextEditingController> durationControllers = <TextEditingController>[].obs;
@@ -48,6 +48,7 @@ class TaskController extends GetxController {
         descriptionController.text = currentTask.value!.description ?? '';
         goCostController.text = currentTask.value!.goCost?.toString() ?? '';
         returnCostController.text = currentTask.value!.returnCost?.toString() ?? '';
+        personalCarCostController.text = currentTask.value!.personalCarCost?.toString() ?? ''; // فیلد جدید
         selectedProjects.clear();
         durationControllers.clear();
         descriptionControllers.clear();
@@ -85,6 +86,9 @@ class TaskController extends GetxController {
     int totalTaskMinutes = durationControllers.fold(0, (sum, controller) {
       return sum + (int.tryParse(controller.text) ?? 0);
     });
+    final totalCost = (int.tryParse(goCostController.text) ?? 0) +
+        (int.tryParse(returnCostController.text) ?? 0) +
+        (int.tryParse(personalCarCostController.text) ?? 0);
 
     if (arrival != null && leave != null) {
       final presence = leave - arrival;
@@ -98,6 +102,7 @@ class TaskController extends GetxController {
                 '${'presence_duration'.tr}: ${presence.inHours} ${'hour'.tr} ${'and'.tr} ${presence.inMinutes % 60} ${'minute'.tr}'),
             Text('${'effective_work'.tr}: $effective ${'minute'.tr}'),
             Text('${'task_total_time'.tr}: $totalTaskMinutes ${'minute'.tr}'),
+            Text('${'total_cost'.tr}: $totalCost'), // نمایش مجموع هزینه‌ها
           ],
         ),
         confirm: ElevatedButton(onPressed: Get.back, child: Text('ok'.tr)),
@@ -125,12 +130,13 @@ class TaskController extends GetxController {
         description: descriptionController.text.isEmpty ? null : descriptionController.text,
         goCost: int.tryParse(goCostController.text),
         returnCost: int.tryParse(returnCostController.text),
+        personalCarCost: int.tryParse(personalCarCostController.text), // فیلد جدید
       );
       await taskService.saveTask(task);
       Get.back();
       Get.snackbar('success'.tr, 'وظیفه با موفقیت ذخیره شد'.tr);
     } catch (e) {
       Get.snackbar('error'.tr, 'failed_to_save_task'.tr);
-    }
-  }
+      }
+      }
 }

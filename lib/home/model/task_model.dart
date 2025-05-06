@@ -2,6 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shamsi_date/shamsi_date.dart';
 
+
+class TaskModel {
+  final Jalali date;
+  final Map<String, String> fields; // داده‌های فیلدهای سفارشی
+
+  TaskModel({
+    required this.date,
+    required this.fields,
+  });
+}
+
 class Project {
   final String code;
   final String name;
@@ -34,6 +45,7 @@ class Task {
   final String? description;
   final int? goCost;
   final int? returnCost;
+  final int? personalCarCost; // فیلد جدید
 
   Task({
     required this.date,
@@ -45,10 +57,10 @@ class Task {
     this.description,
     this.goCost,
     this.returnCost,
+    this.personalCarCost, // فیلد جدید
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
-    // فرض می‌کنیم تاریخ به صورت رشته‌ای مانند "YYYY-MM-DD" دریافت می‌شود
     final dateStr = json['date'] as String;
     final parts = dateStr.split('-').map(int.parse).toList();
     final gregorian = Gregorian(parts[0], parts[1], parts[2]);
@@ -62,12 +74,12 @@ class Task {
       description: json['description'],
       goCost: json['goCost'],
       returnCost: json['returnCost'],
+      personalCarCost: json['personalCarCost'], // فیلد جدید
     );
   }
 
   Map<String, dynamic> toJson() {
     final gregorian = date.toGregorian();
-    // تبدیل تاریخ به رشته در فرمت YYYY-MM-DD
     final dateStr =
         '${gregorian.year}-${gregorian.month.toString().padLeft(2, '0')}-${gregorian.day.toString().padLeft(2, '0')}';
     return {
@@ -80,6 +92,7 @@ class Task {
       'description': description,
       'goCost': goCost,
       'returnCost': returnCost,
+      'personalCarCost': personalCarCost, // فیلد جدید
     };
   }
 }

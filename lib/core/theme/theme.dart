@@ -25,6 +25,7 @@ ThemeData mainTheme = ThemeData(
     surface: Colors.white,
     onSurface: Colors.black87,
   ),
+  disabledColor: Colors.grey[500], // تعریف disabledColor برای تم روشن
   scaffoldBackgroundColor: Colors.grey[100],
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.teal,
@@ -38,8 +39,13 @@ ThemeData mainTheme = ThemeData(
   switchTheme: SwitchThemeData(
     thumbColor: MaterialStateProperty.all(Colors.amber),
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+    filled: true,
+    fillColor: Colors.transparent, // پیش‌فرض شفاف برای حالت فعال
+  ),
 );
-
 
 ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   colorScheme: ColorScheme.fromSeed(
@@ -53,6 +59,7 @@ ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     surface: Colors.grey[850],
     onSurface: Colors.white70,
   ),
+  disabledColor: Colors.grey[700], // تعریف disabledColor برای تم تاریک
   scaffoldBackgroundColor: Colors.black,
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.deepOrange,
@@ -65,5 +72,11 @@ ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
   ),
   switchTheme: SwitchThemeData(
     thumbColor: MaterialStateProperty.all(Colors.amber),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+    filled: true,
+    fillColor: Colors.transparent, // پیش‌فرض شفاف برای حالت فعال
   ),
 );

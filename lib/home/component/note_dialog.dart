@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import '../../core/theme/app_styles.dart';
 import '../controller/task_controller.dart';
 import '../model/task_model.dart';
 
@@ -16,15 +17,7 @@ class NoteDialog extends StatelessWidget {
     controller.fetchTask(date); // بارگذاری داده‌های وظیفه برای تاریخ
 
     final colorScheme = Theme.of(context).colorScheme;
-
-    InputDecoration buildInputDecoration(String labelKey, IconData icon) {
-      return InputDecoration(
-        labelText: labelKey.tr,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      );
-    }
+    final disabledColor = Theme.of(context).disabledColor; // اضافه کردن disabledColor
 
     Widget buildTimePickerField(
         String labelKey,
@@ -32,25 +25,25 @@ class NoteDialog extends StatelessWidget {
         IconData icon,
         bool isEnabled,
         ) {
-      return TextField(
-        readOnly: true,
-        controller: controller,
-        enabled: isEnabled,
-        decoration: buildInputDecoration(labelKey, icon).copyWith(
-          filled: true,
-          fillColor: isEnabled ? null : Colors.grey[300],
-        ),
-        onTap: isEnabled
-            ? () async {
-          final picked = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.now(),
-          );
-          if (picked != null) {
-            controller.text = '${picked.hour}:${picked.minute.toString().padLeft(2, '0')}';
+      return Tooltip(
+        message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+        child: TextField(
+          readOnly: true,
+          controller: controller,
+          enabled: isEnabled,
+          decoration: AppStyles.inputDecoration(context, labelKey, icon, isEnabled),
+          onTap: isEnabled
+              ? () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+            );
+            if (picked != null) {
+              controller.text = '${picked.hour}:${picked.minute.toString().padLeft(2, '0')}';
+            }
           }
-        }
-            : null,
+              : null,
+        ),
       );
     }
 
@@ -115,6 +108,7 @@ class NoteDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ...List.generate(controller.selectedProjects.length, (i) {
+                  final isEnabled = controller.leaveType.value == 'کاری';
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
@@ -123,49 +117,67 @@ class NoteDialog extends StatelessWidget {
                           children: [
                             Expanded(
                               flex: 2,
-                              child: DropdownButtonFormField<Project>(
-                                value: controller.selectedProjects[i].value,
-                                hint: Text('select_project'.tr),
-                                decoration: buildInputDecoration('select_project', Icons.work),
-                                items: controller.projects.map((project) {
-                                  return DropdownMenuItem(
-                                    value: project,
-                                    enabled: controller.leaveType.value == 'کاری',
-                                    child: Text(project.toString()),
-                                  );
-                                }).toList(),
-                                onChanged: controller.leaveType.value == 'کاری'
-                                    ? (val) => controller.selectedProjects[i].value = val
-                                    : null,
+                              child: Tooltip(
+                                message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+                                child: DropdownButtonFormField<Project>(
+                                  value: controller.selectedProjects[i].value,
+                                  hint: Text('select_project'.tr, style: TextStyle(color: disabledColor)),
+                                  decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled),
+                                  items: controller.projects.map<DropdownMenuItem<Project>>((project) {
+                                    return DropdownMenuItem<Project>(
+                                      value: project,
+                                      enabled: isEnabled,
+                                      child: Text(
+                                        project.toString(),
+                                        style: TextStyle(
+                                          color: isEnabled ? colorScheme.onSurface : disabledColor,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: isEnabled ? (val) => controller.selectedProjects[i].value = val : null,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               flex: 1,
-                              child: TextField(
-                                controller: controller.durationControllers[i],
-                                keyboardType: TextInputType.number,
-                                enabled: controller.leaveType.value == 'کاری',
-                                decoration: buildInputDecoration('task_minutes', Icons.timer),
+                              child: Tooltip(
+                                message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+                                child: TextField(
+                                  controller: controller.durationControllers[i],
+                                  keyboardType: TextInputType.number,
+                                  enabled: isEnabled,
+                                  decoration: AppStyles.inputDecoration(context, 'task_minutes', Icons.timer, isEnabled),
+                                ),
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
+                              icon: Icon(Icons.delete, color: isEnabled ? Colors.red : disabledColor),
+                              onPressed: isEnabled
+                                  ? () {
                                 controller.selectedProjects.removeAt(i);
                                 controller.durationControllers.removeAt(i);
                                 controller.descriptionControllers.removeAt(i);
-                              },
+                              }
+                                  : null,
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        TextField(
-                          controller: controller.descriptionControllers[i],
-                          maxLines: 2,
-                          enabled: controller.leaveType.value == 'کاری',
-                          decoration:
-                          buildInputDecoration('task_description_optional', Icons.description),
+                        Tooltip(
+                          message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+                          child: TextField(
+                            controller: controller.descriptionControllers[i],
+                            maxLines: 2,
+                            enabled: isEnabled,
+                            decoration: AppStyles.inputDecoration(
+                              context,
+                              'task_description_optional',
+                              Icons.description,
+                              isEnabled,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -174,60 +186,104 @@ class NoteDialog extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(
-                    onPressed:
-                    controller.leaveType.value == 'کاری' ? controller.addTaskRow : null,
-                    icon: const Icon(Icons.add),
-                    label: Text('add_task'.tr),
+                    onPressed: controller.leaveType.value == 'کاری' ? controller.addTaskRow : null,
+                    icon: Icon(Icons.add, color: controller.leaveType.value == 'کاری' ? colorScheme.primary : disabledColor),
+                    label: Text(
+                      'add_task'.tr,
+                      style: TextStyle(
+                        color: controller.leaveType.value == 'کاری' ? colorScheme.primary : disabledColor,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                TextField(
-                  controller: controller.personalTimeController,
-                  decoration: buildInputDecoration('personal_time', Icons.person),
-                  keyboardType: TextInputType.number,
-                  enabled: controller.leaveType.value == 'کاری',
+                Tooltip(
+                  message: controller.leaveType.value == 'کاری' ? '' : 'disabled_for_non_working_leave'.tr,
+                  child: TextField(
+                    controller: controller.personalTimeController,
+                    keyboardType: TextInputType.number,
+                    enabled: controller.leaveType.value == 'کاری',
+                    decoration: AppStyles.inputDecoration(
+                      context,
+                      'personal_time',
+                      Icons.person,
+                      controller.leaveType.value == 'کاری',
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: controller.leaveType.value.isEmpty ? null : controller.leaveType.value,
-                  hint: Text('leave_type'.tr),
-                  decoration: buildInputDecoration('leave_type', Icons.leave_bags_at_home),
-                  items: ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
+                  hint: Text('leave_type'.tr, style: TextStyle(color: disabledColor)),
+                  decoration: AppStyles.inputDecoration(context, 'leave_type', Icons.leave_bags_at_home, true),
+                  items: ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه'].map((e) {
+                    return DropdownMenuItem(
+                      value: e,
+                      child: Text(e, style: TextStyle(color: colorScheme.onSurface)),
+                    );
+                  }).toList(),
                   onChanged: (val) => controller.leaveType.value = val ?? '',
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: controller.descriptionController,
-                  decoration: buildInputDecoration('note_optional', Icons.note),
-                  maxLines: 2,
-                  enabled: controller.leaveType.value == 'کاری',
+                Tooltip(
+                  message: controller.leaveType.value == 'کاری' ? '' : 'disabled_for_non_working_leave'.tr,
+                  child: TextField(
+                    controller: controller.descriptionController,
+                    maxLines: 2,
+                    enabled: controller.leaveType.value == 'کاری',
+                    decoration: AppStyles.inputDecoration(context, 'note_optional', Icons.note, controller.leaveType.value == 'کاری'),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        controller: controller.goCostController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration: buildInputDecoration('go_cost', Icons.directions_bus),
-                        enabled: controller.leaveType.value == 'کاری',
+                      child: Tooltip(
+                        message: controller.leaveType.value == 'کاری' ? '' : 'disabled_for_non_working_leave'.tr,
+                        child: TextField(
+                          controller: controller.goCostController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          enabled: controller.leaveType.value == 'کاری',
+                          decoration: AppStyles.inputDecoration(context, 'go_cost', Icons.directions_bus, controller.leaveType.value == 'کاری'),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: TextField(
-                        controller: controller.returnCostController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        decoration:
-                        buildInputDecoration('return_cost', Icons.directions_bus_filled),
-                        enabled: controller.leaveType.value == 'کاری',
+                      child: Tooltip(
+                        message: controller.leaveType.value == 'کاری' ? '' : 'disabled_for_non_working_leave'.tr,
+                        child: TextField(
+                          controller: controller.returnCostController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          enabled: controller.leaveType.value == 'کاری',
+                          decoration: AppStyles.inputDecoration(
+                            context,
+                            'return_cost',
+                            Icons.directions_bus_filled,
+                            controller.leaveType.value == 'کاری',
+                          ),
+                        ),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                Tooltip(
+                  message: controller.leaveType.value == 'کاری' ? '' : 'disabled_for_non_working_leave'.tr,
+                  child: TextField(
+                    controller: controller.personalCarCostController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    enabled: controller.leaveType.value == 'کاری',
+                    decoration: AppStyles.inputDecoration(context, 'personal_car_cost', Icons.directions_car, controller.leaveType.value == 'کاری').copyWith(
+                      errorText: int.tryParse(controller.personalCarCostController.text) != null &&
+                          int.parse(controller.personalCarCostController.text) < 0
+                          ? 'invalid_cost'.tr
+                          : null,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -235,16 +291,18 @@ class NoteDialog extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: controller.calculateStats,
-                        icon: const Icon(Icons.calculate),
-                        label: Text('calculate'.tr),
+                        icon: Icon(Icons.calculate, color: colorScheme.onPrimary),
+                        label: Text('calculate'.tr, style: TextStyle(color: colorScheme.onPrimary)),
+                        style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () => controller.saveTask(date),
-                        icon: const Icon(Icons.save),
-                        label: Text('save'.tr),
+                        icon: Icon(Icons.save, color: colorScheme.onPrimary),
+                        label: Text('save'.tr, style: TextStyle(color: colorScheme.onPrimary)),
+                        style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
                       ),
                     ),
                   ],

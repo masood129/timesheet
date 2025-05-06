@@ -44,6 +44,9 @@ class Messages extends Translations {
       'failed_to_fetch_projects': 'دریافت پروژه‌ها ناموفق بود',
       'failed_to_fetch_task': 'دریافت اطلاعات وظیفه ناموفق بود',
       'failed_to_save_task': 'ذخیره وظیفه ناموفق بود',
+      'personal_car_cost': 'هزینه خودرو شخصی',
+      'invalid_cost': 'هزینه نمی‌تواند منفی باشد',
+      'disabled_for_non_working_leave': 'برای مرخصی‌های غیرکاری غیرفعال است', // کلید جدید
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -86,6 +89,9 @@ class Messages extends Translations {
       'failed_to_fetch_projects': 'Failed to fetch projects',
       'failed_to_fetch_task': 'Failed to fetch task details',
       'failed_to_save_task': 'Failed to save task',
+      'personal_car_cost': 'Personal car cost',
+      'invalid_cost': 'Cost cannot be negative',
+      'disabled_for_non_working_leave': 'Disabled for non-working leave types', // کلید جدید
     },
   };
 }
