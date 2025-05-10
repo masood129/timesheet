@@ -1,13 +1,22 @@
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import '../api/home_api.dart';
+import '../model/daily_detail_model.dart';
 
 class HomeController extends GetxController {
   final CalendarModel calendarModel = CalendarModel();
 
   var currentMonth = Jalali.now().month.obs;
   var currentYear = Jalali.now().year.obs;
+  var dailyDetails = <DailyDetail>[].obs;
 
   int get daysInMonth => calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchMonthlyDetails();
+  }
 
   void setNoteForDate(Jalali date, String note) {
     calendarModel.setNoteForDate(date, note);
@@ -24,6 +33,7 @@ class HomeController extends GetxController {
     } else {
       currentMonth.value += 1;
     }
+    fetchMonthlyDetails();
   }
 
   void previousMonth() {
@@ -32,6 +42,16 @@ class HomeController extends GetxController {
       currentYear.value -= 1;
     } else {
       currentMonth.value -= 1;
+    }
+    fetchMonthlyDetails();
+  }
+
+  Future<void> fetchMonthlyDetails() async {
+    try {
+      final details = await HomeApi().getMonthlyDetails(currentYear.value, currentMonth.value, 1); // فرض userId=1
+      dailyDetails.assignAll(details);
+    } catch (e) {
+      Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
     }
   }
 }

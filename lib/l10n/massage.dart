@@ -59,6 +59,14 @@ class Messages extends Translations {
       'security_level': 'سطح امنیتی',
       'id': 'شناسه',
       'cancel': 'لغو',
+      'monthly_details': 'جزئیات ماهانه',
+      'no_details': 'هیچ جزئیاتی موجود نیست',
+      'no_leave_type': 'بدون نوع مرخصی',
+      'description': 'توضیحات',
+      'no_description': 'بدون توضیحات',
+      'details_saved': 'جزئیات با موفقیت ذخیره شد',
+      'failed_to_save_details': 'ذخیره جزئیات ناموفق بود',
+      'failed_to_fetch_details': 'دریافت جزئیات ناموفق بود',
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -116,6 +124,15 @@ class Messages extends Translations {
       'security_level': 'Security Level',
       'id': 'ID',
       'cancel': 'Cancel',
+
+      'monthly_details': 'Monthly Details',
+      'no_details': 'No details available',
+      'no_leave_type': 'No leave type',
+      'description': 'Description',
+      'no_description': 'No description',
+      'details_saved': 'Details saved successfully',
+      'failed_to_save_details': 'Failed to save details',
+      'failed_to_fetch_details': 'Failed to fetch details',
     },
   };
 }

@@ -14,10 +14,9 @@ class NoteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(TaskController());
-    controller.fetchTask(date); // بارگذاری داده‌های وظیفه برای تاریخ
-
+    controller.loadDailyDetail(date); // Load data for the selected date
     final colorScheme = Theme.of(context).colorScheme;
-    final disabledColor = Theme.of(context).disabledColor; // اضافه کردن disabledColor
+    final disabledColor = Theme.of(context).disabledColor;
 
     Widget buildTimePickerField(
         String labelKey,
@@ -230,7 +229,7 @@ class NoteDialog extends StatelessWidget {
                   child: TextField(
                     controller: controller.descriptionController,
                     maxLines: 2,
-                    enabled: controller.leaveType.value == 'کاری',
+                    enabled: controller.leaveType.value == 'کاری beacons',
                     decoration: AppStyles.inputDecoration(context, 'note_optional', Icons.note, controller.leaveType.value == 'کاری'),
                   ),
                 ),
@@ -299,7 +298,7 @@ class NoteDialog extends StatelessWidget {
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => controller.saveTask(date),
+                        onPressed: controller.saveDailyDetail,
                         icon: Icon(Icons.save, color: colorScheme.onPrimary),
                         label: Text('save'.tr, style: TextStyle(color: colorScheme.onPrimary)),
                         style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),

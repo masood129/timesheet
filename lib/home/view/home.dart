@@ -4,6 +4,7 @@ import 'package:shamsi_date/shamsi_date.dart';
 import '../../core/theme/theme.dart';
 import '../component/note_dialog.dart';
 import '../controller/home_controller.dart';
+import 'monthly_details_view.dart';
 
 class CalendarView extends StatelessWidget {
   CalendarView({super.key});
@@ -31,6 +32,10 @@ class CalendarView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_forward),
             onPressed: homeController.nextMonth,
+          ),
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: () => Get.to(() => MonthlyDetailsView()),
           ),
         ],
       ),
@@ -62,7 +67,7 @@ class CalendarView extends StatelessWidget {
               ),
               onTap: () {
                 themeController.toggleTheme(!themeController.isDark.value);
-                Navigator.pop(context); // بستن منو پس از انتخاب
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -79,7 +84,7 @@ class CalendarView extends StatelessWidget {
                     ? const Locale('en')
                     : const Locale('fa');
                 Get.updateLocale(newLocale);
-                Navigator.pop(context); // بستن منو پس از انتخاب
+                Navigator.pop(context);
               },
             ),
           ],

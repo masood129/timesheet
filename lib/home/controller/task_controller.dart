@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/api/home_api.dart';
-import '../api/project_api.dart';
+import '../model/daily_detail_model.dart';
 import '../model/project_model.dart';
 import '../model/task_model.dart';
+import 'home_controller.dart';
 
 class TaskController extends GetxController {
-  final TaskService taskService = TaskService();
-
   final RxList<Project> projects = <Project>[].obs;
-  final Rx<Task?> currentTask = Rx<Task?>(null);
+  final Rx<DailyDetail?> currentDetail = Rx<DailyDetail?>(null);
   final RxString leaveType = 'کاری'.obs;
 
   final arrivalTimeController = TextEditingController();
@@ -19,68 +18,124 @@ class TaskController extends GetxController {
   final descriptionController = TextEditingController();
   final goCostController = TextEditingController();
   final returnCostController = TextEditingController();
-  final personalCarCostController = TextEditingController(); // کنترلر جدید
+  final personalCarCostController = TextEditingController();
 
   final RxList<Rx<Project?>> selectedProjects = <Rx<Project?>>[].obs;
-  final RxList<TextEditingController> durationControllers =
-      <TextEditingController>[].obs;
-  final RxList<TextEditingController> descriptionControllers =
-      <TextEditingController>[].obs;
+  final RxList<TextEditingController> durationControllers = <TextEditingController>[].obs;
+  final RxList<TextEditingController> descriptionControllers = <TextEditingController>[].obs;
+
+  Jalali? currentDate;
 
   @override
   void onInit() {
     super.onInit();
     fetchProjects();
-    addTaskRow();
   }
 
   Future<void> fetchProjects() async {
     try {
-      await HomeApi().getProjects().then((value) {
-      projects.addAll(value) ;
-      });
+      final value = await HomeApi().getProjects();
+      projects.assignAll(value);
     } catch (e) {
       Get.snackbar('error'.tr, 'failed_to_fetch_projects'.tr);
     }
   }
 
-  Future<void> fetchTask(Jalali date) async {
+  Future<void> loadDailyDetail(Jalali date) async {
+    currentDate = date;
     try {
-      currentTask.value = await taskService.fetchTask(date);
-      if (currentTask.value != null) {
-        leaveType.value = currentTask.value!.leaveType;
-        arrivalTimeController.text = currentTask.value!.arrivalTime ?? '';
-        leaveTimeController.text = currentTask.value!.leaveTime ?? '';
-        personalTimeController.text =
-            currentTask.value!.personalTime?.toString() ?? '';
-        descriptionController.text = currentTask.value!.description ?? '';
-        goCostController.text = currentTask.value!.goCost?.toString() ?? '';
-        returnCostController.text =
-            currentTask.value!.returnCost?.toString() ?? '';
-        personalCarCostController.text =
-            currentTask.value!.personalCarCost?.toString() ?? ''; // فیلد جدید
-        selectedProjects.clear();
-        durationControllers.clear();
-        descriptionControllers.clear();
-        for (var task in currentTask.value!.tasks) {
-          selectedProjects.add(Rx<Project?>(task.project));
-          durationControllers.add(
-            TextEditingController(text: task.duration?.toString()),
-          );
-          descriptionControllers.add(
-            TextEditingController(text: task.description),
-          );
-        }
+      final detail = await HomeApi().getDailyDetail(date.toDateTime().toIso8601String().split('T')[0], 1); // فرض userId=1
+      currentDetail.value = detail;
+
+      // Clear previous data
+      selectedProjects.clear();
+      durationControllers.clear();
+      descriptionControllers.clear();
+
+      // Populate fields
+      arrivalTimeController.text = detail?.arrivalTime ?? '';
+      leaveTimeController.text = detail?.leaveTime ?? '';
+      personalTimeController.text = detail?.personalTime?.toString() ?? '';
+      descriptionController.text = detail?.description ?? '';
+      goCostController.text = detail?.goCost?.toString() ?? '';
+      returnCostController.text = detail?.returnCost?.toString() ?? '';
+      personalCarCostController.text = detail?.personalCarCost?.toString() ?? '';
+      leaveType.value = detail?.leaveType ?? 'کاری';
+
+      // Populate tasks
+      for (final task in detail?.tasks ?? []) {
+        final project = projects.firstWhereOrNull((p) => p.id == task.projectId);
+        selectedProjects.add(Rx<Project?>(project));
+        durationControllers.add(TextEditingController(text: task.duration?.toString() ?? ''));
+        descriptionControllers.add(TextEditingController(text: task.description ?? ''));
+      }
+
+      if (selectedProjects.isEmpty) {
+        addTaskRow();
       }
     } catch (e) {
-      Get.snackbar('error'.tr, 'failed_to_fetch_task'.tr);
+      currentDetail.value = null;
+      clearFields();
+      Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
     }
+  }
+
+  void clearFields() {
+    arrivalTimeController.clear();
+    leaveTimeController.clear();
+    personalTimeController.clear();
+    descriptionController.clear();
+    goCostController.clear();
+    returnCostController.clear();
+    personalCarCostController.clear();
+    leaveType.value = 'کاری';
+    selectedProjects.clear();
+    durationControllers.clear();
+    descriptionControllers.clear();
+    addTaskRow();
   }
 
   void addTaskRow() {
     selectedProjects.add(Rx<Project?>(null));
     durationControllers.add(TextEditingController());
     descriptionControllers.add(TextEditingController());
+  }
+
+  Future<void> saveDailyDetail() async {
+    if (currentDate == null) return;
+
+    final tasks = <Task>[];
+    for (int i = 0; i < selectedProjects.length; i++) {
+      if (selectedProjects[i].value != null) {
+        tasks.add(Task(
+          projectId: selectedProjects[i].value!.id,
+          duration: int.tryParse(durationControllers[i].text),
+          description: descriptionControllers[i].text,
+        ));
+      }
+    }
+
+    final detail = DailyDetail(
+      date: currentDate!.toDateTime().toIso8601String().split('T')[0],
+      userId: 1, // فرض userId=1
+      arrivalTime: arrivalTimeController.text,
+      leaveTime: leaveTimeController.text,
+      leaveType: leaveType.value,
+      personalTime: int.tryParse(personalTimeController.text),
+      description: descriptionController.text,
+      goCost: int.tryParse(goCostController.text),
+      returnCost: int.tryParse(returnCostController.text),
+      personalCarCost: int.tryParse(personalCarCostController.text),
+      tasks: tasks,
+    );
+
+    try {
+      await HomeApi().saveDailyDetail(detail);
+      Get.snackbar('success'.tr, 'details_saved'.tr);
+      Get.find<HomeController>().fetchMonthlyDetails();
+    } catch (e) {
+      Get.snackbar('error'.tr, 'failed_to_save_details'.tr);
+    }
   }
 
   Duration? parseTime(String time) {
@@ -103,8 +158,7 @@ class TaskController extends GetxController {
     int totalTaskMinutes = durationControllers.fold(0, (sum, controller) {
       return sum + (int.tryParse(controller.text) ?? 0);
     });
-    final totalCost =
-        (int.tryParse(goCostController.text) ?? 0) +
+    final totalCost = (int.tryParse(goCostController.text) ?? 0) +
         (int.tryParse(returnCostController.text) ?? 0) +
         (int.tryParse(personalCarCostController.text) ?? 0);
 
@@ -121,53 +175,13 @@ class TaskController extends GetxController {
             ),
             Text('${'effective_work'.tr}: $effective ${'minute'.tr}'),
             Text('${'task_total_time'.tr}: $totalTaskMinutes ${'minute'.tr}'),
-            Text('${'total_cost'.tr}: $totalCost'), // نمایش مجموع هزینه‌ها
+            Text('${'total_cost'.tr}: $totalCost'),
           ],
         ),
         confirm: ElevatedButton(onPressed: Get.back, child: Text('ok'.tr)),
       );
     } else {
       Get.snackbar('error'.tr, 'error_arrival_leave'.tr);
-    }
-  }
-
-  Future<void> saveTask(Jalali date) async {
-    try {
-      final task = Task(
-        date: date,
-        arrivalTime:
-            arrivalTimeController.text.isEmpty
-                ? null
-                : arrivalTimeController.text,
-        leaveTime:
-            leaveTimeController.text.isEmpty ? null : leaveTimeController.text,
-        personalTime: int.tryParse(personalTimeController.text),
-        leaveType: leaveType.value,
-        tasks: List.generate(selectedProjects.length, (i) {
-          return TaskDetail(
-            project: selectedProjects[i].value,
-            duration: int.tryParse(durationControllers[i].text),
-            description:
-                descriptionControllers[i].text.isEmpty
-                    ? null
-                    : descriptionControllers[i].text,
-          );
-        }),
-        description:
-            descriptionController.text.isEmpty
-                ? null
-                : descriptionController.text,
-        goCost: int.tryParse(goCostController.text),
-        returnCost: int.tryParse(returnCostController.text),
-        personalCarCost: int.tryParse(
-          personalCarCostController.text,
-        ), // فیلد جدید
-      );
-      await taskService.saveTask(task);
-      Get.back();
-      Get.snackbar('success'.tr, 'وظیفه با موفقیت ذخیره شد'.tr);
-    } catch (e) {
-      Get.snackbar('error'.tr, 'failed_to_save_task'.tr);
     }
   }
 }
