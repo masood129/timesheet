@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../core/theme/app_styles.dart';
 import '../controller/task_controller.dart';
-import '../model/task_model.dart';
+import '../model/project_model.dart';
 
 class NoteDialog extends StatelessWidget {
   final Jalali date;

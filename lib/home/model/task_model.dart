@@ -1,34 +1,7 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:timesheet/home/model/project_model.dart';
 
-class Project {
-  final int id;
-  final String projectName;
-  final int securityLevel;
-
-  Project({
-    required this.id,
-    required this.projectName,
-    required this.securityLevel,
-  });
-
-  factory Project.fromJson(Map<String, dynamic> json) {
-    return Project(
-      id: json['Id'],
-      projectName: json['ProjectName'],
-      securityLevel: json['securityLevel'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'Id': id,
-      'ProjectName': projectName,
-      'securityLevel': securityLevel,
-    };
-  }
-}
 
 
 class Task {
@@ -113,50 +86,4 @@ class TaskDetail {
     'duration': duration,
     'description': description,
   };
-}
-
-class TaskService {
-  final String baseUrl = 'https://api.example.com';
-
-  Future<List<Project>> fetchProjects() async {
-    final response = await http.get(Uri.parse('$baseUrl/projects'));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => Project.fromJson(e)).toList();
-    }
-    throw Exception('Failed to load projects');
-  }
-
-  Future<Task?> fetchTask(Jalali date) async {
-    final gregorianDate = date.toGregorian();
-    final dateStr =
-        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
-    final response = await http.get(Uri.parse('$baseUrl/tasks?date=$dateStr'));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return Task.fromJson(data);
-    }
-    return null;
-  }
-
-  Future<void> saveTask(Task task) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/tasks'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(task.toJson()),
-    );
-    if (response.statusCode != 201) {
-      throw Exception('Failed to save task');
-    }
-  }
-}
-
-class TaskModel {
-  final Jalali date;
-  final Map<String, String> fields; // داده‌های فیلدهای سفارشی
-
-  TaskModel({
-    required this.date,
-    required this.fields,
-  });
 }

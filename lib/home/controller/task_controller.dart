@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/api/home_api.dart';
+import '../api/project_api.dart';
+import '../model/project_model.dart';
 import '../model/task_model.dart';
 
 class TaskController extends GetxController {
@@ -34,7 +36,7 @@ class TaskController extends GetxController {
 
   Future<void> fetchProjects() async {
     try {
-      var a  = await HomeApi().getProjects().then((value) {
+      await HomeApi().getProjects().then((value) {
       projects.addAll(value) ;
       });
     } catch (e) {

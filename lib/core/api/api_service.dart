@@ -55,4 +55,39 @@ class CoreApi {
       return null;
     }
   }
+
+  Future<http.Response?> patch(
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async{
+    try {
+      return await _client.patch(
+          url,
+          headers: headers ?? {},
+          body: body ?? {}
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  Future<http.Response?> put(
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async{
+    try {
+      return await _client.put(
+          url,
+          headers: headers ?? {},
+          body: body ?? {}
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
 }
