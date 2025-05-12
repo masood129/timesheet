@@ -1,8 +1,5 @@
-
-
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http ;
+import 'package:http/http.dart' as http;
 
 class CoreApi {
   final _client = http.Client();
@@ -12,12 +9,15 @@ class CoreApi {
         Map<String, String>? headers,
       }) async {
     try {
-      return await _client.get(
-        url,
-        headers: headers ?? {},
-      );
+      debugPrint('GET => $url');
+      debugPrint('Headers: ${headers ?? {}}');
+
+      final response = await _client.get(url, headers: headers ?? {});
+
+      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('GET Error: $e');
       return null;
     }
   }
@@ -26,15 +26,19 @@ class CoreApi {
       Uri url, {
         Map<String, String>? headers,
         Object? body,
-      }) async{
+      }) async {
     try {
-      return await _client.post(
-          url,
-          headers: headers ?? {},
-          body: body ?? {}
-      );
+      debugPrint('POST => $url');
+      debugPrint('Headers: ${headers ?? {}}');
+      debugPrint('Body: $body');
+
+      final response =
+      await _client.post(url, headers: headers ?? {}, body: body ?? {});
+
+      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('POST Error: $e');
       return null;
     }
   }
@@ -43,15 +47,19 @@ class CoreApi {
       Uri url, {
         Map<String, String>? headers,
         Object? body,
-      }) async{
+      }) async {
     try {
-      return await _client.delete(
-          url,
-          headers: headers ?? {},
-          body: body ?? {}
-      );
+      debugPrint('DELETE => $url');
+      debugPrint('Headers: ${headers ?? {}}');
+      debugPrint('Body: $body');
+
+      final response =
+      await _client.delete(url, headers: headers ?? {}, body: body ?? {});
+
+      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('DELETE Error: $e');
       return null;
     }
   }
@@ -60,15 +68,19 @@ class CoreApi {
       Uri url, {
         Map<String, String>? headers,
         Object? body,
-      }) async{
+      }) async {
     try {
-      return await _client.patch(
-          url,
-          headers: headers ?? {},
-          body: body ?? {}
-      );
+      debugPrint('PATCH => $url');
+      debugPrint('Headers: ${headers ?? {}}');
+      debugPrint('Body: $body');
+
+      final response =
+      await _client.patch(url, headers: headers ?? {}, body: body ?? {});
+
+      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('PATCH Error: $e');
       return null;
     }
   }
@@ -77,17 +89,20 @@ class CoreApi {
       Uri url, {
         Map<String, String>? headers,
         Object? body,
-      }) async{
+      }) async {
     try {
-      return await _client.put(
-          url,
-          headers: headers ?? {},
-          body: body ?? {}
-      );
+      debugPrint('PUT => $url');
+      debugPrint('Headers: ${headers ?? {}}');
+      debugPrint('Body: $body');
+
+      final response =
+      await _client.put(url, headers: headers ?? {}, body: body ?? {});
+
+      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      return response;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('PUT Error: $e');
       return null;
     }
   }
-
 }

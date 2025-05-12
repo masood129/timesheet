@@ -124,7 +124,6 @@ class Messages extends Translations {
       'security_level': 'Security Level',
       'id': 'ID',
       'cancel': 'Cancel',
-
       'monthly_details': 'Monthly Details',
       'no_details': 'No details available',
       'no_leave_type': 'No leave type',

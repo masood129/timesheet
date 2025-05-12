@@ -109,7 +109,7 @@ class NoteDialog extends StatelessWidget {
                 ...List.generate(controller.selectedProjects.length, (i) {
                   final isEnabled = controller.leaveType.value == 'کاری';
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Column(
                       children: [
                         Row(
@@ -163,12 +163,12 @@ class NoteDialog extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 16),
                         Tooltip(
                           message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
                           child: TextField(
                             controller: controller.descriptionControllers[i],
-                            maxLines: 2,
+                            maxLines: 1,
                             enabled: isEnabled,
                             decoration: AppStyles.inputDecoration(
                               context,
@@ -229,7 +229,7 @@ class NoteDialog extends StatelessWidget {
                   child: TextField(
                     controller: controller.descriptionController,
                     maxLines: 2,
-                    enabled: controller.leaveType.value == 'کاری beacons',
+                    enabled: controller.leaveType.value == 'کاری',
                     decoration: AppStyles.inputDecoration(context, 'note_optional', Icons.note, controller.leaveType.value == 'کاری'),
                   ),
                 ),

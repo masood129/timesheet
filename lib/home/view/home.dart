@@ -130,6 +130,7 @@ class CalendarView extends StatelessWidget {
                     ),
                   ),
                   onTap: () => showModalBottomSheet(
+                    enableDrag: false,
                     isScrollControlled: true,
                     context: context,
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
