@@ -89,6 +89,29 @@ class TaskController extends GetxController {
     }
   }
 
+  String _minutesToHHMM(int? minutes) {
+    if (minutes == null || minutes <= 0) return '00:00';
+    final hours = minutes ~/ 60;
+    final mins = minutes % 60;
+    return '${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}';
+  }
+
+  int? _hhmmToMinutes(String? time) {
+    if (time == null ||
+        time.isEmpty ||
+        !RegExp(r'^\d{2}:\d{2}$').hasMatch(time)) {
+      return null;
+    }
+    try {
+      final parts = time.split(':');
+      final hours = int.parse(parts[0]);
+      final minutes = int.parse(parts[1]);
+      return hours * 60 + minutes;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> loadDailyDetail(Jalali date) async {
     currentDate = date;
     try {
@@ -130,7 +153,7 @@ class TaskController extends GetxController {
         );
         selectedProjects.add(Rx<Project?>(project));
         durationControllers.add(
-          TextEditingController(text: task.duration?.toString() ?? ''),
+          TextEditingController(text: _minutesToHHMM(task.duration)),
         );
         descriptionControllers.add(
           TextEditingController(text: task.description ?? ''),
@@ -206,7 +229,7 @@ class TaskController extends GetxController {
 
   void addTaskRow() {
     selectedProjects.add(Rx<Project?>(null));
-    durationControllers.add(TextEditingController());
+    durationControllers.add(TextEditingController(text: '00:00'));
     descriptionControllers.add(TextEditingController());
   }
 
@@ -228,13 +251,16 @@ class TaskController extends GetxController {
     final tasks = <Task>[];
     for (int i = 0; i < selectedProjects.length; i++) {
       if (selectedProjects[i].value != null) {
-        tasks.add(
-          Task(
-            projectId: selectedProjects[i].value!.id,
-            duration: int.tryParse(durationControllers[i].text),
-            description: descriptionControllers[i].text,
-          ),
-        );
+        final duration = _hhmmToMinutes(durationControllers[i].text);
+        if (duration != null) {
+          tasks.add(
+            Task(
+              projectId: selectedProjects[i].value!.id,
+              duration: duration,
+              description: descriptionControllers[i].text,
+            ),
+          );
+        }
       }
     }
 
@@ -303,7 +329,8 @@ class TaskController extends GetxController {
     final leave = parseTime(leaveTimeController.text);
     final personal = int.tryParse(personalTimeController.text) ?? 0;
     int totalTaskMinutes = durationControllers.fold(0, (sum, controller) {
-      return sum + (int.tryParse(controller.text) ?? 0);
+      final minutes = _hhmmToMinutes(controller.text);
+      return sum + (minutes ?? 0);
     });
     final totalCost =
         (int.tryParse(goCostController.text.replaceAll(',', '')) ?? 0) +
@@ -326,7 +353,7 @@ class TaskController extends GetxController {
             Text('${'effective_work'.tr}: $effective ${'minute'.tr}'),
             Text('${'task_total_time'.tr}: $totalTaskMinutes ${'minute'.tr}'),
             Text(
-              '${'total_cost'.tr}: ${ThousandSeparatorInputFormatter()._formatNumber(int.parse(totalCost as String))}',
+              '${'total_cost'.tr}: ${ThousandSeparatorInputFormatter()._formatNumber(totalCost.toInt())}',
             ),
           ],
         ),

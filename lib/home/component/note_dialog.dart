@@ -36,18 +36,65 @@ class NoteDialog extends StatelessWidget {
             icon,
             isEnabled,
           ),
-          onTap: isEnabled
-              ? () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    controller.text =
-                        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+          onTap:
+              isEnabled
+                  ? () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      controller.text =
+                          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                    }
                   }
-                }
-              : null,
+                  : null,
+        ),
+      );
+    }
+
+    Widget buildDurationField(
+      TextEditingController controller,
+      bool isEnabled,
+    ) {
+      return Tooltip(
+        message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+        child: TextField(
+          readOnly: true,
+          controller: controller,
+          enabled: isEnabled,
+          decoration: AppStyles.inputDecoration(
+            context,
+            'task_duration',
+            Icons.timer,
+            isEnabled,
+          ),
+          onTap:
+              isEnabled
+                  ? () async {
+                    // بررسی فرمت متن برای تعیین زمان اولیه
+                    int initialHour = 0;
+                    int initialMinute = 0;
+                    if (controller.text.isNotEmpty &&
+                        RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
+                      final parts = controller.text.split(':');
+                      initialHour = int.tryParse(parts[0]) ?? 0;
+                      initialMinute = int.tryParse(parts[1]) ?? 0;
+                    }
+
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay(
+                        hour: initialHour,
+                        minute: initialMinute,
+                      ),
+                    );
+                    if (picked != null) {
+                      controller.text =
+                          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                    }
+                  }
+                  : null,
         ),
       );
     }
@@ -75,7 +122,61 @@ class NoteDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'company_arrival_time'.tr,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '08:00', // Fake company arrival time
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'company_leave_time'.tr,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '17:00', // Fake company leave time
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -97,7 +198,18 @@ class NoteDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller.descriptionController,
+                maxLines: 1,
+                decoration: AppStyles.inputDecoration(
+                  context,
+                  'note_optional',
+                  Icons.note,
+                  true,
+                ),
+              ),
+              const SizedBox(height: 8),
               Divider(color: colorScheme.secondary),
               Expanded(
                 child: ListView(
@@ -110,11 +222,11 @@ class NoteDialog extends StatelessWidget {
                         color: colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     ...List.generate(controller.selectedProjects.length, (i) {
                       final isEnabled = controller.leaveType.value == 'کاری';
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Column(
                           children: [
                             Row(
@@ -122,11 +234,14 @@ class NoteDialog extends StatelessWidget {
                                 Expanded(
                                   flex: 2,
                                   child: Tooltip(
-                                    message: isEnabled
-                                        ? ''
-                                        : 'disabled_for_non_working_leave'.tr,
+                                    message:
+                                        isEnabled
+                                            ? ''
+                                            : 'disabled_for_non_working_leave'
+                                                .tr,
                                     child: DropdownButtonFormField<Project>(
-                                      value: controller.selectedProjects[i].value,
+                                      value:
+                                          controller.selectedProjects[i].value,
                                       hint: Text(
                                         'select_project'.tr,
                                         style: TextStyle(color: disabledColor),
@@ -137,74 +252,72 @@ class NoteDialog extends StatelessWidget {
                                         Icons.work,
                                         isEnabled,
                                       ),
-                                      items: controller.projects
-                                          .map<DropdownMenuItem<Project>>(
-                                              (project) {
-                                        return DropdownMenuItem<Project>(
-                                          value: project,
-                                          enabled: isEnabled,
-                                          child: Text(
-                                            project.projectName,
-                                            style: TextStyle(
-                                              color: isEnabled
-                                                  ? colorScheme.onSurface
-                                                  : disabledColor,
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: isEnabled
-                                          ? (val) =>
-                                              controller.selectedProjects[i].value =
-                                                  val
-                                          : null,
+                                      items:
+                                          controller.projects.map<
+                                            DropdownMenuItem<Project>
+                                          >((project) {
+                                            return DropdownMenuItem<Project>(
+                                              value: project,
+                                              enabled: isEnabled,
+                                              child: Text(
+                                                project.projectName,
+                                                style: TextStyle(
+                                                  color:
+                                                      isEnabled
+                                                          ? colorScheme
+                                                              .onSurface
+                                                          : disabledColor,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                      onChanged:
+                                          isEnabled
+                                              ? (val) =>
+                                                  controller
+                                                      .selectedProjects[i]
+                                                      .value = val
+                                              : null,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 1,
-                                  child: Tooltip(
-                                    message: isEnabled
-                                        ? ''
-                                        : 'disabled_for_non_working_leave'.tr,
-                                    child: TextField(
-                                      controller: controller.durationControllers[i],
-                                      keyboardType: TextInputType.number,
-                                      enabled: isEnabled,
-                                      decoration: AppStyles.inputDecoration(
-                                        context,
-                                        'task_minutes',
-                                        Icons.timer,
-                                        isEnabled,
-                                      ),
-                                    ),
+                                  child: buildDurationField(
+                                    controller.durationControllers[i],
+                                    isEnabled,
                                   ),
                                 ),
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete,
-                                    color: isEnabled ? Colors.red : disabledColor,
+                                    color:
+                                        isEnabled ? Colors.red : disabledColor,
                                   ),
-                                  onPressed: isEnabled
-                                      ? () {
-                                          controller.selectedProjects.removeAt(i);
-                                          controller.durationControllers
-                                              .removeAt(i);
-                                          controller.descriptionControllers
-                                              .removeAt(i);
-                                        }
-                                      : null,
+                                  onPressed:
+                                      isEnabled
+                                          ? () {
+                                            controller.selectedProjects
+                                                .removeAt(i);
+                                            controller.durationControllers
+                                                .removeAt(i);
+                                            controller.descriptionControllers
+                                                .removeAt(i);
+                                          }
+                                          : null,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
                             Tooltip(
-                              message: isEnabled
-                                  ? ''
-                                  : 'disabled_for_non_working_leave'.tr,
+                              message:
+                                  isEnabled
+                                      ? ''
+                                      : 'disabled_for_non_working_leave'.tr,
                               child: TextField(
-                                controller: controller.descriptionControllers[i],
+                                controller:
+                                    controller.descriptionControllers[i],
                                 maxLines: 1,
                                 enabled: isEnabled,
                                 decoration: AppStyles.inputDecoration(
@@ -222,26 +335,29 @@ class NoteDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
-                        onPressed: controller.leaveType.value == 'کاری'
-                            ? controller.addTaskRow
-                            : null,
+                        onPressed:
+                            controller.leaveType.value == 'کاری'
+                                ? controller.addTaskRow
+                                : null,
                         icon: Icon(
                           Icons.add,
-                          color: controller.leaveType.value == 'کاری'
-                              ? colorScheme.primary
-                              : disabledColor,
+                          color:
+                              controller.leaveType.value == 'کاری'
+                                  ? colorScheme.primary
+                                  : disabledColor,
                         ),
                         label: Text(
                           'add_task'.tr,
                           style: TextStyle(
-                            color: controller.leaveType.value == 'کاری'
-                                ? colorScheme.primary
-                                : disabledColor,
+                            color:
+                                controller.leaveType.value == 'کاری'
+                                    ? colorScheme.primary
+                                    : disabledColor,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Text(
                       'personal_car_costs'.tr,
                       style: TextStyle(
@@ -250,24 +366,30 @@ class NoteDialog extends StatelessWidget {
                         color: colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    ...List.generate(controller.selectedCarCostProjects.length, (i) {
+                    const SizedBox(height: 8),
+                    ...List.generate(controller.selectedCarCostProjects.length, (
+                      i,
+                    ) {
                       final isEnabled = controller.leaveType.value == 'کاری';
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Expanded(
-                                  flex: 2,
+                                  flex : 1,
                                   child: Tooltip(
-                                    message: isEnabled
-                                        ? ''
-                                        : 'disabled_for_non_working_leave'.tr,
+                                    message:
+                                        isEnabled
+                                            ? ''
+                                            : 'disabled_for_non_working_leave'
+                                                .tr,
                                     child: DropdownButtonFormField<Project>(
                                       value:
-                                          controller.selectedCarCostProjects[i].value,
+                                          controller
+                                              .selectedCarCostProjects[i]
+                                              .value,
                                       hint: Text(
                                         'select_project'.tr,
                                         style: TextStyle(color: disabledColor),
@@ -278,26 +400,32 @@ class NoteDialog extends StatelessWidget {
                                         Icons.work,
                                         isEnabled,
                                       ),
-                                      items: controller.projects
-                                          .map<DropdownMenuItem<Project>>(
-                                              (project) {
-                                        return DropdownMenuItem<Project>(
-                                          value: project,
-                                          enabled: isEnabled,
-                                          child: Text(
-                                            project.projectName,
-                                            style: TextStyle(
-                                              color: isEnabled
-                                                  ? colorScheme.onSurface
-                                                  : disabledColor,
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: isEnabled
-                                          ? (val) => controller
-                                              .selectedCarCostProjects[i].value = val
-                                          : null,
+                                      items:
+                                          controller.projects.map<
+                                            DropdownMenuItem<Project>
+                                          >((project) {
+                                            return DropdownMenuItem<Project>(
+                                              value: project,
+                                              enabled: isEnabled,
+                                              child: Text(
+                                                project.projectName,
+                                                style: TextStyle(
+                                                  color:
+                                                      isEnabled
+                                                          ? colorScheme
+                                                              .onSurface
+                                                          : disabledColor,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                      onChanged:
+                                          isEnabled
+                                              ? (val) =>
+                                                  controller
+                                                      .selectedCarCostProjects[i]
+                                                      .value = val
+                                              : null,
                                     ),
                                   ),
                                 ),
@@ -305,15 +433,17 @@ class NoteDialog extends StatelessWidget {
                                 Expanded(
                                   flex: 1,
                                   child: Tooltip(
-                                    message: isEnabled
-                                        ? ''
-                                        : 'disabled_for_non_working_leave'.tr,
+                                    message:
+                                        isEnabled
+                                            ? ''
+                                            : 'disabled_for_non_working_leave'
+                                                .tr,
                                     child: TextField(
-                                      controller: controller.carCostControllers[i],
+                                      controller:
+                                          controller.carCostControllers[i],
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly,
-                                        ThousandSeparatorInputFormatter(),
                                       ],
                                       enabled: isEnabled,
                                       decoration: AppStyles.inputDecoration(
@@ -322,20 +452,29 @@ class NoteDialog extends StatelessWidget {
                                         Icons.directions_car,
                                         isEnabled,
                                       ).copyWith(
-                                        errorText: int.tryParse(
-                                                  controller.carCostControllers[i]
-                                                      .text
-                                                      .replaceAll(',', ''),
-                                                ) !=
-                                                null &&
-                                            int.parse(
-                                                  controller.carCostControllers[i]
-                                                      .text
-                                                      .replaceAll(',', ''),
-                                                ) <
-                                                0
-                                            ? 'invalid_cost'.tr
-                                            : null,
+                                        errorText:
+                                            int.tryParse(
+                                                          controller
+                                                              .carCostControllers[i]
+                                                              .text
+                                                              .replaceAll(
+                                                                ',',
+                                                                '',
+                                                              ),
+                                                        ) !=
+                                                        null &&
+                                                    int.parse(
+                                                          controller
+                                                              .carCostControllers[i]
+                                                              .text
+                                                              .replaceAll(
+                                                                ',',
+                                                                '',
+                                                              ),
+                                                        ) <
+                                                        0
+                                                ? 'invalid_cost'.tr
+                                                : null,
                                       ),
                                     ),
                                   ),
@@ -343,19 +482,22 @@ class NoteDialog extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete,
-                                    color: isEnabled ? Colors.red : disabledColor,
+                                    color:
+                                        isEnabled ? Colors.red : disabledColor,
                                   ),
-                                  onPressed: isEnabled
-                                      ? () => controller.removeCarCostRow(i)
-                                      : null,
+                                  onPressed:
+                                      isEnabled
+                                          ? () => controller.removeCarCostRow(i)
+                                          : null,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
                             Tooltip(
-                              message: isEnabled
-                                  ? ''
-                                  : 'disabled_for_non_working_leave'.tr,
+                              message:
+                                  isEnabled
+                                      ? ''
+                                      : 'disabled_for_non_working_leave'.tr,
                               child: TextField(
                                 controller:
                                     controller.carCostDescriptionControllers[i],
@@ -376,30 +518,34 @@ class NoteDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
-                        onPressed: controller.leaveType.value == 'کاری'
-                            ? controller.addCarCostRow
-                            : null,
+                        onPressed:
+                            controller.leaveType.value == 'کاری'
+                                ? controller.addCarCostRow
+                                : null,
                         icon: Icon(
                           Icons.add,
-                          color: controller.leaveType.value == 'کاری'
-                              ? colorScheme.primary
-                              : disabledColor,
+                          color:
+                              controller.leaveType.value == 'کاری'
+                                  ? colorScheme.primary
+                                  : disabledColor,
                         ),
                         label: Text(
                           'add_car_cost'.tr,
                           style: TextStyle(
-                            color: controller.leaveType.value == 'کاری'
-                                ? colorScheme.primary
-                                : disabledColor,
+                            color:
+                                controller.leaveType.value == 'کاری'
+                                    ? colorScheme.primary
+                                    : disabledColor,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     Tooltip(
-                      message: controller.leaveType.value == 'کاری'
-                          ? ''
-                          : 'disabled_for_non_working_leave'.tr,
+                      message:
+                          controller.leaveType.value == 'کاری'
+                              ? ''
+                              : 'disabled_for_non_working_leave'.tr,
                       child: TextField(
                         controller: controller.personalTimeController,
                         keyboardType: TextInputType.number,
@@ -414,9 +560,10 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: controller.leaveType.value.isEmpty
-                          ? null
-                          : controller.leaveType.value,
+                      value:
+                          controller.leaveType.value.isEmpty
+                              ? null
+                              : controller.leaveType.value,
                       hint: Text(
                         'leave_type'.tr,
                         style: TextStyle(color: disabledColor),
@@ -427,36 +574,28 @@ class NoteDialog extends StatelessWidget {
                         Icons.leave_bags_at_home,
                         true,
                       ),
-                      items: ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه'].map((e) {
-                        return DropdownMenuItem(
-                          value: e,
-                          child: Text(
-                            e,
-                            style: TextStyle(color: colorScheme.onSurface),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (val) => controller.leaveType.value = val ?? '',
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: controller.descriptionController,
-                      maxLines: 2,
-                      decoration: AppStyles.inputDecoration(
-                        context,
-                        'note_optional',
-                        Icons.note,
-                        true,
-                      ),
+                      items:
+                          ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه'].map((e) {
+                            return DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e,
+                                style: TextStyle(color: colorScheme.onSurface),
+                              ),
+                            );
+                          }).toList(),
+                      onChanged:
+                          (val) => controller.leaveType.value = val ?? '',
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
                           child: Tooltip(
-                            message: controller.leaveType.value == 'کاری'
-                                ? ''
-                                : 'disabled_for_non_working_leave'.tr,
+                            message:
+                                controller.leaveType.value == 'کاری'
+                                    ? ''
+                                    : 'disabled_for_non_working_leave'.tr,
                             child: TextField(
                               controller: controller.goCostController,
                               keyboardType: TextInputType.number,
@@ -477,9 +616,10 @@ class NoteDialog extends StatelessWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: Tooltip(
-                            message: controller.leaveType.value == 'کاری'
-                                ? ''
-                                : 'disabled_for_non_working_leave'.tr,
+                            message:
+                                controller.leaveType.value == 'کاری'
+                                    ? ''
+                                    : 'disabled_for_non_working_leave'.tr,
                             child: TextField(
                               controller: controller.returnCostController,
                               keyboardType: TextInputType.number,
@@ -499,76 +639,76 @@ class NoteDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: controller.calculateStats,
-                            icon: Icon(
-                              Icons.calculate,
-                              color: colorScheme.onPrimary,
-                              size: 24,
-                            ),
-                            label: Text(
-                              'calculate'.tr,
-                              style: TextStyle(
-                                color: colorScheme.onPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 4,
-                              shadowColor: colorScheme.primary.withOpacity(0.3),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: controller.saveDailyDetail,
-                            icon: Icon(
-                              Icons.save,
-                              color: colorScheme.onPrimary,
-                              size: 24,
-                            ),
-                            label: Text(
-                              'save'.tr,
-                              style: TextStyle(
-                                color: colorScheme.onPrimary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 16,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 4,
-                              shadowColor: colorScheme.primary.withOpacity(0.3),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.calculateStats,
+                      icon: Icon(
+                        Icons.calculate,
+                        color: colorScheme.onPrimary,
+                        size: 24,
+                      ),
+                      label: Text(
+                        'calculate'.tr,
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                        shadowColor: colorScheme.primary.withOpacity(0.3),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: controller.saveDailyDetail,
+                      icon: Icon(
+                        Icons.save,
+                        color: colorScheme.onPrimary,
+                        size: 24,
+                      ),
+                      label: Text(
+                        'save'.tr,
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                        shadowColor: colorScheme.primary.withOpacity(0.3),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
