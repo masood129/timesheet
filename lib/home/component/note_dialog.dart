@@ -126,6 +126,51 @@ class NoteDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
+                    child: buildTimePickerField(
+                      'arrival_time_hint',
+                      controller.arrivalTimeController,
+                      Icons.login,
+                      controller.leaveType.value == 'کاری',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: buildTimePickerField(
+                      'leave_time_hint',
+                      controller.leaveTimeController,
+                      Icons.logout,
+                      controller.leaveType.value == 'کاری',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Tooltip(
+                      message:
+                      controller.leaveType.value == 'کاری'
+                          ? ''
+                          : 'disabled_for_non_working_leave'.tr,
+                      child: TextField(
+                        controller: controller.personalTimeController,
+                        keyboardType: TextInputType.number,
+                        enabled: controller.leaveType.value == 'کاری',
+                        decoration: AppStyles.inputDecoration(
+                          context,
+                          'personal_time',
+                          Icons.person,
+                          controller.leaveType.value == 'کاری',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -151,6 +196,7 @@ class NoteDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
+                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -175,39 +221,6 @@ class NoteDialog extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: buildTimePickerField(
-                      'arrival_time_hint',
-                      controller.arrivalTimeController,
-                      Icons.login,
-                      controller.leaveType.value == 'کاری',
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: buildTimePickerField(
-                      'leave_time_hint',
-                      controller.leaveTimeController,
-                      Icons.logout,
-                      controller.leaveType.value == 'کاری',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller.descriptionController,
-                maxLines: 1,
-                decoration: AppStyles.inputDecoration(
-                  context,
-                  'note_optional',
-                  Icons.note,
-                  true,
-                ),
               ),
               const SizedBox(height: 8),
               Divider(color: colorScheme.secondary),
@@ -378,7 +391,7 @@ class NoteDialog extends StatelessWidget {
                             Row(
                               children: [
                                 Expanded(
-                                  flex : 1,
+                                  flex: 1,
                                   child: Tooltip(
                                     message:
                                         isEnabled
@@ -541,21 +554,15 @@ class NoteDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Tooltip(
-                      message:
-                          controller.leaveType.value == 'کاری'
-                              ? ''
-                              : 'disabled_for_non_working_leave'.tr,
-                      child: TextField(
-                        controller: controller.personalTimeController,
-                        keyboardType: TextInputType.number,
-                        enabled: controller.leaveType.value == 'کاری',
-                        decoration: AppStyles.inputDecoration(
-                          context,
-                          'personal_time',
-                          Icons.person,
-                          controller.leaveType.value == 'کاری',
-                        ),
+
+                    TextField(
+                      controller: controller.descriptionController,
+                      maxLines: 1,
+                      decoration: AppStyles.inputDecoration(
+                        context,
+                        'note_optional',
+                        Icons.note,
+                        true,
                       ),
                     ),
                     const SizedBox(height: 16),
