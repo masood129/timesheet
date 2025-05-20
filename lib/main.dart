@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-
+import 'package:timezone/data/latest.dart' as tz;
 import 'core/theme/theme.dart';
 import 'home/view/home.dart';
 import 'l10n/massage.dart';
 
 void main() {
+  tz.initializeTimeZones();
   Get.put(ThemeController());
   runApp(const MyApp());
 }

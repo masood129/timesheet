@@ -14,7 +14,7 @@ class NoteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(TaskController());
-    controller.loadDailyDetail(date); // Load data for the selected date
+    controller.loadDailyDetail(date);
     final colorScheme = Theme.of(context).colorScheme;
     final disabledColor = Theme.of(context).disabledColor;
 
@@ -44,8 +44,14 @@ class NoteDialog extends StatelessWidget {
                       initialTime: TimeOfDay.now(),
                     );
                     if (picked != null) {
-                      controller.text =
-                          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                      final hours = picked.hour;
+                      final minutes = picked.minute;
+                      if (hours <= 23 && minutes <= 59) {
+                        controller.text =
+                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+                      } else {
+                        Get.snackbar('error'.tr, 'invalid_time_format'.tr);
+                      }
                     }
                   }
                   : null,
@@ -72,7 +78,6 @@ class NoteDialog extends StatelessWidget {
           onTap:
               isEnabled
                   ? () async {
-                    // بررسی فرمت متن برای تعیین زمان اولیه
                     int initialHour = 0;
                     int initialMinute = 0;
                     if (controller.text.isNotEmpty &&
@@ -90,8 +95,14 @@ class NoteDialog extends StatelessWidget {
                       ),
                     );
                     if (picked != null) {
-                      controller.text =
-                          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                      final hours = picked.hour;
+                      final minutes = picked.minute;
+                      if (hours <= 23 && minutes <= 59) {
+                        controller.text =
+                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+                      } else {
+                        Get.snackbar('error'.tr, 'invalid_time_format'.tr);
+                      }
                     }
                   }
                   : null,
@@ -152,9 +163,9 @@ class NoteDialog extends StatelessWidget {
                     flex: 2,
                     child: Tooltip(
                       message:
-                      controller.leaveType.value == 'کاری'
-                          ? ''
-                          : 'disabled_for_non_working_leave'.tr,
+                          controller.leaveType.value == 'کاری'
+                              ? ''
+                              : 'disabled_for_non_working_leave'.tr,
                       child: TextField(
                         controller: controller.personalTimeController,
                         keyboardType: TextInputType.number,
@@ -184,7 +195,7 @@ class NoteDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '08:00', // Fake company arrival time
+                          '08:00',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -210,7 +221,7 @@ class NoteDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '17:00', // Fake company leave time
+                          '17:00',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -457,6 +468,7 @@ class NoteDialog extends StatelessWidget {
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly,
+                                        ThousandSeparatorInputFormatter(),
                                       ],
                                       enabled: isEnabled,
                                       decoration: AppStyles.inputDecoration(

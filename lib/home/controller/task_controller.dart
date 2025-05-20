@@ -5,22 +5,21 @@ import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/api/home_api.dart';
 import 'package:timesheet/home/model/daily_detail_model.dart';
 import 'package:timesheet/home/model/project_model.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'home_controller.dart';
 
 class ThousandSeparatorInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
-    // حذف همه کاراکترهای غیرعددی
     String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-    // تبدیل به عدد و فرمت با جداکننده
     try {
       final number = int.parse(newText);
       final formatted = _formatNumber(number);
@@ -29,7 +28,7 @@ class ThousandSeparatorInputFormatter extends TextInputFormatter {
         selection: TextSelection.collapsed(offset: formatted.length),
       );
     } catch (e) {
-      return oldValue; // در صورت خطا، مقدار قبلی را نگه می‌دارد
+      return oldValue;
     }
   }
 
@@ -106,8 +105,75 @@ class TaskController extends GetxController {
       final parts = time.split(':');
       final hours = int.parse(parts[0]);
       final minutes = int.parse(parts[1]);
+      if (hours > 23 || minutes > 59) return null;
       return hours * 60 + minutes;
     } catch (e) {
+      return null;
+    }
+  }
+
+  String? _extractTime(String? time) {
+    if (time == null || time.isEmpty) return null;
+    try {
+      final tehran = tz.getLocation('Asia/Tehran');
+      final date = tz.TZDateTime.parse(tehran, time);
+      final hours = date.hour.toString().padLeft(2, '0');
+      final minutes = date.minute.toString().padLeft(2, '0');
+      final result = '$hours:$minutes';
+      print('Input ISO: $time, Extracted time: $result');
+      return result;
+    } catch (e) {
+      final timeRegex = RegExp(r'(\d{2}:\d{2})(?::\d{2})?');
+      final match = timeRegex.firstMatch(time);
+      if (match != null) {
+        final result = match.group(1);
+        print('Input non-ISO: $time, Extracted time: $result');
+        return result;
+      }
+      print('Error in _extractTime: $e');
+      return null;
+    }
+  }
+
+  String? _toIsoTime(String? time, Jalali? date) {
+    if (time == null ||
+        time.isEmpty ||
+        !RegExp(r'^\d{2}:\d{2}$').hasMatch(time) ||
+        date == null) {
+      return null;
+    }
+    try {
+      final parts = time.split(':');
+      final hours = int.parse(parts[0]);
+      final minutes = int.parse(parts[1]);
+
+      if (hours > 23 || minutes > 59) {
+        return null;
+      }
+
+      final gregorianDate = date.toDateTime();
+      final tehran = tz.getLocation('Asia/Tehran');
+      final dt = tz.TZDateTime(
+        tehran,
+        gregorianDate.year,
+        gregorianDate.month,
+        gregorianDate.day,
+        hours,
+        minutes,
+      );
+
+      // فرمت دستی ISO با افست +03:30
+      final isoTime = '${dt.year.toString().padLeft(4, '0')}-'
+          '${dt.month.toString().padLeft(2, '0')}-'
+          '${dt.day.toString().padLeft(2, '0')}T'
+          '${dt.hour.toString().padLeft(2, '0')}:'
+          '${dt.minute.toString().padLeft(2, '0')}:'
+          '${dt.second.toString().padLeft(2, '0')}.000+03:30';
+
+      print('Input time: $time, Output ISO: $isoTime');
+      return isoTime;
+    } catch (e) {
+      print('Error in _toIsoTime: $e');
       return null;
     }
   }
@@ -118,10 +184,9 @@ class TaskController extends GetxController {
       final detail = await HomeApi().getDailyDetail(
         date.toDateTime().toIso8601String().split('T')[0],
         1,
-      ); // فرض userId=1
+      );
       currentDetail.value = detail;
 
-      // Clear previous data
       selectedProjects.clear();
       durationControllers.clear();
       descriptionControllers.clear();
@@ -129,27 +194,24 @@ class TaskController extends GetxController {
       carCostControllers.clear();
       carCostDescriptionControllers.clear();
 
-      // Populate fields
       arrivalTimeController.text = _extractTime(detail?.arrivalTime) ?? '';
       leaveTimeController.text = _extractTime(detail?.leaveTime) ?? '';
       personalTimeController.text = detail?.personalTime?.toString() ?? '';
       descriptionController.text = detail?.description ?? '';
       goCostController.text =
-          detail?.goCost != null
-              ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!)
-              : '';
+      detail?.goCost != null
+          ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!)
+          : '';
       returnCostController.text =
-          detail?.returnCost != null
-              ? ThousandSeparatorInputFormatter()._formatNumber(
-                detail!.returnCost!,
-              )
-              : '';
+      detail?.returnCost != null
+          ? ThousandSeparatorInputFormatter()._formatNumber(
+          detail!.returnCost!)
+          : '';
       leaveType.value = detail?.leaveType ?? 'کاری';
 
-      // Populate tasks
       for (final task in detail?.tasks ?? []) {
         final project = projects.firstWhereOrNull(
-          (p) => p.id == task.projectId,
+              (p) => p.id == task.projectId,
         );
         selectedProjects.add(Rx<Project?>(project));
         durationControllers.add(
@@ -160,20 +222,18 @@ class TaskController extends GetxController {
         );
       }
 
-      // Populate personal car costs
       for (final carCost in detail?.personalCarCosts ?? []) {
         final project = projects.firstWhereOrNull(
-          (p) => p.id == carCost.projectId,
+              (p) => p.id == carCost.projectId,
         );
         selectedCarCostProjects.add(Rx<Project?>(project));
         carCostControllers.add(
           TextEditingController(
             text:
-                carCost.cost != null
-                    ? ThousandSeparatorInputFormatter()._formatNumber(
-                      carCost.cost!,
-                    )
-                    : '',
+            carCost.cost != null
+                ? ThousandSeparatorInputFormatter()._formatNumber(
+                carCost.cost!)
+                : '',
           ),
         );
         carCostDescriptionControllers.add(
@@ -191,21 +251,6 @@ class TaskController extends GetxController {
       currentDetail.value = null;
       clearFields();
       Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
-    }
-  }
-
-  String? _extractTime(String? time) {
-    if (time == null || time.isEmpty) return null;
-    try {
-      // پشتیبانی از فرمت‌های HH:mm، HH:mm:ss
-      final timeRegex = RegExp(r'(\d{2}:\d{2})(?::\d{2})?');
-      final match = timeRegex.firstMatch(time);
-      if (match != null) {
-        return match.group(1); // فقط HH:mm را برمی‌گرداند
-      }
-      return null;
-    } catch (e) {
-      return null;
     }
   }
 
@@ -285,13 +330,8 @@ class TaskController extends GetxController {
     final detail = DailyDetail(
       date: currentDate!.toDateTime().toIso8601String().split('T')[0],
       userId: 1,
-      // فرض userId=1
-      arrivalTime:
-          arrivalTimeController.text.isEmpty
-              ? null
-              : arrivalTimeController.text,
-      leaveTime:
-          leaveTimeController.text.isEmpty ? null : leaveTimeController.text,
+      arrivalTime: _toIsoTime(arrivalTimeController.text, currentDate),
+      leaveTime: _toIsoTime(leaveTimeController.text, currentDate),
       leaveType: leaveType.value,
       personalTime: int.tryParse(personalTimeController.text),
       description: descriptionController.text,
@@ -334,10 +374,10 @@ class TaskController extends GetxController {
     });
     final totalCost =
         (int.tryParse(goCostController.text.replaceAll(',', '')) ?? 0) +
-        (int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0) +
-        carCostControllers.fold(0, (sum, controller) {
-          return sum + (int.tryParse(controller.text.replaceAll(',', '')) ?? 0);
-        });
+            (int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0) +
+            carCostControllers.fold(0, (sum, controller) {
+              return sum + (int.tryParse(controller.text.replaceAll(',', '')) ?? 0);
+            });
 
     if (arrival != null && leave != null) {
       final presence = leave - arrival;
