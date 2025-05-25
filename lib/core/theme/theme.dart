@@ -25,6 +25,7 @@ ThemeData mainTheme = ThemeData(
     error: Colors.red[600], // خطا با شدت کمتر
     surface: Colors.grey[50], // پس‌زمینه کارت‌ها و سطوح
     onSurface: Colors.grey[900], // متن روی سطوح
+    tertiary: Colors.blue[400], // اضافه کردن رنگ tertiary
   ),
   disabledColor: Colors.grey[400], // رنگ غیرفعال ملایم‌تر
   scaffoldBackgroundColor: Colors.grey[200], // پس‌زمینه صفحه
@@ -84,6 +85,7 @@ ThemeData darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
     error: Colors.red[400],
     surface: Colors.grey[900], // سطوح تیره
     onSurface: Colors.grey[200], // متن روی سطوح
+    tertiary: Colors.blue[600], // اضافه کردن رنگ tertiary
   ),
   disabledColor: Colors.grey[600], // رنگ غیرفعال تیره‌تر
   scaffoldBackgroundColor: Colors.grey[950], // پس‌زمینه تیره اما نه مشکی خالص

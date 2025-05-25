@@ -44,9 +44,7 @@ class CalendarView extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-              ),
+              decoration: BoxDecoration(color: colorScheme.primary),
               child: Text(
                 'settings'.tr,
                 style: TextStyle(
@@ -57,12 +55,11 @@ class CalendarView extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(
-                Icons.brightness_6,
-                color: colorScheme.primary,
-              ),
+              leading: Icon(Icons.brightness_6, color: colorScheme.primary),
               title: Text(
-                themeController.isDark.value ? 'light_theme'.tr : 'dark_theme'.tr,
+                themeController.isDark.value
+                    ? 'light_theme'.tr
+                    : 'dark_theme'.tr,
                 style: TextStyle(color: colorScheme.onSurface),
               ),
               onTap: () {
@@ -71,18 +68,16 @@ class CalendarView extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(
-                Icons.language,
-                color: colorScheme.primary,
-              ),
+              leading: Icon(Icons.language, color: colorScheme.primary),
               title: Text(
                 Get.locale!.languageCode == 'fa' ? 'english'.tr : 'persian'.tr,
                 style: TextStyle(color: colorScheme.onSurface),
               ),
               onTap: () {
-                final newLocale = Get.locale!.languageCode == 'fa'
-                    ? const Locale('en')
-                    : const Locale('fa');
+                final newLocale =
+                    Get.locale!.languageCode == 'fa'
+                        ? const Locale('en')
+                        : const Locale('fa');
                 Get.updateLocale(newLocale);
                 Navigator.pop(context);
               },
@@ -91,6 +86,19 @@ class CalendarView extends StatelessWidget {
         ),
       ),
       body: Obx(() {
+        if (homeController.isLoading.value) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('loading_calendar'.tr),
+              ],
+            ),
+          );
+        }
+
         final year = homeController.currentYear.value;
         final month = homeController.currentMonth.value;
         final daysInMonth = homeController.daysInMonth;
@@ -102,25 +110,29 @@ class CalendarView extends StatelessWidget {
             final date = Jalali(year, month, day);
             final note = homeController.getNoteForDate(date) ?? 'no_note'.tr;
             final isFriday = date.weekDay == 7;
+            final cardStatus = homeController.getCardStatus(date, context);
 
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 6,
+              ),
               child: Card(
+                color: cardStatus['color'],
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: colorScheme.primary.withOpacity(0.8),
                     child: Text(
                       '$day',
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                      ),
+                      style: TextStyle(color: colorScheme.onPrimary),
                     ),
                   ),
                   title: Text(
                     '${date.formatter.wN} ${date.day} ${date.formatter.mN} ${date.year}',
                     style: TextStyle(
                       color: isFriday ? colorScheme.error : null,
-                      fontWeight: isFriday ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isFriday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   subtitle: Text(
@@ -129,16 +141,20 @@ class CalendarView extends StatelessWidget {
                       color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
-                  onTap: () => showModalBottomSheet(
-                    enableDrag: false,
-                    isScrollControlled: true,
-                    context: context,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                    ),
-                    builder: (_) => NoteDialog(date: date),
-                  ),
+                  onTap:
+                      () => showModalBottomSheet(
+                        enableDrag: false,
+                        isScrollControlled: true,
+                        context: context,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(20),
+                          ),
+                        ),
+                        builder: (_) => NoteDialog(date: date),
+                      ),
                 ),
               ),
             );

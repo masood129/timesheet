@@ -1,58 +1,5 @@
-class Task {
-  final int? projectId;
-  final int? duration;
-  final String? description;
-
-  Task({
-    this.projectId,
-    this.duration,
-    this.description,
-  });
-
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      projectId: json['ProjectId'],
-      duration: json['Duration'],
-      description: json['Description'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'projectId': projectId,
-      'duration': duration,
-      'description': description,
-    };
-  }
-}
-
-class PersonalCarCost {
-  final int? projectId;
-  final int? cost;
-  final String? description;
-
-  PersonalCarCost({
-    this.projectId,
-    this.cost,
-    this.description,
-  });
-
-  factory PersonalCarCost.fromJson(Map<String, dynamic> json) {
-    return PersonalCarCost(
-      projectId: json['ProjectId'],
-      cost: json['Cost'],
-      description: json['Description'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'projectId': projectId,
-      'cost': cost,
-      'description': description,
-    };
-  }
-}
+import 'package:timesheet/home/model/personal_car_cost_model.dart';
+import 'package:timesheet/home/model/task_model.dart';
 
 class DailyDetail {
   final String date;
@@ -83,29 +30,33 @@ class DailyDetail {
 
   factory DailyDetail.fromJson(Map<String, dynamic> json) {
     return DailyDetail(
-      date: json['Date'],
+      date: json['Date'].toString().split('T')[0], // فقط تاریخ (YYYY-MM-DD)
       userId: json['UserId'],
-      arrivalTime: json['ArrivalTime'],
-      leaveTime: json['LeaveTime'],
+      arrivalTime: json['ArrivalTime'] != null
+          ? json['ArrivalTime'].toString().split('T')[1].substring(0, 8) // فقط زمان (HH:MM:SS)
+          : null,
+      leaveTime: json['LeaveTime'] != null
+          ? json['LeaveTime'].toString().split('T')[1].substring(0, 8) // فقط زمان (HH:MM:SS)
+          : null,
       leaveType: json['LeaveType'],
       personalTime: json['PersonalTime'],
       description: json['Description'],
       goCost: json['GoCost'],
       returnCost: json['ReturnCost'],
       tasks: (json['tasks'] as List<dynamic>?)
-              ?.map((e) => Task.fromJson(e))
-              .toList() ??
+          ?.map((e) => Task.fromJson(e as Map<String, dynamic>))
+          .toList() ??
           [],
       personalCarCosts: (json['personalCarCosts'] as List<dynamic>?)
-              ?.map((e) => PersonalCarCost.fromJson(e))
-              .toList() ??
+          ?.map((e) => PersonalCarCost.fromJson(e as Map<String, dynamic>))
+          .toList() ??
           [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'date': date,
+      'date': '${date}T00:00:00.000Z', // تغییر به 'date' با حرف کوچک
       'userId': userId,
       'arrivalTime': arrivalTime,
       'leaveTime': leaveTime,
