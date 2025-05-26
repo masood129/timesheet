@@ -19,11 +19,25 @@ class NoteDialog extends StatelessWidget {
     final disabledColor = Theme.of(context).disabledColor;
 
     Widget buildTimePickerField(
-      String labelKey,
-      TextEditingController controller,
-      IconData icon,
-      bool isEnabled,
-    ) {
+        String labelKey,
+        TextEditingController controller,
+        IconData icon,
+        bool isEnabled,
+        ) {
+      // تنظیم مقدار اولیه برای TimePicker
+      TimeOfDay getInitialTime() {
+        if (controller.text.isNotEmpty &&
+            RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
+          final parts = controller.text.split(':');
+          final hours = int.tryParse(parts[0]) ?? 0;
+          final minutes = int.tryParse(parts[1]) ?? 0;
+          if (hours <= 23 && minutes <= 59) {
+            return TimeOfDay(hour: hours, minute: minutes);
+          }
+        }
+        return const TimeOfDay(hour: 0, minute: 0); // مقدار پیش‌فرض 00:00
+      }
+
       return Tooltip(
         message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
         child: TextField(
@@ -36,33 +50,46 @@ class NoteDialog extends StatelessWidget {
             icon,
             isEnabled,
           ),
-          onTap:
-              isEnabled
-                  ? () async {
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (picked != null) {
-                      final hours = picked.hour;
-                      final minutes = picked.minute;
-                      if (hours <= 23 && minutes <= 59) {
-                        controller.text =
-                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-                      } else {
-                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-                      }
-                    }
-                  }
-                  : null,
+          onTap: isEnabled
+              ? () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: getInitialTime(),
+            );
+            if (picked != null) {
+              final hours = picked.hour;
+              final minutes = picked.minute;
+              if (hours <= 23 && minutes <= 59) {
+                controller.text =
+                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+              } else {
+                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+              }
+            }
+          }
+              : null,
         ),
       );
     }
 
     Widget buildDurationField(
-      TextEditingController controller,
-      bool isEnabled,
-    ) {
+        TextEditingController controller,
+        bool isEnabled,
+        ) {
+      // تنظیم مقدار اولیه برای TimePicker
+      TimeOfDay getInitialTime() {
+        if (controller.text.isNotEmpty &&
+            RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
+          final parts = controller.text.split(':');
+          final hours = int.tryParse(parts[0]) ?? 0;
+          final minutes = int.tryParse(parts[1]) ?? 0;
+          if (hours <= 23 && minutes <= 59) {
+            return TimeOfDay(hour: hours, minute: minutes);
+          }
+        }
+        return const TimeOfDay(hour: 0, minute: 0); // مقدار پیش‌فرض 00:00
+      }
+
       return Tooltip(
         message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
         child: TextField(
@@ -75,37 +102,24 @@ class NoteDialog extends StatelessWidget {
             Icons.timer,
             isEnabled,
           ),
-          onTap:
-              isEnabled
-                  ? () async {
-                    int initialHour = 0;
-                    int initialMinute = 0;
-                    if (controller.text.isNotEmpty &&
-                        RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
-                      final parts = controller.text.split(':');
-                      initialHour = int.tryParse(parts[0]) ?? 0;
-                      initialMinute = int.tryParse(parts[1]) ?? 0;
-                    }
-
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay(
-                        hour: initialHour,
-                        minute: initialMinute,
-                      ),
-                    );
-                    if (picked != null) {
-                      final hours = picked.hour;
-                      final minutes = picked.minute;
-                      if (hours <= 23 && minutes <= 59) {
-                        controller.text =
-                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-                      } else {
-                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-                      }
-                    }
-                  }
-                  : null,
+          onTap: isEnabled
+              ? () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: getInitialTime(),
+            );
+            if (picked != null) {
+              final hours = picked.hour;
+              final minutes = picked.minute;
+              if (hours <= 23 && minutes <= 59) {
+                controller.text =
+                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+              } else {
+                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+              }
+            }
+          }
+              : null,
         ),
       );
     }
@@ -121,7 +135,7 @@ class NoteDialog extends StatelessWidget {
           top: 10,
         ),
         child: Obx(
-          () => Column(
+              () => Column(
             children: [
               Center(
                 child: Text(
@@ -196,22 +210,11 @@ class NoteDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Tooltip(
-                      message:
-                          controller.leaveType.value == 'کاری'
-                              ? ''
-                              : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                      child: TextField(
-                        controller: controller.personalTimeController,
-                        keyboardType: TextInputType.number,
-                        enabled: controller.leaveType.value == 'کاری',
-                        decoration: AppStyles.inputDecoration(
-                          context,
-                          'personal_time',
-                          Icons.person,
-                          controller.leaveType.value == 'کاری',
-                        ),
-                      ),
+                    child: buildTimePickerField(
+                      'personal_time',
+                      controller.personalTimeController,
+                      Icons.person,
+                      controller.leaveType.value == 'کاری',
                     ),
                   ),
                 ],
@@ -251,9 +254,12 @@ class NoteDialog extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Divider(height: 16),
+                    Divider(
+                      color: colorScheme.outlineVariant ?? colorScheme.outline,
+                      height: 16,
+                    ),
                     Obx(
-                      () => Row(
+                          () => Row(
                         children: [
                           Icon(
                             Icons.access_time,
@@ -273,7 +279,7 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(
-                      () => Row(
+                          () => Row(
                         children: [
                           Icon(
                             Icons.work,
@@ -293,7 +299,7 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(
-                      () => Row(
+                          () => Row(
                         children: [
                           Icon(
                             Icons.task,
@@ -313,7 +319,7 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(
-                      () => Row(
+                          () => Row(
                         children: [
                           Icon(
                             Icons.monetization_on,
@@ -335,7 +341,7 @@ class NoteDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Divider(color: colorScheme.secondary),
+              Divider(color: colorScheme.outlineVariant ?? colorScheme.outline),
               Expanded(
                 child: ListView(
                   children: [
@@ -360,12 +366,12 @@ class NoteDialog extends StatelessWidget {
                                   flex: 2,
                                   child: Tooltip(
                                     message:
-                                        isEnabled
-                                            ? ''
-                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                    isEnabled
+                                        ? ''
+                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: DropdownButtonFormField<Project>(
                                       value:
-                                          controller.selectedProjects[i].value,
+                                      controller.selectedProjects[i].value,
                                       hint: Text(
                                         'انتخاب پروژه'.tr,
                                         style: TextStyle(color: disabledColor),
@@ -377,31 +383,31 @@ class NoteDialog extends StatelessWidget {
                                         isEnabled,
                                       ),
                                       items:
-                                          controller.projects.map<
-                                            DropdownMenuItem<Project>
-                                          >((project) {
-                                            return DropdownMenuItem<Project>(
-                                              value: project,
-                                              enabled: isEnabled,
-                                              child: Text(
-                                                project.projectName,
-                                                style: TextStyle(
-                                                  color:
-                                                      isEnabled
-                                                          ? colorScheme
-                                                              .onSurface
-                                                          : disabledColor,
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
+                                      controller.projects.map<
+                                          DropdownMenuItem<Project>
+                                      >((project) {
+                                        return DropdownMenuItem<Project>(
+                                          value: project,
+                                          enabled: isEnabled,
+                                          child: Text(
+                                            project.projectName,
+                                            style: TextStyle(
+                                              color:
+                                              isEnabled
+                                                  ? colorScheme
+                                                  .onSurface
+                                                  : disabledColor,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                       onChanged:
-                                          isEnabled
-                                              ? (val) =>
-                                                  controller
-                                                      .selectedProjects[i]
-                                                      .value = val
-                                              : null,
+                                      isEnabled
+                                          ? (val) =>
+                                      controller
+                                          .selectedProjects[i]
+                                          .value = val
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -417,31 +423,33 @@ class NoteDialog extends StatelessWidget {
                                   icon: Icon(
                                     Icons.delete,
                                     color:
-                                        isEnabled ? Colors.red : disabledColor,
+                                    isEnabled
+                                        ? colorScheme.error
+                                        : disabledColor,
                                   ),
                                   onPressed:
-                                      isEnabled
-                                          ? () {
-                                            controller.selectedProjects
-                                                .removeAt(i);
-                                            controller.durationControllers
-                                                .removeAt(i);
-                                            controller.descriptionControllers
-                                                .removeAt(i);
-                                          }
-                                          : null,
+                                  isEnabled
+                                      ? () {
+                                    controller.selectedProjects
+                                        .removeAt(i);
+                                    controller.durationControllers
+                                        .removeAt(i);
+                                    controller.descriptionControllers
+                                        .removeAt(i);
+                                  }
+                                      : null,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Tooltip(
                               message:
-                                  isEnabled
-                                      ? ''
-                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                              isEnabled
+                                  ? ''
+                                  : 'غیرفعال برای مرخصی غیرکاری'.tr,
                               child: TextField(
                                 controller:
-                                    controller.descriptionControllers[i],
+                                controller.descriptionControllers[i],
                                 maxLines: 1,
                                 enabled: isEnabled,
                                 decoration: AppStyles.inputDecoration(
@@ -460,23 +468,23 @@ class NoteDialog extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed:
-                            controller.leaveType.value == 'کاری'
-                                ? controller.addTaskRow
-                                : null,
+                        controller.leaveType.value == 'کاری'
+                            ? controller.addTaskRow
+                            : null,
                         icon: Icon(
                           Icons.add,
                           color:
-                              controller.leaveType.value == 'کاری'
-                                  ? colorScheme.primary
-                                  : disabledColor,
+                          controller.leaveType.value == 'کاری'
+                              ? colorScheme.primary
+                              : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن وظیفه'.tr,
                           style: TextStyle(
                             color:
-                                controller.leaveType.value == 'کاری'
-                                    ? colorScheme.primary
-                                    : disabledColor,
+                            controller.leaveType.value == 'کاری'
+                                ? colorScheme.primary
+                                : disabledColor,
                           ),
                         ),
                       ),
@@ -492,8 +500,8 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     ...List.generate(controller.selectedCarCostProjects.length, (
-                      i,
-                    ) {
+                        i,
+                        ) {
                       final isEnabled = controller.leaveType.value == 'کاری';
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -505,14 +513,14 @@ class NoteDialog extends StatelessWidget {
                                   flex: 1,
                                   child: Tooltip(
                                     message:
-                                        isEnabled
-                                            ? ''
-                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                    isEnabled
+                                        ? ''
+                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: DropdownButtonFormField<Project>(
                                       value:
-                                          controller
-                                              .selectedCarCostProjects[i]
-                                              .value,
+                                      controller
+                                          .selectedCarCostProjects[i]
+                                          .value,
                                       hint: Text(
                                         'انتخاب پروژه'.tr,
                                         style: TextStyle(color: disabledColor),
@@ -524,31 +532,31 @@ class NoteDialog extends StatelessWidget {
                                         isEnabled,
                                       ),
                                       items:
-                                          controller.projects.map<
-                                            DropdownMenuItem<Project>
-                                          >((project) {
-                                            return DropdownMenuItem<Project>(
-                                              value: project,
-                                              enabled: isEnabled,
-                                              child: Text(
-                                                project.projectName,
-                                                style: TextStyle(
-                                                  color:
-                                                      isEnabled
-                                                          ? colorScheme
-                                                              .onSurface
-                                                          : disabledColor,
-                                                ),
-                                              ),
-                                            );
-                                          }).toList(),
+                                      controller.projects.map<
+                                          DropdownMenuItem<Project>
+                                      >((project) {
+                                        return DropdownMenuItem<Project>(
+                                          value: project,
+                                          enabled: isEnabled,
+                                          child: Text(
+                                            project.projectName,
+                                            style: TextStyle(
+                                              color:
+                                              isEnabled
+                                                  ? colorScheme
+                                                  .onSurface
+                                                  : disabledColor,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                       onChanged:
-                                          isEnabled
-                                              ? (val) =>
-                                                  controller
-                                                      .selectedCarCostProjects[i]
-                                                      .value = val
-                                              : null,
+                                      isEnabled
+                                          ? (val) =>
+                                      controller
+                                          .selectedCarCostProjects[i]
+                                          .value = val
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -557,12 +565,12 @@ class NoteDialog extends StatelessWidget {
                                   flex: 1,
                                   child: Tooltip(
                                     message:
-                                        isEnabled
-                                            ? ''
-                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                    isEnabled
+                                        ? ''
+                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: TextField(
                                       controller:
-                                          controller.carCostControllers[i],
+                                      controller.carCostControllers[i],
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly,
@@ -576,28 +584,27 @@ class NoteDialog extends StatelessWidget {
                                         isEnabled,
                                       ).copyWith(
                                         errorText:
-                                            int.tryParse(
-                                                          controller
-                                                              .carCostControllers[i]
-                                                              .text
-                                                              .replaceAll(
-                                                                ',',
-                                                                '',
-                                                              ),
-                                                        ) !=
-                                                        null &&
-                                                    int.parse(
-                                                          controller
-                                                              .carCostControllers[i]
-                                                              .text
-                                                              .replaceAll(
-                                                                ',',
-                                                                '',
-                                                              ),
-                                                        ) <
-                                                        0
-                                                ? 'هزینه نامعتبر'.tr
-                                                : null,
+                                        int.tryParse(
+                                          controller
+                                              .carCostControllers[i]
+                                              .text
+                                              .replaceAll(
+                                            ',',
+                                            '',
+                                          ),
+                                        ) !=
+                                            null &&
+                                            int.parse(
+                                              controller
+                                                  .carCostControllers[i]
+                                                  .text
+                                                  .replaceAll(
+                                                ',',
+                                                '',
+                                              ),
+                                            ) < 0
+                                            ? 'هزینه نامعتبر'.tr
+                                            : null,
                                       ),
                                     ),
                                   ),
@@ -606,24 +613,26 @@ class NoteDialog extends StatelessWidget {
                                   icon: Icon(
                                     Icons.delete,
                                     color:
-                                        isEnabled ? Colors.red : disabledColor,
+                                    isEnabled
+                                        ? colorScheme.error
+                                        : disabledColor,
                                   ),
                                   onPressed:
-                                      isEnabled
-                                          ? () => controller.removeCarCostRow(i)
-                                          : null,
+                                  isEnabled
+                                      ? () => controller.removeCarCostRow(i)
+                                      : null,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Tooltip(
                               message:
-                                  isEnabled
-                                      ? ''
-                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                              isEnabled
+                                  ? ''
+                                  : 'غیرفعال برای مرخصی غیرکاری'.tr,
                               child: TextField(
                                 controller:
-                                    controller.carCostDescriptionControllers[i],
+                                controller.carCostDescriptionControllers[i],
                                 maxLines: 1,
                                 enabled: isEnabled,
                                 decoration: AppStyles.inputDecoration(
@@ -642,23 +651,23 @@ class NoteDialog extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed:
-                            controller.leaveType.value == 'کاری'
-                                ? controller.addCarCostRow
-                                : null,
+                        controller.leaveType.value == 'کاری'
+                            ? controller.addCarCostRow
+                            : null,
                         icon: Icon(
                           Icons.add,
                           color:
-                              controller.leaveType.value == 'کاری'
-                                  ? colorScheme.primary
-                                  : disabledColor,
+                          controller.leaveType.value == 'کاری'
+                              ? colorScheme.primary
+                              : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن هزینه ماشین'.tr,
                           style: TextStyle(
                             color:
-                                controller.leaveType.value == 'کاری'
-                                    ? colorScheme.primary
-                                    : disabledColor,
+                            controller.leaveType.value == 'کاری'
+                                ? colorScheme.primary
+                                : disabledColor,
                           ),
                         ),
                       ),
@@ -677,9 +686,9 @@ class NoteDialog extends StatelessWidget {
                     const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
                       value:
-                          controller.leaveType.value.isEmpty
-                              ? null
-                              : controller.leaveType.value,
+                      controller.leaveType.value.isEmpty
+                          ? null
+                          : controller.leaveType.value,
                       hint: Text(
                         'نوع مرخصی'.tr,
                         style: TextStyle(color: disabledColor),
@@ -691,19 +700,19 @@ class NoteDialog extends StatelessWidget {
                         true,
                       ),
                       items:
-                          ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
-                              .map(
-                                (e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(
-                                    e,
-                                    style: TextStyle(
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                      ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
+                          .map(
+                            (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(
+                            e,
+                            style: TextStyle(
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      )
+                          .toList(),
                       onChanged:
                           (val) => controller.leaveType.value = val ?? '',
                     ),
@@ -713,9 +722,9 @@ class NoteDialog extends StatelessWidget {
                         Expanded(
                           child: Tooltip(
                             message:
-                                controller.leaveType.value == 'کاری'
-                                    ? ''
-                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                            controller.leaveType.value == 'کاری'
+                                ? ''
+                                : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.goCostController,
                               keyboardType: TextInputType.number,
@@ -737,9 +746,9 @@ class NoteDialog extends StatelessWidget {
                         Expanded(
                           child: Tooltip(
                             message:
-                                controller.leaveType.value == 'کاری'
-                                    ? ''
-                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                            controller.leaveType.value == 'کاری'
+                                ? ''
+                                : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.returnCostController,
                               keyboardType: TextInputType.number,
