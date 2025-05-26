@@ -22,7 +22,7 @@ class MyApp extends GetView<ThemeController> {
       translations: Messages(),
       locale: const Locale('fa'),
       fallbackLocale: const Locale('en'),
-      title: 'Shamsi Calendar',
+      title: 'app_title'.tr,
       themeMode: controller.theme,
       theme: mainTheme,
       darkTheme: darkTheme,

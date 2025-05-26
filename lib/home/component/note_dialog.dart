@@ -154,7 +154,7 @@ class NoteDialog extends StatelessWidget {
                       color: colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 22),
+                  const SizedBox(width: 24),
                   Text(
                     'company_leave_time'.tr,
                     style: TextStyle(

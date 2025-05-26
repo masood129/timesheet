@@ -60,7 +60,7 @@ class MonthlyDetailsView extends StatelessWidget {
                           Text('${'go_cost'.tr}: ${detail.goCost}'),
                         if (detail.returnCost != null)
                           Text('${'return_cost'.tr}: ${detail.returnCost}'),
-                        if (detail.personalCarCosts.isEmpty)
+                        if (detail.personalCarCosts.isNotEmpty)
                           Text('${'personal_car_cost'.tr}: ${detail.personalCarCosts}'),
                         if (detail.description != null)
                           Text('${'description'.tr}: ${detail.description}'),
