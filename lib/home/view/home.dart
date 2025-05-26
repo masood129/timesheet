@@ -118,13 +118,22 @@ class CalendarView extends StatelessWidget {
                 vertical: 6,
               ),
               child: Card(
-                color: cardStatus['color'],
+
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: colorScheme.primary.withOpacity(0.8),
-                    child: Text(
-                      '$day',
-                      style: TextStyle(color: colorScheme.onPrimary),
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: cardStatus['color'],
+                        width: 4,
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: colorScheme.primary.withOpacity(0.8),
+                      child: Text(
+                        '$day',
+                        style: TextStyle(color: colorScheme.onPrimary),
+                      ),
                     ),
                   ),
                   title: Text(

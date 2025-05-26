@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../controller/home_controller.dart';
-import '../model/daily_detail_model.dart';
 
 class MonthlyDetailsView extends StatelessWidget {
   MonthlyDetailsView({super.key});
@@ -61,7 +60,7 @@ class MonthlyDetailsView extends StatelessWidget {
                           Text('${'go_cost'.tr}: ${detail.goCost}'),
                         if (detail.returnCost != null)
                           Text('${'return_cost'.tr}: ${detail.returnCost}'),
-                        if (detail.personalCarCosts != null)
+                        if (detail.personalCarCosts.isEmpty)
                           Text('${'personal_car_cost'.tr}: ${detail.personalCarCosts}'),
                         if (detail.description != null)
                           Text('${'description'.tr}: ${detail.description}'),

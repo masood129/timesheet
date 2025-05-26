@@ -25,7 +25,7 @@ class NoteDialog extends StatelessWidget {
       bool isEnabled,
     ) {
       return Tooltip(
-        message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+        message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
         child: TextField(
           readOnly: true,
           controller: controller,
@@ -50,7 +50,7 @@ class NoteDialog extends StatelessWidget {
                         controller.text =
                             '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
                       } else {
-                        Get.snackbar('error'.tr, 'invalid_time_format'.tr);
+                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
                       }
                     }
                   }
@@ -64,7 +64,7 @@ class NoteDialog extends StatelessWidget {
       bool isEnabled,
     ) {
       return Tooltip(
-        message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
+        message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
         child: TextField(
           readOnly: true,
           controller: controller,
@@ -101,7 +101,7 @@ class NoteDialog extends StatelessWidget {
                         controller.text =
                             '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
                       } else {
-                        Get.snackbar('error'.tr, 'invalid_time_format'.tr);
+                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
                       }
                     }
                   }
@@ -112,13 +112,13 @@ class NoteDialog extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Container(
-        height: Get.height * .85,
+        height: Get.height * 0.85,
         width: Get.width,
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-          right: 16,
-          left: 16,
-          top: 16,
+          right: 15,
+          left: 15,
+          top: 10,
         ),
         child: Obx(
           () => Column(
@@ -133,7 +133,48 @@ class NoteDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'company_arrival_time'.tr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '08:00',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 22),
+                  Text(
+                    'company_leave_time'.tr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '17:00',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -144,7 +185,7 @@ class NoteDialog extends StatelessWidget {
                       controller.leaveType.value == 'کاری',
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: buildTimePickerField(
                       'leave_time_hint',
@@ -153,19 +194,13 @@ class NoteDialog extends StatelessWidget {
                       controller.leaveType.value == 'کاری',
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              Row(
-                children: [
+                  const SizedBox(width: 10),
                   Expanded(
-                    flex: 2,
                     child: Tooltip(
                       message:
                           controller.leaveType.value == 'کاری'
                               ? ''
-                              : 'disabled_for_non_working_leave'.tr,
+                              : 'غیرفعال برای مرخصی غیرکاری'.tr,
                       child: TextField(
                         controller: controller.personalTimeController,
                         keyboardType: TextInputType.number,
@@ -179,59 +214,125 @@ class NoteDialog extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'company_arrival_time'.tr,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '08:00',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'company_leave_time'.tr,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '17:00',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calculate,
+                          color: colorScheme.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'محاسبات'.tr,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 16),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            color: colorScheme.secondary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            controller.presenceDuration.value,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Icon(
+                            Icons.work,
+                            color: colorScheme.secondary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            controller.effectiveWork.value,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Icon(
+                            Icons.task,
+                            color: colorScheme.secondary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            controller.taskTotalTime.value,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Icon(
+                            Icons.monetization_on,
+                            color: colorScheme.secondary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            controller.totalCost.value,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               Divider(color: colorScheme.secondary),
@@ -239,7 +340,7 @@ class NoteDialog extends StatelessWidget {
                 child: ListView(
                   children: [
                     Text(
-                      'tasks'.tr,
+                      'وظایف'.tr,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -261,13 +362,12 @@ class NoteDialog extends StatelessWidget {
                                     message:
                                         isEnabled
                                             ? ''
-                                            : 'disabled_for_non_working_leave'
-                                                .tr,
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: DropdownButtonFormField<Project>(
                                       value:
                                           controller.selectedProjects[i].value,
                                       hint: Text(
-                                        'select_project'.tr,
+                                        'انتخاب پروژه'.tr,
                                         style: TextStyle(color: disabledColor),
                                       ),
                                       decoration: AppStyles.inputDecoration(
@@ -305,7 +405,7 @@ class NoteDialog extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   flex: 1,
                                   child: buildDurationField(
@@ -338,7 +438,7 @@ class NoteDialog extends StatelessWidget {
                               message:
                                   isEnabled
                                       ? ''
-                                      : 'disabled_for_non_working_leave'.tr,
+                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
                               child: TextField(
                                 controller:
                                     controller.descriptionControllers[i],
@@ -371,7 +471,7 @@ class NoteDialog extends StatelessWidget {
                                   : disabledColor,
                         ),
                         label: Text(
-                          'add_task'.tr,
+                          'اضافه کردن وظیفه'.tr,
                           style: TextStyle(
                             color:
                                 controller.leaveType.value == 'کاری'
@@ -381,9 +481,9 @@ class NoteDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     Text(
-                      'personal_car_costs'.tr,
+                      'هزینه‌های ماشین شخصی'.tr,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -407,15 +507,14 @@ class NoteDialog extends StatelessWidget {
                                     message:
                                         isEnabled
                                             ? ''
-                                            : 'disabled_for_non_working_leave'
-                                                .tr,
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: DropdownButtonFormField<Project>(
                                       value:
                                           controller
                                               .selectedCarCostProjects[i]
                                               .value,
                                       hint: Text(
-                                        'select_project'.tr,
+                                        'انتخاب پروژه'.tr,
                                         style: TextStyle(color: disabledColor),
                                       ),
                                       decoration: AppStyles.inputDecoration(
@@ -453,15 +552,14 @@ class NoteDialog extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   flex: 1,
                                   child: Tooltip(
                                     message:
                                         isEnabled
                                             ? ''
-                                            : 'disabled_for_non_working_leave'
-                                                .tr,
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: TextField(
                                       controller:
                                           controller.carCostControllers[i],
@@ -498,7 +596,7 @@ class NoteDialog extends StatelessWidget {
                                                               ),
                                                         ) <
                                                         0
-                                                ? 'invalid_cost'.tr
+                                                ? 'هزینه نامعتبر'.tr
                                                 : null,
                                       ),
                                     ),
@@ -522,7 +620,7 @@ class NoteDialog extends StatelessWidget {
                               message:
                                   isEnabled
                                       ? ''
-                                      : 'disabled_for_non_working_leave'.tr,
+                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
                               child: TextField(
                                 controller:
                                     controller.carCostDescriptionControllers[i],
@@ -555,7 +653,7 @@ class NoteDialog extends StatelessWidget {
                                   : disabledColor,
                         ),
                         label: Text(
-                          'add_car_cost'.tr,
+                          'اضافه کردن هزینه ماشین'.tr,
                           style: TextStyle(
                             color:
                                 controller.leaveType.value == 'کاری'
@@ -565,8 +663,7 @@ class NoteDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-
+                    const SizedBox(height: 10),
                     TextField(
                       controller: controller.descriptionController,
                       maxLines: 1,
@@ -577,14 +674,14 @@ class NoteDialog extends StatelessWidget {
                         true,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
                       value:
                           controller.leaveType.value.isEmpty
                               ? null
                               : controller.leaveType.value,
                       hint: Text(
-                        'leave_type'.tr,
+                        'نوع مرخصی'.tr,
                         style: TextStyle(color: disabledColor),
                       ),
                       decoration: AppStyles.inputDecoration(
@@ -594,19 +691,23 @@ class NoteDialog extends StatelessWidget {
                         true,
                       ),
                       items:
-                          ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه'].map((e) {
-                            return DropdownMenuItem(
-                              value: e,
-                              child: Text(
-                                e,
-                                style: TextStyle(color: colorScheme.onSurface),
-                              ),
-                            );
-                          }).toList(),
+                          ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: TextStyle(
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
                       onChanged:
                           (val) => controller.leaveType.value = val ?? '',
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -614,7 +715,7 @@ class NoteDialog extends StatelessWidget {
                             message:
                                 controller.leaveType.value == 'کاری'
                                     ? ''
-                                    : 'disabled_for_non_working_leave'.tr,
+                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.goCostController,
                               keyboardType: TextInputType.number,
@@ -632,13 +733,13 @@ class NoteDialog extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Tooltip(
                             message:
                                 controller.leaveType.value == 'کاری'
                                     ? ''
-                                    : 'disabled_for_non_working_leave'.tr,
+                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.returnCostController,
                               keyboardType: TextInputType.number,
@@ -661,40 +762,9 @@ class NoteDialog extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: controller.calculateStats,
-                      icon: Icon(
-                        Icons.calculate,
-                        color: colorScheme.onPrimary,
-                        size: 24,
-                      ),
-                      label: Text(
-                        'calculate'.tr,
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                        shadowColor: colorScheme.primary.withOpacity(0.3),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: controller.saveDailyDetail,
@@ -704,7 +774,7 @@ class NoteDialog extends StatelessWidget {
                         size: 24,
                       ),
                       label: Text(
-                        'save'.tr,
+                        'ذخیره'.tr,
                         style: TextStyle(
                           color: colorScheme.onPrimary,
                           fontSize: 16,
@@ -715,7 +785,7 @@ class NoteDialog extends StatelessWidget {
                         backgroundColor: colorScheme.primary,
                         padding: const EdgeInsets.symmetric(
                           vertical: 12,
-                          horizontal: 16,
+                          horizontal: 15,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -727,7 +797,7 @@ class NoteDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 15),
             ],
           ),
         ),

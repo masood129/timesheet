@@ -70,8 +70,8 @@ class Messages extends Translations {
       "personal_car_costs": "هزینه‌های خودرو شخصی",
       "add_car_cost": "افزودن هزینه خودرو",
       "cost_description_optional": "توضیحات هزینه (اختیاری)",
-      "company_arrival_time": "ساعت ورود به شرکت",
-      "company_leave_time": "ساعت خروج از شرکت",
+      "company_arrival_time": "ساعت ورود به شرکت:",
+      "company_leave_time": "ساعت خروج از شرکت:",
       "task_duration": "مدت زمان تسک",
     },
     'en': {

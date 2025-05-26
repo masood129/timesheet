@@ -21,7 +21,7 @@ class HomeApi {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => Project.fromJson(e)).toList();
     }
-    throw Exception('Failed to fetch projects: ${response?.statusCode}');
+    throw Exception('Failed to fetch projects: ${response.statusCode}');
   }
 
   Future<Project> getProjectById(int id) async {
@@ -32,10 +32,10 @@ class HomeApi {
     if (response!.statusCode == 200) {
       return Project.fromJson(jsonDecode(response.body));
     }
-    if (response!.statusCode == 404) {
+    if (response.statusCode == 404) {
       throw Exception('Project not found');
     }
-    throw Exception('Failed to fetch project: ${response?.statusCode}');
+    throw Exception('Failed to fetch project: ${response.statusCode}');
   }
 
   Future<Project> createProject(Project project) async {
@@ -47,10 +47,10 @@ class HomeApi {
     if (response!.statusCode == 201) {
       return Project.fromJson(jsonDecode(response.body));
     }
-    if (response!.statusCode == 400) {
+    if (response.statusCode == 400) {
       throw Exception('Invalid input or ID already exists');
     }
-    throw Exception('Failed to create project: ${response?.statusCode}');
+    throw Exception('Failed to create project: ${response.statusCode}');
   }
 
   Future<Project> updateProject(int id, Map<String, dynamic> updates) async {
@@ -62,13 +62,13 @@ class HomeApi {
     if (response!.statusCode == 200) {
       return Project.fromJson(jsonDecode(response.body));
     }
-    if (response!.statusCode == 404) {
+    if (response.statusCode == 404) {
       throw Exception('Project not found');
     }
-    if (response!.statusCode == 400) {
+    if (response.statusCode == 400) {
       throw Exception('Invalid input');
     }
-    throw Exception('Failed to update project: ${response?.statusCode}');
+    throw Exception('Failed to update project: ${response.statusCode}');
   }
 
   Future<void> deleteProject(int id) async {
@@ -79,10 +79,10 @@ class HomeApi {
     if (response!.statusCode == 204) {
       return;
     }
-    if (response!.statusCode == 404) {
+    if (response.statusCode == 404) {
       throw Exception('Project not found');
     }
-    throw Exception('Failed to delete project: ${response?.statusCode}');
+    throw Exception('Failed to delete project: ${response.statusCode}');
   }
 
   // DailyDetails Endpoints
@@ -94,10 +94,10 @@ class HomeApi {
     if (response!.statusCode == 200) {
       return DailyDetail.fromJson(jsonDecode(response.body));
     }
-    if (response!.statusCode == 404) {
+    if (response.statusCode == 404) {
       return null;
     }
-    throw Exception('Failed to fetch daily detail: ${response?.statusCode}');
+    throw Exception('Failed to fetch daily detail: ${response.statusCode}');
   }
 
   Future<DailyDetail> saveDailyDetail(DailyDetail detail) async {
@@ -109,10 +109,10 @@ class HomeApi {
     if (response!.statusCode == 201) {
       return DailyDetail.fromJson(jsonDecode(response.body));
     }
-    if (response!.statusCode == 400) {
+    if (response.statusCode == 400) {
       throw Exception('Invalid input');
     }
-    throw Exception('Failed to save daily detail: ${response?.statusCode}');
+    throw Exception('Failed to save daily detail: ${response.statusCode}');
   }
 
   Future<List<DailyDetail>> getMonthlyDetails(
@@ -128,6 +128,6 @@ class HomeApi {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => DailyDetail.fromJson(e)).toList();
     }
-    throw Exception('Failed to fetch monthly details: ${response?.statusCode}');
+    throw Exception('Failed to fetch monthly details: ${response.statusCode}');
   }
 }
