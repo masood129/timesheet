@@ -19,12 +19,11 @@ class NoteDialog extends StatelessWidget {
     final disabledColor = Theme.of(context).disabledColor;
 
     Widget buildTimePickerField(
-        String labelKey,
-        TextEditingController controller,
-        IconData icon,
-        bool isEnabled,
-        ) {
-      // تنظیم مقدار اولیه برای TimePicker
+      String labelKey,
+      TextEditingController controller,
+      IconData icon,
+      bool isEnabled,
+    ) {
       TimeOfDay getInitialTime() {
         if (controller.text.isNotEmpty &&
             RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
@@ -35,7 +34,7 @@ class NoteDialog extends StatelessWidget {
             return TimeOfDay(hour: hours, minute: minutes);
           }
         }
-        return const TimeOfDay(hour: 0, minute: 0); // مقدار پیش‌فرض 00:00
+        return const TimeOfDay(hour: 0, minute: 0);
       }
 
       return Tooltip(
@@ -50,33 +49,33 @@ class NoteDialog extends StatelessWidget {
             icon,
             isEnabled,
           ),
-          onTap: isEnabled
-              ? () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: getInitialTime(),
-            );
-            if (picked != null) {
-              final hours = picked.hour;
-              final minutes = picked.minute;
-              if (hours <= 23 && minutes <= 59) {
-                controller.text =
-                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-              } else {
-                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-              }
-            }
-          }
-              : null,
+          onTap:
+              isEnabled
+                  ? () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: getInitialTime(),
+                    );
+                    if (picked != null) {
+                      final hours = picked.hour;
+                      final minutes = picked.minute;
+                      if (hours <= 23 && minutes <= 59) {
+                        controller.text =
+                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+                      } else {
+                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+                      }
+                    }
+                  }
+                  : null,
         ),
       );
     }
 
     Widget buildDurationField(
-        TextEditingController controller,
-        bool isEnabled,
-        ) {
-      // تنظیم مقدار اولیه برای TimePicker
+      TextEditingController controller,
+      bool isEnabled,
+    ) {
       TimeOfDay getInitialTime() {
         if (controller.text.isNotEmpty &&
             RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
@@ -87,7 +86,7 @@ class NoteDialog extends StatelessWidget {
             return TimeOfDay(hour: hours, minute: minutes);
           }
         }
-        return const TimeOfDay(hour: 0, minute: 0); // مقدار پیش‌فرض 00:00
+        return const TimeOfDay(hour: 0, minute: 0);
       }
 
       return Tooltip(
@@ -102,24 +101,25 @@ class NoteDialog extends StatelessWidget {
             Icons.timer,
             isEnabled,
           ),
-          onTap: isEnabled
-              ? () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: getInitialTime(),
-            );
-            if (picked != null) {
-              final hours = picked.hour;
-              final minutes = picked.minute;
-              if (hours <= 23 && minutes <= 59) {
-                controller.text =
-                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-              } else {
-                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-              }
-            }
-          }
-              : null,
+          onTap:
+              isEnabled
+                  ? () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: getInitialTime(),
+                    );
+                    if (picked != null) {
+                      final hours = picked.hour;
+                      final minutes = picked.minute;
+                      if (hours <= 23 && minutes <= 59) {
+                        controller.text =
+                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+                      } else {
+                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+                      }
+                    }
+                  }
+                  : null,
         ),
       );
     }
@@ -135,7 +135,7 @@ class NoteDialog extends StatelessWidget {
           top: 10,
         ),
         child: Obx(
-              () => Column(
+          () => Column(
             children: [
               Center(
                 child: Text(
@@ -220,125 +220,189 @@ class NoteDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainer,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+              ExpansionTile(
+                title: Text(
+                  controller.summaryReport.value.isEmpty
+                      ? 'محاسبات'.tr
+                      : controller.summaryReport.value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: colorScheme.primary,
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                leading: Icon(
+                  Icons.calculate,
+                  color: colorScheme.primary,
+                  size: 20,
+                ),
+                backgroundColor: colorScheme.surfaceContainer,
+                collapsedBackgroundColor: colorScheme.surfaceContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                collapsedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.calculate,
-                          color: colorScheme.primary,
-                          size: 20,
+                        Divider(
+                          color:
+                              colorScheme.outlineVariant ?? colorScheme.outline,
+                          height: 16,
                         ),
-                        const SizedBox(width: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              color: colorScheme.secondary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              controller.presenceDuration.value,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.work,
+                              color: colorScheme.secondary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              controller.effectiveWork.value,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         Text(
-                          'محاسبات'.tr,
+                          'زمان وظایف به تفکیک:'.tr,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                             color: colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Obx(
+                          () => Column(
+                            children:
+                                controller.taskDetails.isNotEmpty
+                                    ? controller.taskDetails
+                                        .map(
+                                          (task) => Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 8,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.task,
+                                                  color: colorScheme.secondary,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    task,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          colorScheme.onSurface,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                        .toList()
+                                    : [
+                                      Text(
+                                        'وظیفه‌ای ثبت نشده است'.tr,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'هزینه‌ها به تفکیک:'.tr,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Obx(
+                          () => Column(
+                            children:
+                                controller.costDetails.isNotEmpty
+                                    ? controller.costDetails
+                                        .map(
+                                          (cost) => Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 8,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.monetization_on,
+                                                  color: colorScheme.secondary,
+                                                  size: 18,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    cost,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          colorScheme.onSurface,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                        .toList()
+                                    : [
+                                      Text(
+                                        'هزینه‌ای ثبت نشده است'.tr,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ],
                           ),
                         ),
                       ],
                     ),
-                    Divider(
-                      color: colorScheme.outlineVariant ?? colorScheme.outline,
-                      height: 16,
-                    ),
-                    Obx(
-                          () => Row(
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            color: colorScheme.secondary,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            controller.presenceDuration.value,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(
-                          () => Row(
-                        children: [
-                          Icon(
-                            Icons.work,
-                            color: colorScheme.secondary,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            controller.effectiveWork.value,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(
-                          () => Row(
-                        children: [
-                          Icon(
-                            Icons.task,
-                            color: colorScheme.secondary,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            controller.taskTotalTime.value,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Obx(
-                          () => Row(
-                        children: [
-                          Icon(
-                            Icons.monetization_on,
-                            color: colorScheme.secondary,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            controller.totalCost.value,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               Divider(color: colorScheme.outlineVariant ?? colorScheme.outline),
@@ -354,137 +418,152 @@ class NoteDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...List.generate(controller.selectedProjects.length, (i) {
-                      final isEnabled = controller.leaveType.value == 'کاری';
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Tooltip(
-                                    message:
-                                    isEnabled
-                                        ? ''
-                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                                    child: DropdownButtonFormField<Project>(
-                                      value:
-                                      controller.selectedProjects[i].value,
-                                      hint: Text(
-                                        'انتخاب پروژه'.tr,
-                                        style: TextStyle(color: disabledColor),
+                    Obx(
+                      () => Column(
+                        children: List.generate(
+                          controller.selectedProjects.length,
+                          (i) {
+                            final isEnabled =
+                                controller.leaveType.value == 'کاری';
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Tooltip(
+                                          message:
+                                              isEnabled
+                                                  ? ''
+                                                  : 'غیرفعال برای مرخصی غیرکاری'
+                                                      .tr,
+                                          child: DropdownButtonFormField<
+                                            Project
+                                          >(
+                                            value:
+                                                controller
+                                                    .selectedProjects[i]
+                                                    .value,
+                                            hint: Text(
+                                              'انتخاب پروژه'.tr,
+                                              style: TextStyle(
+                                                color: disabledColor,
+                                              ),
+                                            ),
+                                            decoration:
+                                                AppStyles.inputDecoration(
+                                                  context,
+                                                  'select_project',
+                                                  Icons.work,
+                                                  isEnabled,
+                                                ),
+                                            items:
+                                                controller.projects.map<
+                                                  DropdownMenuItem<Project>
+                                                >((project) {
+                                                  return DropdownMenuItem<
+                                                    Project
+                                                  >(
+                                                    value: project,
+                                                    enabled: isEnabled,
+                                                    child: Text(
+                                                      project.projectName,
+                                                      style: TextStyle(
+                                                        color:
+                                                            isEnabled
+                                                                ? colorScheme
+                                                                    .onSurface
+                                                                : disabledColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            onChanged:
+                                                isEnabled
+                                                    ? (val) {
+                                                      controller
+                                                          .selectedProjects[i]
+                                                          .value = val;
+                                                      controller
+                                                          .calculateStats();
+                                                    }
+                                                    : null,
+                                          ),
+                                        ),
                                       ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: buildDurationField(
+                                          controller.durationControllers[i],
+                                          isEnabled,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color:
+                                              isEnabled
+                                                  ? colorScheme.error
+                                                  : disabledColor,
+                                        ),
+                                        onPressed:
+                                            isEnabled
+                                                ? () =>
+                                                    controller.removeTaskRow(i)
+                                                : null,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Tooltip(
+                                    message:
+                                        isEnabled
+                                            ? ''
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                    child: TextField(
+                                      controller:
+                                          controller.descriptionControllers[i],
+                                      maxLines: 1,
+                                      enabled: isEnabled,
                                       decoration: AppStyles.inputDecoration(
                                         context,
-                                        'select_project',
-                                        Icons.work,
+                                        'task_description_optional',
+                                        Icons.description,
                                         isEnabled,
                                       ),
-                                      items:
-                                      controller.projects.map<
-                                          DropdownMenuItem<Project>
-                                      >((project) {
-                                        return DropdownMenuItem<Project>(
-                                          value: project,
-                                          enabled: isEnabled,
-                                          child: Text(
-                                            project.projectName,
-                                            style: TextStyle(
-                                              color:
-                                              isEnabled
-                                                  ? colorScheme
-                                                  .onSurface
-                                                  : disabledColor,
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged:
-                                      isEnabled
-                                          ? (val) =>
-                                      controller
-                                          .selectedProjects[i]
-                                          .value = val
-                                          : null,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  flex: 1,
-                                  child: buildDurationField(
-                                    controller.durationControllers[i],
-                                    isEnabled,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color:
-                                    isEnabled
-                                        ? colorScheme.error
-                                        : disabledColor,
-                                  ),
-                                  onPressed:
-                                  isEnabled
-                                      ? () {
-                                    controller.selectedProjects
-                                        .removeAt(i);
-                                    controller.durationControllers
-                                        .removeAt(i);
-                                    controller.descriptionControllers
-                                        .removeAt(i);
-                                  }
-                                      : null,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Tooltip(
-                              message:
-                              isEnabled
-                                  ? ''
-                                  : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                              child: TextField(
-                                controller:
-                                controller.descriptionControllers[i],
-                                maxLines: 1,
-                                enabled: isEnabled,
-                                decoration: AppStyles.inputDecoration(
-                                  context,
-                                  'task_description_optional',
-                                  Icons.description,
-                                  isEnabled,
-                                ),
+                                ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed:
-                        controller.leaveType.value == 'کاری'
-                            ? controller.addTaskRow
-                            : null,
+                            controller.leaveType.value == 'کاری'
+                                ? controller.addTaskRow
+                                : null,
                         icon: Icon(
                           Icons.add,
                           color:
-                          controller.leaveType.value == 'کاری'
-                              ? colorScheme.primary
-                              : disabledColor,
+                              controller.leaveType.value == 'کاری'
+                                  ? colorScheme.primary
+                                  : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن وظیفه'.tr,
                           style: TextStyle(
                             color:
-                            controller.leaveType.value == 'کاری'
-                                ? colorScheme.primary
-                                : disabledColor,
+                                controller.leaveType.value == 'کاری'
+                                    ? colorScheme.primary
+                                    : disabledColor,
                           ),
                         ),
                       ),
@@ -499,175 +578,220 @@ class NoteDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...List.generate(controller.selectedCarCostProjects.length, (
-                        i,
-                        ) {
-                      final isEnabled = controller.leaveType.value == 'کاری';
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Tooltip(
-                                    message:
-                                    isEnabled
-                                        ? ''
-                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                                    child: DropdownButtonFormField<Project>(
-                                      value:
-                                      controller
-                                          .selectedCarCostProjects[i]
-                                          .value,
-                                      hint: Text(
-                                        'انتخاب پروژه'.tr,
-                                        style: TextStyle(color: disabledColor),
-                                      ),
-                                      decoration: AppStyles.inputDecoration(
-                                        context,
-                                        'select_project',
-                                        Icons.work,
-                                        isEnabled,
-                                      ),
-                                      items:
-                                      controller.projects.map<
-                                          DropdownMenuItem<Project>
-                                      >((project) {
-                                        return DropdownMenuItem<Project>(
-                                          value: project,
-                                          enabled: isEnabled,
-                                          child: Text(
-                                            project.projectName,
-                                            style: TextStyle(
-                                              color:
+                    Obx(
+                      () => Column(
+                        children: List.generate(
+                          controller.selectedCarCostProjects.length,
+                          (i) {
+                            final isEnabled =
+                                controller.leaveType.value == 'کاری';
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Tooltip(
+                                          message:
                                               isEnabled
-                                                  ? colorScheme
-                                                  .onSurface
-                                                  : disabledColor,
+                                                  ? ''
+                                                  : 'غیرفعال برای مرخصی غیرکاری'
+                                                      .tr,
+                                          child: DropdownButtonFormField<
+                                            Project
+                                          >(
+                                            value:
+                                                controller
+                                                    .selectedCarCostProjects[i]
+                                                    .value,
+                                            hint: Text(
+                                              'انتخاب پروژه'.tr,
+                                              style: TextStyle(
+                                                color: disabledColor,
+                                              ),
                                             ),
+                                            decoration:
+                                                AppStyles.inputDecoration(
+                                                  context,
+                                                  'select_project',
+                                                  Icons.work,
+                                                  isEnabled,
+                                                ),
+                                            items:
+                                                controller.projects.map<
+                                                  DropdownMenuItem<Project>
+                                                >((project) {
+                                                  return DropdownMenuItem<
+                                                    Project
+                                                  >(
+                                                    value: project,
+                                                    enabled: isEnabled,
+                                                    child: Text(
+                                                      project.projectName,
+                                                      style: TextStyle(
+                                                        color:
+                                                            isEnabled
+                                                                ? colorScheme
+                                                                    .onSurface
+                                                                : disabledColor,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                            onChanged:
+                                                isEnabled
+                                                    ? (val) {
+                                                      controller
+                                                          .selectedCarCostProjects[i]
+                                                          .value = val;
+                                                      controller
+                                                          .calculateStats();
+                                                    }
+                                                    : null,
                                           ),
-                                        );
-                                      }).toList(),
-                                      onChanged:
-                                      isEnabled
-                                          ? (val) =>
-                                      controller
-                                          .selectedCarCostProjects[i]
-                                          .value = val
-                                          : null,
-                                    ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Tooltip(
+                                          message:
+                                              isEnabled
+                                                  ? ''
+                                                  : 'غیرفعال برای مرخصی غیرکاری'
+                                                      .tr,
+                                          child: TextField(
+                                            controller:
+                                                controller.carKmControllers[i],
+                                            keyboardType: TextInputType.number,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly,
+                                              ThousandSeparatorInputFormatter(),
+                                            ],
+                                            enabled: isEnabled,
+                                            decoration: AppStyles.inputDecoration(
+                                              context,
+                                              'kilometers',
+                                              Icons.directions_car,
+                                              isEnabled,
+                                            ).copyWith(
+                                              errorText:
+                                                  int.tryParse(
+                                                                controller
+                                                                    .carKmControllers[i]
+                                                                    .text
+                                                                    .replaceAll(
+                                                                      ',',
+                                                                      '',
+                                                                    ),
+                                                              ) !=
+                                                              null &&
+                                                          int.parse(
+                                                                controller
+                                                                    .carKmControllers[i]
+                                                                    .text
+                                                                    .replaceAll(
+                                                                      ',',
+                                                                      '',
+                                                                    ),
+                                                              ) <=
+                                                              0
+                                                      ? 'کیلومتر نامعتبر'.tr
+                                                      : null,
+                                            ),
+                                            onChanged: (value) {
+                                              controller.calculateStats();
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 1,
+                                        child: TextField(
+                                          controller: TextEditingController(
+                                            text:
+                                                controller
+                                                    .carCostControllers[i]
+                                                    .text,
+                                          ),
+                                          readOnly: true,
+                                          enabled: false,
+                                          decoration: AppStyles.inputDecoration(
+                                            context,
+                                            'calculated_cost',
+                                            Icons.monetization_on,
+                                            false,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color:
+                                              isEnabled
+                                                  ? colorScheme.error
+                                                  : disabledColor,
+                                        ),
+                                        onPressed:
+                                            isEnabled
+                                                ? () => controller
+                                                    .removeCarCostRow(i)
+                                                : null,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  flex: 1,
-                                  child: Tooltip(
+                                  const SizedBox(height: 8),
+                                  Tooltip(
                                     message:
-                                    isEnabled
-                                        ? ''
-                                        : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                        isEnabled
+                                            ? ''
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                     child: TextField(
                                       controller:
-                                      controller.carCostControllers[i],
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        ThousandSeparatorInputFormatter(),
-                                      ],
+                                          controller
+                                              .carCostDescriptionControllers[i],
+                                      maxLines: 1,
                                       enabled: isEnabled,
                                       decoration: AppStyles.inputDecoration(
                                         context,
-                                        'personal_car_cost',
-                                        Icons.directions_car,
+                                        'cost_description_optional',
+                                        Icons.description,
                                         isEnabled,
-                                      ).copyWith(
-                                        errorText:
-                                        int.tryParse(
-                                          controller
-                                              .carCostControllers[i]
-                                              .text
-                                              .replaceAll(
-                                            ',',
-                                            '',
-                                          ),
-                                        ) !=
-                                            null &&
-                                            int.parse(
-                                              controller
-                                                  .carCostControllers[i]
-                                                  .text
-                                                  .replaceAll(
-                                                ',',
-                                                '',
-                                              ),
-                                            ) < 0
-                                            ? 'هزینه نامعتبر'.tr
-                                            : null,
                                       ),
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color:
-                                    isEnabled
-                                        ? colorScheme.error
-                                        : disabledColor,
-                                  ),
-                                  onPressed:
-                                  isEnabled
-                                      ? () => controller.removeCarCostRow(i)
-                                      : null,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Tooltip(
-                              message:
-                              isEnabled
-                                  ? ''
-                                  : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                              child: TextField(
-                                controller:
-                                controller.carCostDescriptionControllers[i],
-                                maxLines: 1,
-                                enabled: isEnabled,
-                                decoration: AppStyles.inputDecoration(
-                                  context,
-                                  'cost_description_optional',
-                                  Icons.description,
-                                  isEnabled,
-                                ),
+                                ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    }),
+                      ),
+                    ),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed:
-                        controller.leaveType.value == 'کاری'
-                            ? controller.addCarCostRow
-                            : null,
+                            controller.leaveType.value == 'کاری'
+                                ? controller.addCarCostRow
+                                : null,
                         icon: Icon(
                           Icons.add,
                           color:
-                          controller.leaveType.value == 'کاری'
-                              ? colorScheme.primary
-                              : disabledColor,
+                              controller.leaveType.value == 'کاری'
+                                  ? colorScheme.primary
+                                  : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن هزینه ماشین'.tr,
                           style: TextStyle(
                             color:
-                            controller.leaveType.value == 'کاری'
-                                ? colorScheme.primary
-                                : disabledColor,
+                                controller.leaveType.value == 'کاری'
+                                    ? colorScheme.primary
+                                    : disabledColor,
                           ),
                         ),
                       ),
@@ -686,9 +810,9 @@ class NoteDialog extends StatelessWidget {
                     const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
                       value:
-                      controller.leaveType.value.isEmpty
-                          ? null
-                          : controller.leaveType.value,
+                          controller.leaveType.value.isEmpty
+                              ? null
+                              : controller.leaveType.value,
                       hint: Text(
                         'نوع مرخصی'.tr,
                         style: TextStyle(color: disabledColor),
@@ -700,21 +824,23 @@ class NoteDialog extends StatelessWidget {
                         true,
                       ),
                       items:
-                      ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
-                          .map(
-                            (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(
-                            e,
-                            style: TextStyle(
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      )
-                          .toList(),
-                      onChanged:
-                          (val) => controller.leaveType.value = val ?? '',
+                          ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: TextStyle(
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (val) {
+                        controller.leaveType.value = val ?? '';
+                        controller.calculateStats();
+                      },
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -722,9 +848,9 @@ class NoteDialog extends StatelessWidget {
                         Expanded(
                           child: Tooltip(
                             message:
-                            controller.leaveType.value == 'کاری'
-                                ? ''
-                                : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                controller.leaveType.value == 'کاری'
+                                    ? ''
+                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.goCostController,
                               keyboardType: TextInputType.number,
@@ -739,6 +865,9 @@ class NoteDialog extends StatelessWidget {
                                 Icons.directions_bus,
                                 controller.leaveType.value == 'کاری',
                               ),
+                              onChanged: (value) {
+                                controller.calculateStats();
+                              },
                             ),
                           ),
                         ),
@@ -746,9 +875,9 @@ class NoteDialog extends StatelessWidget {
                         Expanded(
                           child: Tooltip(
                             message:
-                            controller.leaveType.value == 'کاری'
-                                ? ''
-                                : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                controller.leaveType.value == 'کاری'
+                                    ? ''
+                                    : 'غیرفعال برای مرخصی غیرکاری'.tr,
                             child: TextField(
                               controller: controller.returnCostController,
                               keyboardType: TextInputType.number,
@@ -763,6 +892,9 @@ class NoteDialog extends StatelessWidget {
                                 Icons.directions_bus_filled,
                                 controller.leaveType.value == 'کاری',
                               ),
+                              onChanged: (value) {
+                                controller.calculateStats();
+                              },
                             ),
                           ),
                         ),
