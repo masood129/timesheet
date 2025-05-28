@@ -57,12 +57,73 @@ final ColorScheme _lightColorScheme = ColorScheme.fromSeed(
   onBackground: const Color(0xFF1A1A1A),
 );
 
+// --- Dark Theme ---
+final ColorScheme _darkColorScheme = ColorScheme.fromSeed(
+  seedColor: const Color(0xFF1A2A29), // یک سبز بسیار تیره برای پایه تم دارک
+  brightness: Brightness.dark,
+).copyWith(
+  primary: const Color(0xFF4DB6AC), // Teal 300
+  onPrimary: Colors.black,
+  primaryContainer: const Color(0xFF00695C), // Teal 800
+  onPrimaryContainer: const Color(0xFFB2DFDB),
+
+  secondary: const Color(0xFF80CBC4), // Teal 200
+  onSecondary: Colors.black,
+  secondaryContainer: const Color(0xFF004D40), // Teal 900
+  onSecondaryContainer: const Color(0xFFB2DFDB),
+
+  tertiary: const Color(0xFF4FC3F7), // Light Blue A200
+  onTertiary: Colors.black,
+  tertiaryContainer: const Color(0xFF0277BD), // Light Blue 800
+  onTertiaryContainer: const Color(0xFFE1F5FE),
+
+  error: const Color(0xFFEF9A9A), // Red 200
+  onError: Colors.black,
+  errorContainer: const Color(0xFFC62828), // Red 800
+  onErrorContainer: const Color(0xFFFFEBEE),
+
+  surface: const Color(0xFF1E1E1E),
+  onSurface: const Color(0xFFE0E0E0),
+  surfaceContainerHighest: const Color(0xFF2C2C2C),
+  onSurfaceVariant: const Color(0xFFA0A0A0),
+  outline: const Color(0xFF546E7A), // Blue Grey 500
+  outlineVariant: const Color(0xFF455A64), // Blue Grey 600
+  background: const Color(0xFF121212), // پس‌زمینه اصلی اسکیم برای تم تیره
+  onBackground: const Color(0xFFE0E0E0),
+);
+
+// --- Custom Colors Extension ---
+const Color _lightCompletedStatusColor = Color(0xFFCCFF90); // سبز فسفری ملایم روشن
+const Color _onLightCompletedStatusColor = Colors.black;
+
+const Color _darkCompletedStatusColor = Color(0xFF69F0AE);  // سبز فسفری ملایم برای تم تیره
+const Color _onDarkCompletedStatusColor = Colors.black;
+
+extension CustomColorSchemeExtension on ColorScheme {
+  Color get completedStatus {
+    if (brightness == Brightness.light) {
+      return _lightCompletedStatusColor;
+    } else {
+      return _darkCompletedStatusColor;
+    }
+  }
+
+  Color get onCompletedStatus {
+    if (brightness == Brightness.light) {
+      return _onLightCompletedStatusColor;
+    } else {
+      return _onDarkCompletedStatusColor;
+    }
+  }
+}
+
+// --- ThemeData Definitions ---
 ThemeData mainTheme = ThemeData(
   useMaterial3: true,
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
   disabledColor: _applyOpacity(_lightColorScheme.outline, 0.7),
-  scaffoldBackgroundColor: _lightColorScheme.background, // استفاده از background تعریف شده در ColorScheme
+  scaffoldBackgroundColor: _lightColorScheme.background,
   appBarTheme: AppBarTheme(
     backgroundColor: _lightColorScheme.primary,
     foregroundColor: _lightColorScheme.onPrimary,
@@ -148,47 +209,12 @@ ThemeData mainTheme = ThemeData(
 );
 
 
-// --- Dark Theme ---
-final ColorScheme _darkColorScheme = ColorScheme.fromSeed(
-  seedColor: const Color(0xFF1A2A29), // یک سبز بسیار تیره برای پایه تم دارک
-  brightness: Brightness.dark,
-).copyWith(
-  primary: const Color(0xFF4DB6AC), // Teal 300
-  onPrimary: Colors.black,
-  primaryContainer: const Color(0xFF00695C), // Teal 800
-  onPrimaryContainer: const Color(0xFFB2DFDB),
-
-  secondary: const Color(0xFF80CBC4), // Teal 200
-  onSecondary: Colors.black,
-  secondaryContainer: const Color(0xFF004D40), // Teal 900
-  onSecondaryContainer: const Color(0xFFB2DFDB),
-
-  tertiary: const Color(0xFF4FC3F7), // Light Blue A200
-  onTertiary: Colors.black,
-  tertiaryContainer: const Color(0xFF0277BD), // Light Blue 800
-  onTertiaryContainer: const Color(0xFFE1F5FE),
-
-  error: const Color(0xFFEF9A9A), // Red 200
-  onError: Colors.black,
-  errorContainer: const Color(0xFFC62828), // Red 800
-  onErrorContainer: const Color(0xFFFFEBEE),
-
-  surface: const Color(0xFF1E1E1E),
-  onSurface: const Color(0xFFE0E0E0),
-  surfaceContainerHighest: const Color(0xFF2C2C2C),
-  onSurfaceVariant: const Color(0xFFA0A0A0),
-  outline: const Color(0xFF546E7A), // Blue Grey 500
-  outlineVariant: const Color(0xFF455A64), // Blue Grey 600
-  background: const Color(0xFF121212), // پس‌زمینه اصلی اسکیم برای تم تیره
-  onBackground: const Color(0xFFE0E0E0),
-);
-
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   colorScheme: _darkColorScheme,
   brightness: Brightness.dark,
   disabledColor: _applyOpacity(_darkColorScheme.outline, 0.7),
-  scaffoldBackgroundColor: _darkColorScheme.background, // استفاده از background تعریف شده در ColorScheme
+  scaffoldBackgroundColor: _darkColorScheme.background,
   appBarTheme: AppBarTheme(
     backgroundColor: _darkColorScheme.surface,
     foregroundColor: _darkColorScheme.onSurface,

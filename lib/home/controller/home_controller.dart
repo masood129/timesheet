@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:timesheet/core/theme/theme.dart';
 import '../api/home_api.dart';
 import '../model/daily_detail_model.dart';
 
@@ -74,8 +75,29 @@ class HomeController extends GetxController {
     }
   }
 
+  TimeOfDay? _parseTime(String? timeString) {
+    if (timeString == null || timeString.isEmpty) {
+      return null;
+    }
+    try {
+      final parts = timeString.split(':');
+      if (parts.length >= 2) {
+        return TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }
+    } catch (e) {
+      print('Error parsing time: $timeString, Error: $e');
+      return null;
+    }
+    return null;
+  }
+
   Map<String, dynamic> getCardStatus(Jalali date, BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+
     final gregorianDate = date.toGregorian();
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
@@ -85,7 +107,6 @@ class HomeController extends GetxController {
     );
 
     if (detail == null) {
-      print('No detail found for date: $formattedDate'); // دیباگ
       return {
         'color': colorScheme.surface,
         'leaveType': null,
@@ -93,10 +114,8 @@ class HomeController extends GetxController {
       };
     }
 
-    final isWorkingDay = detail.leaveType == 'کاری';
     bool isComplete = false;
-
-    if (isWorkingDay) {
+    if (detail.leaveType == 'کاری') {
       final hasArrivalTime =
           detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
       final hasLeaveTime =
@@ -112,8 +131,12 @@ class HomeController extends GetxController {
       final leave = _parseTime(detail.leaveTime);
       int? effectiveWorkMinutes;
       if (arrival != null && leave != null) {
-        final presence = leave - arrival;
-        effectiveWorkMinutes = presence.inMinutes - (detail.personalTime ?? 0);
+        final presenceDuration = Duration(
+          hours: leave.hour - arrival.hour,
+          minutes: leave.minute - arrival.minute,
+        );
+        effectiveWorkMinutes =
+            presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
 
       isComplete =
@@ -121,56 +144,45 @@ class HomeController extends GetxController {
           hasLeaveTime &&
           hasPersonalTime &&
           effectiveWorkMinutes != null &&
-          totalTaskMinutes == effectiveWorkMinutes;
+          totalTaskMinutes == effectiveWorkMinutes &&
+          effectiveWorkMinutes > 0; // اطمینان از اینکه زمان حضور مثبت است
     } else {
-      isComplete = true; // روزهای غیرکاری (مثل استحقاقی) کامل هستند
+      isComplete = true;
     }
 
     Color cardColor;
-    switch (detail.leaveType) {
-      case 'کاری':
-        cardColor = isComplete ? colorScheme.primary : colorScheme.secondary;
-        break;
-      case 'استحقاقی':
-        cardColor = colorScheme.tertiary;
-        break;
-      case 'استعلاجی':
-        cardColor = colorScheme.error;
-        break;
-      case 'هدیه':
-        cardColor = colorScheme.secondaryContainer;
-        break;
-      default:
-        cardColor = colorScheme.surface;
+
+    if (detail.leaveType == 'کاری') {
+      if (isComplete) {
+        cardColor =
+            colorScheme.completedStatus; // <-- استفاده از رنگ جدید فسفری
+      } else {
+        cardColor =
+            brightness == Brightness.light
+                ? Colors.amber.shade300
+                : Colors.amber.shade400;
+      }
+    } else {
+      switch (detail.leaveType) {
+        case 'استحقاقی':
+          cardColor = colorScheme.tertiaryContainer;
+          break;
+        case 'استعلاجی':
+          cardColor = colorScheme.error;
+          break;
+        case 'هدیه':
+          cardColor = colorScheme.tertiary;
+          break;
+        default:
+          cardColor = colorScheme.surface;
+      }
     }
 
-    print(
-      'Card status for $formattedDate: ${detail.leaveType}, isComplete: $isComplete, color: $cardColor',
-    ); // دیباگ
     return {
       'color': cardColor,
       'leaveType': detail.leaveType,
       'isComplete': isComplete,
     };
-  }
-
-  Duration? _parseTime(String? time) {
-    if (time == null ||
-        time.isEmpty ||
-        !RegExp(r'^\d{2}:\d{2}:\d{2}$').hasMatch(time)) {
-      print('Invalid time format: $time'); // دیباگ
-      return null;
-    }
-    try {
-      final parts = time.split(':');
-      final hours = int.parse(parts[0]);
-      final minutes = int.parse(parts[1]);
-      final seconds = int.parse(parts[2]);
-      return Duration(hours: hours, minutes: minutes, seconds: seconds);
-    } catch (e) {
-      print('Error parsing time: $time, error: $e'); // دیباگ
-      return null;
-    }
   }
 }
 

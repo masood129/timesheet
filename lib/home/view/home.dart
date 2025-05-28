@@ -57,9 +57,7 @@ class CalendarView extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.brightness_6, color: colorScheme.primary),
               title: Text(
-                themeController.isDark.value
-                    ? 'light_theme'.tr
-                    : 'dark_theme'.tr,
+                themeController.isDark.value ? 'light_theme'.tr : 'dark_theme'.tr,
                 style: TextStyle(color: colorScheme.onSurface),
               ),
               onTap: () {
@@ -74,10 +72,9 @@ class CalendarView extends StatelessWidget {
                 style: TextStyle(color: colorScheme.onSurface),
               ),
               onTap: () {
-                final newLocale =
-                    Get.locale!.languageCode == 'fa'
-                        ? const Locale('en')
-                        : const Locale('fa');
+                final newLocale = Get.locale!.languageCode == 'fa'
+                    ? const Locale('en')
+                    : const Locale('fa');
                 Get.updateLocale(newLocale);
                 Navigator.pop(context);
               },
@@ -118,30 +115,20 @@ class CalendarView extends StatelessWidget {
                 vertical: 6,
               ),
               child: Card(
-
+                color: cardStatus['color'],
                 child: ListTile(
-                  leading: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: cardStatus['color'],
-                        width: 4,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      backgroundColor: colorScheme.primary.withOpacity(0.8),
-                      child: Text(
-                        '$day',
-                        style: TextStyle(color: colorScheme.onPrimary),
-                      ),
+                  leading: CircleAvatar(
+                    backgroundColor: colorScheme.primary.withOpacity(0.8),
+                    child: Text(
+                      '$day',
+                      style: TextStyle(color: colorScheme.onPrimary),
                     ),
                   ),
                   title: Text(
                     '${date.formatter.wN} ${date.day} ${date.formatter.mN} ${date.year}',
                     style: TextStyle(
                       color: isFriday ? colorScheme.error : null,
-                      fontWeight:
-                          isFriday ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isFriday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   subtitle: Text(
@@ -150,20 +137,18 @@ class CalendarView extends StatelessWidget {
                       color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
-                  onTap:
-                      () => showModalBottomSheet(
-                        enableDrag: false,
-                        isScrollControlled: true,
-                        context: context,
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(20),
-                          ),
-                        ),
-                        builder: (_) => NoteDialog(date: date),
+                  onTap: () => showModalBottomSheet(
+                    enableDrag: false,
+                    isScrollControlled: true,
+                    context: context,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
                       ),
+                    ),
+                    builder: (_) => NoteDialog(date: date),
+                  ),
                 ),
               ),
             );
