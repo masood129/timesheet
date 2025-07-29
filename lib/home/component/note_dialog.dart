@@ -21,11 +21,11 @@ class NoteDialog extends StatelessWidget {
     final disabledColor = Theme.of(context).disabledColor;
 
     Widget buildTimePickerField(
-      String labelKey,
-      TextEditingController controller,
-      IconData icon,
-      bool isEnabled,
-    ) {
+        String labelKey,
+        TextEditingController controller,
+        IconData icon,
+        bool isEnabled,
+        ) {
       TimeOfDay getInitialTime() {
         if (controller.text.isNotEmpty &&
             RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
@@ -51,33 +51,32 @@ class NoteDialog extends StatelessWidget {
             icon,
             isEnabled,
           ),
-          onTap:
-              isEnabled
-                  ? () async {
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: getInitialTime(),
-                    );
-                    if (picked != null) {
-                      final hours = picked.hour;
-                      final minutes = picked.minute;
-                      if (hours <= 23 && minutes <= 59) {
-                        controller.text =
-                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-                      } else {
-                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-                      }
-                    }
-                  }
-                  : null,
+          onTap: isEnabled
+              ? () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: getInitialTime(),
+            );
+            if (picked != null) {
+              final hours = picked.hour;
+              final minutes = picked.minute;
+              if (hours <= 23 && minutes <= 59) {
+                controller.text =
+                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+              } else {
+                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+              }
+            }
+          }
+              : null,
         ),
       );
     }
 
     Widget buildDurationField(
-      TextEditingController controller,
-      bool isEnabled,
-    ) {
+        TextEditingController controller,
+        bool isEnabled,
+        ) {
       TimeOfDay getInitialTime() {
         if (controller.text.isNotEmpty &&
             RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
@@ -103,25 +102,24 @@ class NoteDialog extends StatelessWidget {
             Icons.timer,
             isEnabled,
           ),
-          onTap:
-              isEnabled
-                  ? () async {
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: getInitialTime(),
-                    );
-                    if (picked != null) {
-                      final hours = picked.hour;
-                      final minutes = picked.minute;
-                      if (hours <= 23 && minutes <= 59) {
-                        controller.text =
-                            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
-                      } else {
-                        Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
-                      }
-                    }
-                  }
-                  : null,
+          onTap: isEnabled
+              ? () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: getInitialTime(),
+            );
+            if (picked != null) {
+              final hours = picked.hour;
+              final minutes = picked.minute;
+              if (hours <= 23 && minutes <= 59) {
+                controller.text =
+                '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+              } else {
+                Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+              }
+            }
+          }
+              : null,
         ),
       );
     }
@@ -137,7 +135,7 @@ class NoteDialog extends StatelessWidget {
           top: 10,
         ),
         child: Obx(
-          () => Column(
+              () => Column(
             children: [
               Center(
                 child: Text(
@@ -254,8 +252,7 @@ class NoteDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Divider(
-                          color:
-                              colorScheme.outlineVariant ?? colorScheme.outline,
+                          color: colorScheme.outlineVariant,
                           height: 16,
                         ),
                         Row(
@@ -304,47 +301,44 @@ class NoteDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Obx(
-                          () => Column(
-                            children:
-                                controller.taskDetails.isNotEmpty
-                                    ? controller.taskDetails
-                                        .map(
-                                          (task) => Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.task,
-                                                  color: colorScheme.secondary,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Text(
-                                                    task,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color:
-                                                          colorScheme.onSurface,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                        .toList()
-                                    : [
-                                      Text(
-                                        'وظیفه‌ای ثبت نشده است'.tr,
+                              () => Column(
+                            children: controller.taskDetails.isNotEmpty
+                                ? controller.taskDetails
+                                .map(
+                                  (task) => Padding(
+                                padding:
+                                const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.task,
+                                      color: colorScheme.secondary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        task,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: colorScheme.onSurface,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                                .toList()
+                                : [
+                              Text(
+                                'وظیفه‌ای ثبت نشده است'.tr,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -358,47 +352,44 @@ class NoteDialog extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Obx(
-                          () => Column(
-                            children:
-                                controller.costDetails.isNotEmpty
-                                    ? controller.costDetails
-                                        .map(
-                                          (cost) => Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 8,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.monetization_on,
-                                                  color: colorScheme.secondary,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Text(
-                                                    cost,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color:
-                                                          colorScheme.onSurface,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                        .toList()
-                                    : [
-                                      Text(
-                                        'هزینه‌ای ثبت نشده است'.tr,
+                              () => Column(
+                            children: controller.costDetails.isNotEmpty
+                                ? controller.costDetails
+                                .map(
+                                  (cost) => Padding(
+                                padding:
+                                const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.monetization_on,
+                                      color: colorScheme.secondary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        cost,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: colorScheme.onSurface,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                                .toList()
+                                : [
+                              Text(
+                                'هزینه‌ای ثبت نشده است'.tr,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -407,7 +398,38 @@ class NoteDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Divider(color: colorScheme.outlineVariant ?? colorScheme.outline),
+              Divider(color: colorScheme.outlineVariant),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                value: controller.leaveType.value.isEmpty
+                    ? null
+                    : controller.leaveType.value,
+                hint: Text(
+                  'نوع مرخصی'.tr,
+                  style: TextStyle(color: disabledColor),
+                ),
+                decoration: AppStyles.inputDecoration(
+                  context,
+                  'leave_type',
+                  Icons.leave_bags_at_home,
+                  true,
+                ),
+                items: ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
+                    .map(
+                      (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e,
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  ),
+                )
+                    .toList(),
+                onChanged: (val) {
+                  controller.leaveType.value = val ?? '';
+                  controller.calculateStats();
+                },
+              ),
               const SizedBox(height: 10),
               TextField(
                 controller: controller.descriptionController,
@@ -420,47 +442,13 @@ class NoteDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value:
-                    controller.leaveType.value.isEmpty
-                        ? null
-                        : controller.leaveType.value,
-                hint: Text(
-                  'نوع مرخصی'.tr,
-                  style: TextStyle(color: disabledColor),
-                ),
-                decoration: AppStyles.inputDecoration(
-                  context,
-                  'leave_type',
-                  Icons.leave_bags_at_home,
-                  true,
-                ),
-                items:
-                    ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه']
-                        .map(
-                          (e) => DropdownMenuItem(
-                            value: e,
-                            child: Text(
-                              e,
-                              style: TextStyle(color: colorScheme.onSurface),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                onChanged: (val) {
-                  controller.leaveType.value = val ?? '';
-                  controller.calculateStats();
-                },
-              ),
-              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: Tooltip(
-                      message:
-                          controller.leaveType.value == 'کاری'
-                              ? ''
-                              : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                      message: controller.leaveType.value == 'کاری'
+                          ? ''
+                          : 'غیرفعال برای مرخصی غیرکاری'.tr,
                       child: TextField(
                         controller: controller.goCostController,
                         keyboardType: TextInputType.number,
@@ -484,10 +472,9 @@ class NoteDialog extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Tooltip(
-                      message:
-                          controller.leaveType.value == 'کاری'
-                              ? ''
-                              : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                      message: controller.leaveType.value == 'کاری'
+                          ? ''
+                          : 'غیرفعال برای مرخصی غیرکاری'.tr,
                       child: TextField(
                         controller: controller.returnCostController,
                         keyboardType: TextInputType.number,
@@ -510,12 +497,12 @@ class NoteDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 30, child: Center(child: Divider())),
               Expanded(
                 child: ListView(
                   children: [
                     Text(
-                      'وظایف'.tr,
+                      'task'.tr,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -524,10 +511,9 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(
-                      () => Column(
-                        children: List.generate(controller.selectedProjects.length, (
-                          i,
-                        ) {
+                          () => Column(
+                        children: List.generate(
+                            controller.selectedProjects.length, (i) {
                           final isEnabled =
                               controller.leaveType.value == 'کاری';
                           return Padding(
@@ -539,24 +525,17 @@ class NoteDialog extends StatelessWidget {
                                     Expanded(
                                       flex: 2,
                                       child: Tooltip(
-                                        message:
-                                            isEnabled
-                                                ? ''
-                                                : 'غیرفعال برای مرخصی غیرکاری'
-                                                    .tr,
+                                        message: isEnabled
+                                            ? ''
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                         child: Obx(
-                                          () => DropdownButtonFormField<
-                                            Project
-                                          >(
-                                            value:
-                                                controller
-                                                    .selectedProjects[i]
-                                                    .value,
+                                              () => DropdownButtonFormField<Project>(
+                                            value: controller
+                                                .selectedProjects[i].value,
                                             hint: Text(
                                               'انتخاب پروژه'.tr,
-                                              style: TextStyle(
-                                                color: disabledColor,
-                                              ),
+                                              style:
+                                              TextStyle(color: disabledColor),
                                             ),
                                             decoration: AppStyles.inputDecoration(
                                               context,
@@ -564,66 +543,55 @@ class NoteDialog extends StatelessWidget {
                                               Icons.work,
                                               isEnabled,
                                             ).copyWith(
-                                              errorText:
-                                                  controller
-                                                          .taskProjectErrors[i]
-                                                          .value
-                                                      ? 'پروژه الزامی است'.tr
-                                                      : null,
+                                              errorText: controller
+                                                  .taskProjectErrors[i].value
+                                                  ? 'پروژه الزامی است'.tr
+                                                  : null,
                                               errorBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                   color: colorScheme.error,
                                                   width: 1.5,
                                                 ),
                                                 borderRadius:
-                                                    BorderRadius.circular(12),
+                                                BorderRadius.circular(12),
                                               ),
                                               focusedErrorBorder:
-                                                  OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                      color: colorScheme.error,
-                                                      width: 1.5,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
+                                              OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: colorScheme.error,
+                                                  width: 1.5,
+                                                ),
+                                                borderRadius:
+                                                BorderRadius.circular(12),
+                                              ),
                                             ),
-                                            items:
-                                                controller.projects.map<
-                                                  DropdownMenuItem<Project>
-                                                >((project) {
-                                                  return DropdownMenuItem<
-                                                    Project
-                                                  >(
+                                            items: controller.projects
+                                                .map<DropdownMenuItem<Project>>(
+                                                    (project) {
+                                                  return DropdownMenuItem<Project>(
                                                     value: project,
                                                     enabled: isEnabled,
                                                     child: Text(
                                                       project.projectName,
                                                       style: TextStyle(
-                                                        color:
-                                                            isEnabled
-                                                                ? colorScheme
-                                                                    .onSurface
-                                                                : disabledColor,
+                                                        color: isEnabled
+                                                            ? colorScheme.onSurface
+                                                            : disabledColor,
                                                       ),
                                                     ),
                                                   );
                                                 }).toList(),
-                                            onChanged:
-                                                isEnabled
-                                                    ? (val) {
-                                                      controller
-                                                          .selectedProjects[i]
-                                                          .value = val;
-                                                      controller
-                                                          .taskProjectErrors[i]
-                                                          .value = false;
-                                                      controller
-                                                          .calculateStats();
-                                                    }
-                                                    : null,
+                                            onChanged: isEnabled
+                                                ? (val) {
+                                              controller
+                                                  .selectedProjects[i]
+                                                  .value = val;
+                                              controller
+                                                  .taskProjectErrors[i]
+                                                  .value = false;
+                                              controller.calculateStats();
+                                            }
+                                                : null,
                                           ),
                                         ),
                                       ),
@@ -639,28 +607,24 @@ class NoteDialog extends StatelessWidget {
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
-                                        color:
-                                            isEnabled
-                                                ? colorScheme.error
-                                                : disabledColor,
+                                        color: isEnabled
+                                            ? colorScheme.error
+                                            : disabledColor,
                                       ),
-                                      onPressed:
-                                          isEnabled
-                                              ? () =>
-                                                  controller.removeTaskRow(i)
-                                              : null,
+                                      onPressed: isEnabled
+                                          ? () => controller.removeTaskRow(i)
+                                          : null,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Tooltip(
-                                  message:
-                                      isEnabled
-                                          ? ''
-                                          : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                  message: isEnabled
+                                      ? ''
+                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                   child: TextField(
                                     controller:
-                                        controller.descriptionControllers[i],
+                                    controller.descriptionControllers[i],
                                     maxLines: 1,
                                     enabled: isEnabled,
                                     decoration: AppStyles.inputDecoration(
@@ -680,24 +644,21 @@ class NoteDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
-                        onPressed:
-                            controller.leaveType.value == 'کاری'
-                                ? controller.addTaskRow
-                                : null,
+                        onPressed: controller.leaveType.value == 'کاری'
+                            ? controller.addTaskRow
+                            : null,
                         icon: Icon(
                           Icons.add,
-                          color:
-                              controller.leaveType.value == 'کاری'
-                                  ? colorScheme.primary
-                                  : disabledColor,
+                          color: controller.leaveType.value == 'کاری'
+                              ? colorScheme.primary
+                              : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن وظیفه'.tr,
                           style: TextStyle(
-                            color:
-                                controller.leaveType.value == 'کاری'
-                                    ? colorScheme.primary
-                                    : disabledColor,
+                            color: controller.leaveType.value == 'کاری'
+                                ? colorScheme.primary
+                                : disabledColor,
                           ),
                         ),
                       ),
@@ -713,16 +674,12 @@ class NoteDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(
-                      () => Column(
-                        children: List.generate(controller.selectedCarCostProjects.length, (
-                          i,
-                        ) {
+                          () => Column(
+                        children: List.generate(
+                            controller.selectedCarCostProjects.length, (i) {
                           if (i >= controller.carKmControllers.length ||
                               i >= controller.carCostControllers.length ||
-                              i >=
-                                  controller
-                                      .carCostDescriptionControllers
-                                      .length ||
+                              i >= controller.carCostDescriptionControllers.length ||
                               i >= controller.carCostProjectErrors.length) {
                             return const SizedBox.shrink();
                           }
@@ -736,26 +693,19 @@ class NoteDialog extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       flex: 2,
-                                      // تخصیص فضای بیشتر به Dropdown برای جلوگیری از سرریز
                                       child: Tooltip(
-                                        message:
-                                            isEnabled
-                                                ? ''
-                                                : 'غیرفعال برای مرخصی غیرکاری'
-                                                    .tr,
+                                        message: isEnabled
+                                            ? ''
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                         child: Obx(
-                                          () => DropdownButtonFormField<
-                                            Project
-                                          >(
-                                            value:
-                                                controller
-                                                    .selectedCarCostProjects[i]
-                                                    .value,
+                                              () => DropdownButtonFormField<Project>(
+                                            value: controller
+                                                .selectedCarCostProjects[i]
+                                                .value,
                                             hint: Text(
                                               'انتخاب پروژه'.tr,
-                                              style: TextStyle(
-                                                color: disabledColor,
-                                              ),
+                                              style:
+                                              TextStyle(color: disabledColor),
                                             ),
                                             decoration: AppStyles.inputDecoration(
                                               context,
@@ -763,71 +713,59 @@ class NoteDialog extends StatelessWidget {
                                               Icons.work,
                                               isEnabled,
                                             ).copyWith(
-                                              errorText:
-                                                  controller
-                                                          .carCostProjectErrors[i]
-                                                          .value
-                                                      ? 'پروژه الزامی است'.tr
-                                                      : null,
+                                              errorText: controller
+                                                  .carCostProjectErrors[i]
+                                                  .value
+                                                  ? 'پروژه الزامی است'.tr
+                                                  : null,
                                               errorBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                   color: colorScheme.error,
                                                   width: 1.5,
                                                 ),
                                                 borderRadius:
-                                                    BorderRadius.circular(12),
+                                                BorderRadius.circular(12),
                                               ),
                                               focusedErrorBorder:
-                                                  OutlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                      color: colorScheme.error,
-                                                      width: 1.5,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
+                                              OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                  color: colorScheme.error,
+                                                  width: 1.5,
+                                                ),
+                                                borderRadius:
+                                                BorderRadius.circular(12),
+                                              ),
                                             ),
-                                            items:
-                                                controller.projects.map<
-                                                  DropdownMenuItem<Project>
-                                                >((project) {
-                                                  return DropdownMenuItem<
-                                                    Project
-                                                  >(
+                                            items: controller.projects
+                                                .map<DropdownMenuItem<Project>>(
+                                                    (project) {
+                                                  return DropdownMenuItem<Project>(
                                                     value: project,
                                                     enabled: isEnabled,
                                                     child: Text(
                                                       project.projectName,
                                                       style: TextStyle(
-                                                        color:
-                                                            isEnabled
-                                                                ? colorScheme
-                                                                    .onSurface
-                                                                : disabledColor,
+                                                        color: isEnabled
+                                                            ? colorScheme.onSurface
+                                                            : disabledColor,
                                                         overflow:
-                                                            TextOverflow
-                                                                .ellipsis, // جلوگیری از سرریز متن
+                                                        TextOverflow.ellipsis,
                                                       ),
                                                     ),
                                                   );
                                                 }).toList(),
                                             isDense: true,
-                                            // کاهش ارتفاع برای فشرده‌سازی
-                                            onChanged:
-                                                isEnabled
-                                                    ? (val) {
-                                                      controller
-                                                          .selectedCarCostProjects[i]
-                                                          .value = val;
-                                                      controller
-                                                          .carCostProjectErrors[i]
-                                                          .value = false;
-                                                      controller
-                                                          .calculateStats();
-                                                    }
-                                                    : null,
+                                            onChanged: isEnabled
+                                                ? (val) {
+                                              controller
+                                                  .selectedCarCostProjects[i]
+                                                  .value = val;
+                                              controller
+                                                  .carCostProjectErrors[i]
+                                                  .value = false;
+                                              controller.calculateStats();
+                                            }
+                                                : null,
                                           ),
                                         ),
                                       ),
@@ -836,14 +774,12 @@ class NoteDialog extends StatelessWidget {
                                     Expanded(
                                       flex: 1,
                                       child: Tooltip(
-                                        message:
-                                            isEnabled
-                                                ? ''
-                                                : 'غیرفعال برای مرخصی غیرکاری'
-                                                    .tr,
+                                        message: isEnabled
+                                            ? ''
+                                            : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                         child: TextField(
                                           controller:
-                                              controller.carKmControllers[i],
+                                          controller.carKmControllers[i],
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [
                                             FilteringTextInputFormatter
@@ -857,29 +793,19 @@ class NoteDialog extends StatelessWidget {
                                             Icons.directions_car,
                                             isEnabled,
                                           ).copyWith(
-                                            errorText:
-                                                int.tryParse(
-                                                              controller
-                                                                  .carKmControllers[i]
-                                                                  .text
-                                                                  .replaceAll(
-                                                                    ',',
-                                                                    '',
-                                                                  ),
-                                                            ) !=
-                                                            null &&
-                                                        int.parse(
-                                                              controller
-                                                                  .carKmControllers[i]
-                                                                  .text
-                                                                  .replaceAll(
-                                                                    ',',
-                                                                    '',
-                                                                  ),
-                                                            ) <=
-                                                            0
-                                                    ? 'کیلومتر نامعتبر'.tr
-                                                    : null,
+                                            errorText: int.tryParse(
+                                                controller
+                                                    .carKmControllers[i]
+                                                    .text
+                                                    .replaceAll(',', '')) !=
+                                                null &&
+                                                int.parse(controller
+                                                    .carKmControllers[i]
+                                                    .text
+                                                    .replaceAll(',', '')) <=
+                                                    0
+                                                ? 'کیلومتر نامعتبر'.tr
+                                                : null,
                                           ),
                                           onChanged: (value) {
                                             controller.calculateStats();
@@ -892,7 +818,7 @@ class NoteDialog extends StatelessWidget {
                                       flex: 1,
                                       child: TextField(
                                         controller:
-                                            controller.carCostControllers[i],
+                                        controller.carCostControllers[i],
                                         readOnly: true,
                                         enabled: false,
                                         decoration: AppStyles.inputDecoration(
@@ -906,29 +832,24 @@ class NoteDialog extends StatelessWidget {
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
-                                        color:
-                                            isEnabled
-                                                ? colorScheme.error
-                                                : disabledColor,
+                                        color: isEnabled
+                                            ? colorScheme.error
+                                            : disabledColor,
                                       ),
-                                      onPressed:
-                                          isEnabled
-                                              ? () =>
-                                                  controller.removeCarCostRow(i)
-                                              : null,
+                                      onPressed: isEnabled
+                                          ? () => controller.removeCarCostRow(i)
+                                          : null,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Tooltip(
-                                  message:
-                                      isEnabled
-                                          ? ''
-                                          : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                                  message: isEnabled
+                                      ? ''
+                                      : 'غیرفعال برای مرخصی غیرکاری'.tr,
                                   child: TextField(
-                                    controller:
-                                        controller
-                                            .carCostDescriptionControllers[i],
+                                    controller: controller
+                                        .carCostDescriptionControllers[i],
                                     maxLines: 1,
                                     enabled: isEnabled,
                                     decoration: AppStyles.inputDecoration(
@@ -948,24 +869,21 @@ class NoteDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
-                        onPressed:
-                            controller.leaveType.value == 'کاری'
-                                ? controller.addCarCostRow
-                                : null,
+                        onPressed: controller.leaveType.value == 'کاری'
+                            ? controller.addCarCostRow
+                            : null,
                         icon: Icon(
                           Icons.add,
-                          color:
-                              controller.leaveType.value == 'کاری'
-                                  ? colorScheme.primary
-                                  : disabledColor,
+                          color: controller.leaveType.value == 'کاری'
+                              ? colorScheme.primary
+                              : disabledColor,
                         ),
                         label: Text(
                           'اضافه کردن هزینه ماشین'.tr,
                           style: TextStyle(
-                            color:
-                                controller.leaveType.value == 'کاری'
-                                    ? colorScheme.primary
-                                    : disabledColor,
+                            color: controller.leaveType.value == 'کاری'
+                                ? colorScheme.primary
+                                : disabledColor,
                           ),
                         ),
                       ),
@@ -1002,7 +920,7 @@ class NoteDialog extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 4,
-                        shadowColor: colorScheme.primary.withOpacity(0.3),
+                        shadowColor: colorScheme.primary.withValues(alpha:0.3),
                       ),
                     ),
                   ),

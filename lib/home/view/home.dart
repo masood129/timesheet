@@ -105,7 +105,6 @@ class CalendarView extends StatelessWidget {
           itemBuilder: (context, index) {
             final day = index + 1;
             final date = Jalali(year, month, day);
-            final note = homeController.getNoteForDate(date) ?? 'no_note'.tr;
             final isFriday = date.weekDay == 7;
             final cardStatus = homeController.getCardStatus(date, context);
 
@@ -115,29 +114,41 @@ class CalendarView extends StatelessWidget {
                 vertical: 6,
               ),
               child: Card(
-                color: cardStatus['color'],
+                color: colorScheme.surface,
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: colorScheme.primary.withOpacity(0.8),
-                    child: Text(
-                      '$day',
-                      style: TextStyle(color: colorScheme.onPrimary),
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? colorScheme.outline
+                            : colorScheme.outlineVariant,
+                        width: 1.5,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: cardStatus['avatarColor'],
+                      child: Icon(
+                        cardStatus['avatarIcon'],
+                        color: cardStatus['avatarIconColor'],
+                      ),
                     ),
                   ),
                   title: Text(
-                    '${date.formatter.wN} ${date.day} ${date.formatter.mN} ${date.year}',
+                    '${date.formatter.wN} $day ${date.formatter.mN} ${date.year}',
                     style: TextStyle(
                       color: isFriday ? colorScheme.error : null,
                       fontWeight: isFriday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   subtitle: Text(
-                    note,
+                    '',//TODO: SUBTITLE for there
                     style: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha:0.7),
                     ),
                   ),
                   onTap: () => showModalBottomSheet(
+                    useSafeArea: true,
                     enableDrag: false,
                     isScrollControlled: true,
                     context: context,

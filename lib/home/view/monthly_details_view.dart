@@ -91,7 +91,7 @@ class MonthlyDetailsView extends StatelessWidget {
     final year = controller.currentYear.value;
     final month = controller.currentMonth.value;
     final monthName = Jalali(year, month).formatter.mN;
-    final fileName = 'Monthly_Details_${monthName}_${year}.xlsx';
+    final fileName = 'Monthly_Details_${monthName}_$year.xlsx';
 
     // ذخیره یا دانلود فایل
     try {
@@ -158,7 +158,7 @@ class MonthlyDetailsView extends StatelessWidget {
                 ),
                 subtitle: Text(
                   detail.leaveType ?? 'no_leave_type'.tr,
-                  style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+                  style: TextStyle(color: colorScheme.onSurface.withValues(alpha:0.7)),
                 ),
                 children: [
                   Padding(

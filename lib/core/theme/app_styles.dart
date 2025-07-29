@@ -19,7 +19,7 @@ class AppStyles {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       contentPadding: const EdgeInsets.all(20),
       filled: true,
-      fillColor: isEnabled ? colorScheme.surface : disabledColor.withOpacity(0.3),
+      fillColor: isEnabled ? colorScheme.surface : disabledColor.withValues(alpha: 0.3),
       labelStyle: TextStyle(
         color: isEnabled ? colorScheme.onSurface : disabledColor,
       ),

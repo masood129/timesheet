@@ -76,13 +76,12 @@ class HomeController extends GetxController {
         1,
       );
 
-      final filteredDetails =
-          details.where((detail) {
-            final date = DateTime.parse(detail.date);
-            final jalali = Jalali.fromDateTime(date);
-            return jalali.year == currentYear.value &&
-                jalali.month == currentMonth.value;
-          }).toList();
+      final filteredDetails = details.where((detail) {
+        final date = DateTime.parse(detail.date);
+        final jalali = Jalali.fromDateTime(date);
+        return jalali.year == currentYear.value &&
+            jalali.month == currentMonth.value;
+      }).toList();
 
       dailyDetails.assignAll(filteredDetails);
     } catch (e) {
@@ -112,19 +111,20 @@ class HomeController extends GetxController {
 
   Map<String, dynamic> getCardStatus(Jalali date, BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final brightness = Theme.of(context).brightness;
 
     final gregorianDate = date.toGregorian();
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
       return {
-        'color': colorScheme.surface,
+        'avatarColor': colorScheme.noDataStatus,
+        'avatarIcon': Icons.calendar_today,
+        'avatarIconColor': colorScheme.onNoDataStatus,
         'leaveType': null,
         'isComplete': false,
       };
@@ -138,7 +138,7 @@ class HomeController extends GetxController {
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-        (sum, task) => sum + (task.duration ?? 0),
+            (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -151,8 +151,7 @@ class HomeController extends GetxController {
         effectiveWorkMinutes =
             presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
-      isComplete =
-          hasArrivalTime &&
+      isComplete = hasArrivalTime &&
           hasLeaveTime &&
           effectiveWorkMinutes != null &&
           totalTaskMinutes == effectiveWorkMinutes &&
@@ -161,32 +160,45 @@ class HomeController extends GetxController {
       isComplete = true;
     }
 
-    Color cardColor;
+    IconData avatarIcon;
+    Color avatarColor;
+    Color avatarIconColor;
     if (detail.leaveType == 'کاری') {
-      cardColor =
-          isComplete
-              ? colorScheme.completedStatus
-              : (brightness == Brightness.light
-                  ? Colors.amber.shade300
-                  : Colors.amber.shade400);
+      avatarIcon = isComplete ? Icons.check_circle : Icons.access_time;
+      avatarColor = isComplete
+          ? colorScheme.completedStatus
+          : colorScheme.incompleteStatus;
+      avatarIconColor = isComplete
+          ? colorScheme.onCompletedStatus
+          : colorScheme.onIncompleteStatus;
     } else {
       switch (detail.leaveType) {
         case 'استحقاقی':
-          cardColor = colorScheme.tertiaryContainer;
+          avatarIcon = Icons.beach_access;
+          avatarColor = colorScheme.secondary;
+          avatarIconColor = colorScheme.onSecondary;
           break;
         case 'استعلاجی':
-          cardColor = colorScheme.error;
+          avatarIcon = Icons.local_hospital;
+          avatarColor = colorScheme.error;
+          avatarIconColor = colorScheme.onError;
           break;
         case 'هدیه':
-          cardColor = colorScheme.tertiary;
+          avatarIcon = Icons.card_giftcard;
+          avatarColor = colorScheme.tertiary;
+          avatarIconColor = colorScheme.onTertiary;
           break;
         default:
-          cardColor = colorScheme.surface;
+          avatarIcon = Icons.calendar_today;
+          avatarColor = colorScheme.noDataStatus;
+          avatarIconColor = colorScheme.onNoDataStatus;
       }
     }
 
     return {
-      'color': cardColor,
+      'avatarColor': avatarColor,
+      'avatarIcon': avatarIcon,
+      'avatarIconColor': avatarIconColor,
       'leaveType': detail.leaveType,
       'isComplete': isComplete,
     };
