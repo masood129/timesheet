@@ -4,9 +4,9 @@ import '../model/project_model.dart';
 import '../model/daily_detail_model.dart';
 
 class HomeApi {
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = 'http://192.168.1.57:3000';
   final coreAPI = CoreApi();
-  Map<String, String> defaultHeaders = {
+  final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',
   };
@@ -87,11 +87,19 @@ class HomeApi {
 
   // DailyDetails Endpoints
   Future<DailyDetail?> getDailyDetail(String date, int userId) async {
+    final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+    if (!dateFormat.hasMatch(date)) {
+      throw Exception('Invalid date format. Use YYYY-MM-DD');
+    }
+
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/$date?userId=$userId'),
       headers: defaultHeaders,
     );
-    if (response!.statusCode == 200) {
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
       return DailyDetail.fromJson(jsonDecode(response.body));
     }
     if (response.statusCode == 404) {
@@ -106,7 +114,10 @@ class HomeApi {
       headers: defaultHeaders,
       body: jsonEncode(detail.toJson()),
     );
-    if (response!.statusCode == 201) {
+    if (response == null) {
+      throw Exception('Failed to post: No response from server');
+    }
+    if (response.statusCode == 201) {
       return DailyDetail.fromJson(jsonDecode(response.body));
     }
     if (response.statusCode == 400) {
@@ -116,18 +127,51 @@ class HomeApi {
   }
 
   Future<List<DailyDetail>> getMonthlyDetails(
-      int year,
-      int month,
-      int userId,
-      ) async {
+    int year,
+    int month,
+    int userId,
+  ) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/month/$year/$month?userId=$userId'),
       headers: defaultHeaders,
     );
-    if (response!.statusCode == 200) {
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => DailyDetail.fromJson(e)).toList();
     }
     throw Exception('Failed to fetch monthly details: ${response.statusCode}');
+  }
+
+  Future<List<DailyDetail>> getDateRangeDetails(
+    String startDate,
+    String endDate,
+    int userId,
+  ) async {
+    final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+    if (!dateFormat.hasMatch(startDate) || !dateFormat.hasMatch(endDate)) {
+      throw Exception('Invalid date format. Use YYYY-MM-DD');
+    }
+    if (startDate == 'range' || endDate == 'range') {
+      throw Exception('Invalid date: "range" is not a valid date');
+    }
+
+    final url = Uri.parse(
+      '$baseUrl/daily-details/range?startDate=$startDate&endDate=$endDate&userId=$userId',
+    );
+    final response = await coreAPI.get(url, headers: defaultHeaders);
+
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => DailyDetail.fromJson(e)).toList();
+    }
+    throw Exception(
+      'Failed to fetch date range details: ${response.statusCode}',
+    );
   }
 }

@@ -135,7 +135,7 @@ ThemeData mainTheme = ThemeData(
       fontWeight: FontWeight.w600,
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: _lightColorScheme.surface,
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -208,7 +208,6 @@ ThemeData mainTheme = ThemeData(
   ),
 );
 
-
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   colorScheme: _darkColorScheme,
@@ -226,7 +225,7 @@ ThemeData darkTheme = ThemeData(
       fontWeight: FontWeight.w600,
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: _darkColorScheme.surfaceContainerHighest,
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

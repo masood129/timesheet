@@ -222,18 +222,26 @@ class TaskController extends GetxController {
 
       // پاک کردن لیست‌ها بدون فراخوانی calculateStats
       selectedProjects.clear();
-      durationControllers.forEach((controller) => controller.dispose());
+      for (var controller in durationControllers) {
+        controller.dispose();
+      }
       durationControllers.clear();
-      descriptionControllers.forEach((controller) => controller.dispose());
+      for (var controller in descriptionControllers) {
+        controller.dispose();
+      }
       descriptionControllers.clear();
       selectedCarCostProjects.clear();
-      carKmControllers.forEach((controller) => controller.dispose());
+      for (var controller in carKmControllers) {
+        controller.dispose();
+      }
       carKmControllers.clear();
-      carCostControllers.forEach((controller) => controller.dispose());
+      for (var controller in carCostControllers) {
+        controller.dispose();
+      }
       carCostControllers.clear();
-      carCostDescriptionControllers.forEach(
-            (controller) => controller.dispose(),
-      );
+      for (var controller in carCostDescriptionControllers) {
+        controller.dispose();
+      }
       carCostDescriptionControllers.clear();
       carCostProjectErrors.clear();
       taskProjectErrors.clear(); // Clear task errors
@@ -322,18 +330,26 @@ class TaskController extends GetxController {
       leaveType.value = 'کاری';
 
       selectedProjects.clear();
-      durationControllers.forEach((controller) => controller.dispose());
+      for (var controller in durationControllers) {
+        controller.dispose();
+      }
       durationControllers.clear();
-      descriptionControllers.forEach((controller) => controller.dispose());
+      for (var controller in descriptionControllers) {
+        controller.dispose();
+      }
       descriptionControllers.clear();
       selectedCarCostProjects.clear();
-      carKmControllers.forEach((controller) => controller.dispose());
+      for (var controller in carKmControllers) {
+        controller.dispose();
+      }
       carKmControllers.clear();
-      carCostControllers.forEach((controller) => controller.dispose());
+      for (var controller in carCostControllers) {
+        controller.dispose();
+      }
       carCostControllers.clear();
-      carCostDescriptionControllers.forEach(
-            (controller) => controller.dispose(),
-      );
+      for (var controller in carCostDescriptionControllers) {
+        controller.dispose();
+      }
       carCostDescriptionControllers.clear();
       carCostProjectErrors.clear();
       taskProjectErrors.clear();
@@ -356,16 +372,26 @@ class TaskController extends GetxController {
     leaveType.value = 'کاری';
 
     selectedProjects.clear();
-    durationControllers.forEach((controller) => controller.dispose());
+    for (var controller in durationControllers) {
+      controller.dispose();
+    }
     durationControllers.clear();
-    descriptionControllers.forEach((controller) => controller.dispose());
+    for (var controller in descriptionControllers) {
+      controller.dispose();
+    }
     descriptionControllers.clear();
     selectedCarCostProjects.clear();
-    carKmControllers.forEach((controller) => controller.dispose());
+    for (var controller in carKmControllers) {
+      controller.dispose();
+    }
     carKmControllers.clear();
-    carCostControllers.forEach((controller) => controller.dispose());
+    for (var controller in carCostControllers) {
+      controller.dispose();
+    }
     carCostControllers.clear();
-    carCostDescriptionControllers.forEach((controller) => controller.dispose());
+    for (var controller in carCostDescriptionControllers) {
+      controller.dispose();
+    }
     carCostDescriptionControllers.clear();
     carCostProjectErrors.clear();
     taskProjectErrors.clear();

@@ -53,23 +53,40 @@ class HomeController extends GetxController {
   Future<void> fetchMonthlyDetails() async {
     try {
       isLoading.value = true;
-      final jalaliDate = Jalali(currentYear.value, currentMonth.value);
-      final gregorianDate = jalaliDate.toGregorian();
-      final gregorianYear = gregorianDate.year;
-      final gregorianMonth = gregorianDate.month;
+      final jalaliDate = Jalali(currentYear.value, currentMonth.value, 1);
+      final daysInMonth =
+          Jalali(currentYear.value, currentMonth.value).monthLength;
 
-      final details = await HomeApi().getMonthlyDetails(
-        gregorianYear,
-        gregorianMonth,
+      final startGregorian = jalaliDate.toGregorian();
+      final endJalali = Jalali(
+        currentYear.value,
+        currentMonth.value,
+        daysInMonth,
+      );
+      final endGregorian = endJalali.toGregorian();
+
+      final startDate =
+          '${startGregorian.year}-${startGregorian.month.toString().padLeft(2, '0')}-${startGregorian.day.toString().padLeft(2, '0')}';
+      final endDate =
+          '${endGregorian.year}-${endGregorian.month.toString().padLeft(2, '0')}-${endGregorian.day.toString().padLeft(2, '0')}';
+
+      final details = await HomeApi().getDateRangeDetails(
+        startDate,
+        endDate,
         1,
       );
-      dailyDetails.assignAll(details);
-      print(
-        'Fetched DailyDetails: ${dailyDetails.map((d) => d.toJson())}',
-      ); // دیباگ
+
+      final filteredDetails =
+          details.where((detail) {
+            final date = DateTime.parse(detail.date);
+            final jalali = Jalali.fromDateTime(date);
+            return jalali.year == currentYear.value &&
+                jalali.month == currentMonth.value;
+          }).toList();
+
+      dailyDetails.assignAll(filteredDetails);
     } catch (e) {
       Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
-      print('Error fetching details: $e');
     } finally {
       isLoading.value = false;
     }
@@ -88,7 +105,6 @@ class HomeController extends GetxController {
         );
       }
     } catch (e) {
-      print('Error parsing time: $timeString, Error: $e');
       return null;
     }
     return null;
@@ -120,13 +136,10 @@ class HomeController extends GetxController {
           detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
       final hasLeaveTime =
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
-      final hasPersonalTime = detail.personalTime != null;
-
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
         (sum, task) => sum + (task.duration ?? 0),
       );
-
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
       int? effectiveWorkMinutes;
@@ -138,30 +151,24 @@ class HomeController extends GetxController {
         effectiveWorkMinutes =
             presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
-
       isComplete =
           hasArrivalTime &&
           hasLeaveTime &&
-          hasPersonalTime &&
           effectiveWorkMinutes != null &&
           totalTaskMinutes == effectiveWorkMinutes &&
-          effectiveWorkMinutes > 0; // اطمینان از اینکه زمان حضور مثبت است
+          effectiveWorkMinutes > 0;
     } else {
       isComplete = true;
     }
 
     Color cardColor;
-
     if (detail.leaveType == 'کاری') {
-      if (isComplete) {
-        cardColor =
-            colorScheme.completedStatus; // <-- استفاده از رنگ جدید فسفری
-      } else {
-        cardColor =
-            brightness == Brightness.light
-                ? Colors.amber.shade300
-                : Colors.amber.shade400;
-      }
+      cardColor =
+          isComplete
+              ? colorScheme.completedStatus
+              : (brightness == Brightness.light
+                  ? Colors.amber.shade300
+                  : Colors.amber.shade400);
     } else {
       switch (detail.leaveType) {
         case 'استحقاقی':
