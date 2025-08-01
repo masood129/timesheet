@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,9 +14,9 @@ import 'home_controller.dart';
 class ThousandSeparatorInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
@@ -68,30 +69,36 @@ class TaskController extends GetxController {
   final returnCostController = TextEditingController();
 
   final RxList<Rx<Project?>> selectedProjects = <Rx<Project?>>[].obs;
-  final RxList<TextEditingController> durationControllers =
-      <TextEditingController>[].obs;
-  final RxList<TextEditingController> descriptionControllers =
-      <TextEditingController>[].obs;
+  final RxList<TextEditingController> durationControllers = <TextEditingController>[].obs;
+  final RxList<TextEditingController> descriptionControllers = <TextEditingController>[].obs;
 
   final RxList<Rx<Project?>> selectedCarCostProjects = <Rx<Project?>>[].obs;
-  final RxList<TextEditingController> carKmControllers =
-      <TextEditingController>[].obs;
-  final RxList<TextEditingController> carCostControllers =
-      <TextEditingController>[].obs;
-  final RxList<TextEditingController> carCostDescriptionControllers =
-      <TextEditingController>[].obs;
+  final RxList<TextEditingController> carKmControllers = <TextEditingController>[].obs;
+  final RxList<TextEditingController> carCostControllers = <TextEditingController>[].obs;
+  final RxList<TextEditingController> carCostDescriptionControllers = <TextEditingController>[].obs;
 
   final RxString presenceDuration = ''.obs;
   final RxString effectiveWork = ''.obs;
   final RxString taskTotalTime = ''.obs;
   final RxString totalCost = ''.obs;
 
+  // Timer-related variables
+  final RxBool isTimerRunning = false.obs;
+  final Rx<Project?> selectedTimerProject = Rx<Project?>(null);
+  final RxString timerDuration = '00:00:00'.obs;
+  DateTime? timerStartTime;
   Jalali? currentDate;
 
   @override
   void onInit() {
     super.onInit();
     fetchProjects();
+    // Start updating timer duration every second
+    ever(isTimerRunning, (_) {
+      if (isTimerRunning.value) {
+        _updateTimerDuration();
+      }
+    });
   }
 
   void setupListeners() {
@@ -104,6 +111,60 @@ class TaskController extends GetxController {
     durationControllers.listen((_) => calculateStats());
     selectedProjects.listen((_) => calculateStats());
     selectedCarCostProjects.listen((_) => calculateStats());
+  }
+
+  void startTimer() {
+    if (selectedTimerProject.value == null) return;
+    isTimerRunning.value = true;
+    timerStartTime = DateTime.now();
+    _updateTimerDuration();
+  }
+
+  void stopTimer(Jalali date) async {
+    if (!isTimerRunning.value || selectedTimerProject.value == null) return;
+    isTimerRunning.value = false;
+    final duration = DateTime.now().difference(timerStartTime!).inMinutes;
+    if (duration > 0) {
+      currentDate = date;
+      await loadDailyDetail(date, Get.find<HomeController>().dailyDetails);
+      // Check if a task with the same projectId already exists
+      int existingIndex = selectedProjects.indexWhere((p) => p.value?.id == selectedTimerProject.value!.id);
+      if (existingIndex != -1) {
+        // Update existing task duration
+        final existingDuration = _hhmmToMinutes(durationControllers[existingIndex].text) ?? 0;
+        durationControllers[existingIndex].text = _minutesToHHMM(existingDuration + duration);
+        if (descriptionControllers[existingIndex].text.isEmpty) {
+          descriptionControllers[existingIndex].text = 'اضافه‌شده توسط تایمر';
+        }
+      } else {
+        // Add new task
+        addTaskRow();
+        final index = selectedProjects.length - 1;
+        selectedProjects[index].value = selectedTimerProject.value;
+        durationControllers[index].text = _minutesToHHMM(duration);
+        descriptionControllers[index].text = 'اضافه‌شده توسط تایمر';
+      }
+      calculateStats();
+    }
+    timerStartTime = null;
+    timerDuration.value = '00:00:00';
+    selectedTimerProject.value = null;
+  }
+
+  void _updateTimerDuration() {
+    if (isTimerRunning.value && timerStartTime != null) {
+      Timer.periodic(Duration(seconds: 1), (timer) {
+        if (!isTimerRunning.value) {
+          timer.cancel();
+          return;
+        }
+        final duration = DateTime.now().difference(timerStartTime!).inSeconds;
+        final hours = duration ~/ 3600;
+        final minutes = (duration % 3600) ~/ 60;
+        final seconds = duration % 60;
+        timerDuration.value = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+      });
+    }
   }
 
   Future<void> fetchProjects() async {
@@ -123,9 +184,7 @@ class TaskController extends GetxController {
   }
 
   int? _hhmmToMinutes(String? time) {
-    if (time == null ||
-        time.isEmpty ||
-        !RegExp(r'^\d{2}:\d{2}$').hasMatch(time)) {
+    if (time == null || time.isEmpty || !RegExp(r'^\d{2}:\d{2}$').hasMatch(time)) {
       return null;
     }
     try {
@@ -158,10 +217,7 @@ class TaskController extends GetxController {
   }
 
   String? _toIsoTime(String? time, Jalali? date) {
-    if (time == null ||
-        time.isEmpty ||
-        !RegExp(r'^\d{2}:\d{2}$').hasMatch(time) ||
-        date == null) {
+    if (time == null || time.isEmpty || !RegExp(r'^\d{2}:\d{2}$').hasMatch(time) || date == null) {
       return null;
     }
     try {
@@ -202,25 +258,16 @@ class TaskController extends GetxController {
     }
   }
 
-  Future<void> loadDailyDetail(
-    Jalali date,
-    List<DailyDetail> dailyDetails,
-  ) async {
+  Future<void> loadDailyDetail(Jalali date, List<DailyDetail> dailyDetails) async {
     currentDate = date;
     try {
-      // تبدیل تاریخ جلالی به فرمت گرگویی برای مقایسه
       final gregorianDate = date.toGregorian();
-      final formattedDate =
-          '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
+      final formattedDate = '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
-      // جستجوی داده‌های روز در dailyDetails
-      final detail = dailyDetails.firstWhereOrNull(
-        (d) => d.date == formattedDate,
-      );
+      final detail = dailyDetails.firstWhereOrNull((d) => d.date == formattedDate);
 
       currentDetail.value = detail;
 
-      // پاک کردن لیست‌ها بدون فراخوانی calculateStats
       selectedProjects.clear();
       for (var controller in durationControllers) {
         controller.dispose();
@@ -246,67 +293,28 @@ class TaskController extends GetxController {
       carCostProjectErrors.clear();
       taskProjectErrors.clear();
 
-      // پر کردن فیلدها با داده‌های موجود یا مقادیر پیش‌فرض
       arrivalTimeController.text = _extractTime(detail?.arrivalTime) ?? '';
       leaveTimeController.text = _extractTime(detail?.leaveTime) ?? '';
       personalTimeController.text = _minutesToHHMM(detail?.personalTime);
       descriptionController.text = detail?.description ?? '';
-      goCostController.text =
-          detail?.goCost != null
-              ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!)
-              : '';
-      returnCostController.text =
-          detail?.returnCost != null
-              ? ThousandSeparatorInputFormatter()._formatNumber(
-                detail!.returnCost!,
-              )
-              : '';
+      goCostController.text = detail?.goCost != null ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!) : '';
+      returnCostController.text = detail?.returnCost != null ? ThousandSeparatorInputFormatter()._formatNumber(detail!.returnCost!) : '';
       leaveType.value = detail?.leaveType ?? 'کاری';
 
-      // پر کردن وظایف
       for (final task in detail?.tasks ?? []) {
-        final project = projects.firstWhereOrNull(
-          (p) => p.id == task.projectId,
-        );
+        final project = projects.firstWhereOrNull((p) => p.id == task.projectId);
         selectedProjects.add(Rx<Project?>(project));
-        durationControllers.add(
-          TextEditingController(text: _minutesToHHMM(task.duration)),
-        );
-        descriptionControllers.add(
-          TextEditingController(text: task.description ?? ''),
-        );
+        durationControllers.add(TextEditingController(text: _minutesToHHMM(task.duration)));
+        descriptionControllers.add(TextEditingController(text: task.description ?? ''));
         taskProjectErrors.add(RxBool(false));
       }
 
-      // پر کردن هزینه‌های ماشین شخصی
       for (final carCost in detail?.personalCarCosts ?? []) {
-        final project = projects.firstWhereOrNull(
-          (p) => p.id == carCost.projectId,
-        );
+        final project = projects.firstWhereOrNull((p) => p.id == carCost.projectId);
         selectedCarCostProjects.add(Rx<Project?>(project));
-        carKmControllers.add(
-          TextEditingController(
-            text:
-                carCost.kilometers != null
-                    ? ThousandSeparatorInputFormatter()._formatNumber(
-                      carCost.kilometers!,
-                    )
-                    : '',
-          ),
-        );
-        carCostControllers.add(
-          TextEditingController(
-            text:
-                carCost.cost != null
-                    ? ThousandSeparatorInputFormatter()._formatNumber(
-                      carCost.cost!,
-                    )
-                    : '',
-          ),
-        );
-        carCostDescriptionControllers.add(
-          TextEditingController(text: carCost.description ?? ''),
-        );
+        carKmControllers.add(TextEditingController(text: carCost.kilometers != null ? ThousandSeparatorInputFormatter()._formatNumber(carCost.kilometers!) : ''));
+        carCostControllers.add(TextEditingController(text: carCost.cost != null ? ThousandSeparatorInputFormatter()._formatNumber(carCost.cost!) : ''));
+        carCostDescriptionControllers.add(TextEditingController(text: carCost.description ?? ''));
         carCostProjectErrors.add(RxBool(false));
       }
 
@@ -321,7 +329,6 @@ class TaskController extends GetxController {
       calculateStats();
     } catch (e) {
       currentDetail.value = null;
-      // ریست کردن فیلدها
       arrivalTimeController.text = '';
       leaveTimeController.text = '';
       personalTimeController.text = '00:00';
@@ -454,7 +461,6 @@ class TaskController extends GetxController {
   Future<void> saveDailyDetail() async {
     if (currentDate == null) return;
 
-    // Reset error states
     for (var error in carCostProjectErrors) {
       error.value = false;
     }
@@ -462,7 +468,6 @@ class TaskController extends GetxController {
       error.value = false;
     }
 
-    // Validate task projects
     bool hasTaskError = false;
     for (int i = 0; i < selectedProjects.length; i++) {
       final duration = _hhmmToMinutes(durationControllers[i].text) ?? 0;
@@ -472,11 +477,9 @@ class TaskController extends GetxController {
       }
     }
 
-    // Validate car cost projects
     bool hasCarCostError = false;
     for (int i = 0; i < selectedCarCostProjects.length; i++) {
-      final kilometers =
-          int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
+      final kilometers = int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
       if (kilometers > 0 && selectedCarCostProjects[i].value == null) {
         carCostProjectErrors[i].value = true;
         hasCarCostError = true;
@@ -484,10 +487,7 @@ class TaskController extends GetxController {
     }
 
     if (hasTaskError || hasCarCostError) {
-      Get.snackbar(
-        'خطا',
-        'لطفاً برای تمام وظایف و هزینه‌های خودرو پروژه انتخاب کنید',
-      );
+      Get.snackbar('خطا', 'لطفاً برای تمام وظایف و هزینه‌های خودرو پروژه انتخاب کنید');
       return;
     }
 
@@ -510,8 +510,7 @@ class TaskController extends GetxController {
     final personalCarCosts = <PersonalCarCost>[];
     for (int i = 0; i < selectedCarCostProjects.length; i++) {
       if (selectedCarCostProjects[i].value != null) {
-        final kilometers =
-            int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
+        final kilometers = int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
         if (kilometers > 0) {
           final cost = calculateCarCost(kilometers);
           personalCarCosts.add(
@@ -527,8 +526,7 @@ class TaskController extends GetxController {
     }
 
     final goCost = int.tryParse(goCostController.text.replaceAll(',', '')) ?? 0;
-    final returnCost =
-        int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0;
+    final returnCost = int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0;
     final cappedGoCost = goCost > 40000 ? 40000 : goCost;
     final cappedReturnCost = returnCost > 40000 ? 40000 : returnCost;
 
@@ -573,28 +571,20 @@ class TaskController extends GetxController {
     final arrival = parseTime(arrivalTimeController.text);
     final leave = parseTime(leaveTimeController.text);
     final personal = _hhmmToMinutes(personalTimeController.text) ?? 0;
-    final totalTaskMinutes = durationControllers.fold<int>(0, (
-      sum,
-      controller,
-    ) {
+    final totalTaskMinutes = durationControllers.fold<int>(0, (sum, controller) {
       final minutes = _hhmmToMinutes(controller.text);
       return sum + (minutes ?? 0);
     });
 
     final goCost = int.tryParse(goCostController.text.replaceAll(',', '')) ?? 0;
-    final returnCost =
-        int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0;
+    final returnCost = int.tryParse(returnCostController.text.replaceAll(',', '')) ?? 0;
     final cappedGoCost = goCost > 40000 ? 40000 : goCost;
     final cappedReturnCost = returnCost > 40000 ? 40000 : returnCost;
 
-    // اطمینان از همگام‌سازی لیست‌ها
-    if (carKmControllers.isEmpty ||
-        carCostControllers.isEmpty ||
-        selectedCarCostProjects.isEmpty) {
+    if (carKmControllers.isEmpty || carCostControllers.isEmpty || selectedCarCostProjects.isEmpty) {
       return;
     }
 
-    // همگام‌سازی لیست‌ها
     while (carCostControllers.length < carKmControllers.length) {
       carCostControllers.add(TextEditingController());
     }
@@ -611,30 +601,20 @@ class TaskController extends GetxController {
       taskProjectErrors.add(RxBool(false));
     }
 
-    final totalCarCosts = carKmControllers.asMap().entries.fold<int>(0, (
-      sum,
-      entry,
-    ) {
+    final totalCarCosts = carKmControllers.asMap().entries.fold<int>(0, (sum, entry) {
       final i = entry.key;
       final controller = entry.value;
       if (i < carKmControllers.length && i < carCostControllers.length) {
-        final kilometers =
-            int.tryParse(controller.text.replaceAll(',', '')) ?? 0;
+        final kilometers = int.tryParse(controller.text.replaceAll(',', '')) ?? 0;
         return sum + (kilometers > 0 ? calculateCarCost(kilometers) : 0);
       }
       return sum;
     });
 
-    for (
-      int i = 0;
-      i < carKmControllers.length && i < carCostControllers.length;
-      i++
-    ) {
-      final kilometers =
-          int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
+    for (int i = 0; i < carKmControllers.length && i < carCostControllers.length; i++) {
+      final kilometers = int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
       final cost = kilometers > 0 ? calculateCarCost(kilometers) : 0;
-      carCostControllers[i].text = ThousandSeparatorInputFormatter()
-          ._formatNumber(cost);
+      carCostControllers[i].text = ThousandSeparatorInputFormatter()._formatNumber(cost);
     }
 
     final totalCosts = cappedGoCost + cappedReturnCost + totalCarCosts;
@@ -648,36 +628,23 @@ class TaskController extends GetxController {
         if (minutes > 0) {
           final hours = minutes ~/ 60;
           final mins = minutes % 60;
-          taskDetails.add(
-            '${selectedProjects[i].value!.projectName}: ${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}',
-          );
+          taskDetails.add('${selectedProjects[i].value!.projectName}: ${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}');
         }
       }
     }
 
     if (cappedGoCost > 0) {
-      costDetails.add(
-        'هزینه رفت: ${ThousandSeparatorInputFormatter()._formatNumber(cappedGoCost)}',
-      );
+      costDetails.add('هزینه رفت: ${ThousandSeparatorInputFormatter()._formatNumber(cappedGoCost)}');
     }
     if (cappedReturnCost > 0) {
-      costDetails.add(
-        'هزینه بازگشت: ${ThousandSeparatorInputFormatter()._formatNumber(cappedReturnCost)}',
-      );
+      costDetails.add('هزینه بازگشت: ${ThousandSeparatorInputFormatter()._formatNumber(cappedReturnCost)}');
     }
-    for (
-      int i = 0;
-      i < carKmControllers.length && i < selectedCarCostProjects.length;
-      i++
-    ) {
+    for (int i = 0; i < carKmControllers.length && i < selectedCarCostProjects.length; i++) {
       if (selectedCarCostProjects[i].value != null) {
-        final kilometers =
-            int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
+        final kilometers = int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
         if (kilometers > 0) {
           final cost = calculateCarCost(kilometers);
-          costDetails.add(
-            'هزینه خودرو (${selectedCarCostProjects[i].value!.projectName} - $kilometers کیلومتر): ${ThousandSeparatorInputFormatter()._formatNumber(cost)}',
-          );
+          costDetails.add('هزینه خودرو (${selectedCarCostProjects[i].value!.projectName} - $kilometers کیلومتر): ${ThousandSeparatorInputFormatter()._formatNumber(cost)}');
         }
       }
     }
@@ -686,16 +653,11 @@ class TaskController extends GetxController {
       final presence = leave - arrival;
       final effective = presence.inMinutes - personal;
 
-      summaryReport.value =
-          'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
-      presenceDuration.value =
-          'مدت حضور: ${presence.inHours} ساعت و ${presence.inMinutes % 60} دقیقه';
-      effectiveWork.value =
-          'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
-      taskTotalTime.value =
-          'مجموع زمان وظایف: ${totalTaskMinutes ~/ 60} ساعت و ${totalTaskMinutes % 60} دقیقه';
-      totalCost.value =
-          'مجموع هزینه: ${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
+      summaryReport.value = 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
+      presenceDuration.value = 'مدت حضور: ${presence.inHours} ساعت و ${presence.inMinutes % 60} دقیقه';
+      effectiveWork.value = 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
+      taskTotalTime.value = 'مجموع زمان وظایف: ${totalTaskMinutes ~/ 60} ساعت و ${totalTaskMinutes % 60} دقیقه';
+      totalCost.value = 'مجموع هزینه: ${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
     } else {
       summaryReport.value = '';
       presenceDuration.value = '';

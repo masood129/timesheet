@@ -76,12 +76,13 @@ class HomeController extends GetxController {
         1,
       );
 
-      final filteredDetails = details.where((detail) {
-        final date = DateTime.parse(detail.date);
-        final jalali = Jalali.fromDateTime(date);
-        return jalali.year == currentYear.value &&
-            jalali.month == currentMonth.value;
-      }).toList();
+      final filteredDetails =
+          details.where((detail) {
+            final date = DateTime.parse(detail.date);
+            final jalali = Jalali.fromDateTime(date);
+            return jalali.year == currentYear.value &&
+                jalali.month == currentMonth.value;
+          }).toList();
 
       dailyDetails.assignAll(filteredDetails);
     } catch (e) {
@@ -109,6 +110,36 @@ class HomeController extends GetxController {
     return null;
   }
 
+  String calculateEffectiveWork(Jalali date) {
+    final gregorianDate = date.toGregorian();
+    final formattedDate =
+        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
+    final detail = dailyDetails.firstWhereOrNull(
+      (d) => d.date == formattedDate,
+    );
+
+    if (detail == null || detail.leaveType != 'کاری') {
+      return '';
+    }
+
+    final arrival = _parseTime(detail.arrivalTime);
+    final leave = _parseTime(detail.leaveTime);
+    final personal = detail.personalTime ?? 0;
+
+    if (arrival != null && leave != null) {
+      final presenceDuration = Duration(
+        hours: leave.hour - arrival.hour,
+        minutes: leave.minute - arrival.minute,
+      );
+      final effective = presenceDuration.inMinutes - personal;
+      if (effective <= 0) {
+        return '';
+      }
+      return 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
+    }
+    return '';
+  }
+
   Map<String, dynamic> getCardStatus(Jalali date, BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -117,7 +148,7 @@ class HomeController extends GetxController {
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
@@ -138,7 +169,7 @@ class HomeController extends GetxController {
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-            (sum, task) => sum + (task.duration ?? 0),
+        (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -151,7 +182,8 @@ class HomeController extends GetxController {
         effectiveWorkMinutes =
             presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
-      isComplete = hasArrivalTime &&
+      isComplete =
+          hasArrivalTime &&
           hasLeaveTime &&
           effectiveWorkMinutes != null &&
           totalTaskMinutes == effectiveWorkMinutes &&
@@ -165,12 +197,14 @@ class HomeController extends GetxController {
     Color avatarIconColor;
     if (detail.leaveType == 'کاری') {
       avatarIcon = isComplete ? Icons.check_circle : Icons.access_time;
-      avatarColor = isComplete
-          ? colorScheme.completedStatus
-          : colorScheme.incompleteStatus;
-      avatarIconColor = isComplete
-          ? colorScheme.onCompletedStatus
-          : colorScheme.onIncompleteStatus;
+      avatarColor =
+          isComplete
+              ? colorScheme.completedStatus
+              : colorScheme.incompleteStatus;
+      avatarIconColor =
+          isComplete
+              ? colorScheme.onCompletedStatus
+              : colorScheme.onIncompleteStatus;
     } else {
       switch (detail.leaveType) {
         case 'استحقاقی':

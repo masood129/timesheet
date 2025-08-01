@@ -4,7 +4,7 @@ import '../model/project_model.dart';
 import '../model/daily_detail_model.dart';
 
 class HomeApi {
-  final String baseUrl = 'http://192.168.1.57:3000';
+  final String baseUrl = 'http://localhost:3000';
   final coreAPI = CoreApi();
   final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',

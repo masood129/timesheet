@@ -96,6 +96,7 @@ class Messages extends Translations {
       'live_calc_total_cost_prefix': 'مجموع هزینه: ',
       'loading_calendar': 'در حال بارگذاری تقویم...',
       'app_title': 'تایم شیت شمسی',
+      'no_effective_work': 'بدون کار مفید',
     },
     'en': {
       'calendar_title': 'Calendar',
@@ -190,6 +191,7 @@ class Messages extends Translations {
       'live_calc_total_cost_prefix': 'Total Cost: ',
       'loading_calendar': 'Loading calendar...',
       'app_title': 'Timesheet Shamsi Calendar',
+      'no_effective_work': 'no effective work',
     },
   };
 }
