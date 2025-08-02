@@ -258,7 +258,7 @@ class NoteDialog extends StatelessWidget {
                                           ? null
                                           : controller.leaveType.value,
                                   hint: Text(
-                                    'نوع مرخصی'.tr,
+                                    'وضعیت روز'.tr,
                                     style: TextStyle(color: disabledColor),
                                   ),
                                   decoration: AppStyles.inputDecoration(

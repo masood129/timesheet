@@ -374,7 +374,7 @@ class CalendarView extends StatelessWidget {
                                     ),
                                 ] else
                                   Text(
-                                    'نوع مرخصی: ${cardStatus['leaveType']}'.tr,
+                                    'وضعیت روز: ${cardStatus['leaveType']}'.tr,
                                   ),
                               ],
                               const SizedBox(height: 8),
