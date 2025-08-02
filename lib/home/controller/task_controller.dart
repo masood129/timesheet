@@ -120,7 +120,7 @@ class TaskController extends GetxController {
     _updateTimerDuration();
   }
 
-  void stopTimer(Jalali date) async {
+  stopTimer(Jalali date) async {
     if (!isTimerRunning.value || selectedTimerProject.value == null) return;
     isTimerRunning.value = false;
     final duration = DateTime.now().difference(timerStartTime!).inMinutes;

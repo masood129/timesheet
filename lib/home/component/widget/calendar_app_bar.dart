@@ -4,7 +4,6 @@ import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
 import '../../view/monthly_details_view.dart';
-import '../note_dialog.dart';
 
 class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
   CalendarAppBar({super.key});
@@ -46,26 +45,17 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             TextButton(onPressed: () => Navigator.pop(context), child: Text('لغو'.tr, style: TextStyle(color: colorScheme.error))),
             Obx(
                   () => ElevatedButton(
-                onPressed: taskController.selectedTimerProject.value == null ? null : () {
+                onPressed: taskController.selectedTimerProject.value == null ? null : () async {
                   if (taskController.isTimerRunning.value) {
-                    taskController.stopTimer(today);
-                    Navigator.pop(context);
-                    showModalBottomSheet(
-                      useSafeArea: true,
-                      enableDrag: false,
-                      isScrollControlled: true,
-                      context: context,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                      builder: (_) => NoteDialog(date: today),
-                    );
+                    await taskController.stopTimer(today);
+                    await taskController.saveDailyDetail();
                   } else {
                     taskController.startTimer();
                     Navigator.pop(context);
                   }
                 },
-                child: Text(taskController.isTimerRunning.value ? 'توقف تایمر'.tr : 'شروع تایمر'.tr, style: TextStyle(color: colorScheme.onPrimary)),
                 style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                child: Text(taskController.isTimerRunning.value ? 'توقف تایمر'.tr : 'شروع تایمر'.tr, style: TextStyle(color: colorScheme.onPrimary)),
               ),
             ),
           ],
