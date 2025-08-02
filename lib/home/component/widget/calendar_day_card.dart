@@ -7,87 +7,143 @@ import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
 import '../note_dialog.dart';
 
-class CalendarDayCard extends StatelessWidget {
+class CalendarDayCard extends StatefulWidget {
   final Jalali date;
 
-  CalendarDayCard({super.key, required this.date});
+  const CalendarDayCard({super.key, required this.date});
 
+  @override
+  State<CalendarDayCard> createState() => _CalendarDayCardState();
+}
+
+class _CalendarDayCardState extends State<CalendarDayCard>
+    with SingleTickerProviderStateMixin {
   final HomeController homeController = Get.find<HomeController>();
   final TaskController taskController = Get.find<TaskController>();
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isFriday = date.weekDay == 7;
-    final cardStatus = homeController.getCardStatus(date, context);
-    final effectiveWork = homeController.calculateEffectiveWork(date);
+    final isFriday = widget.date.weekDay == 7;
+    final cardStatus = homeController.getCardStatus(widget.date, context);
+    final effectiveWork = homeController.calculateEffectiveWork(widget.date);
     final today = Jalali.now();
-    final isToday = date.year == today.year && date.month == today.month && date.day == today.day;
+    final isToday = widget.date.year == today.year &&
+        widget.date.month == today.month &&
+        widget.date.day == today.day;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-      child: Card(
-        elevation: isToday ? 8 : 4,
-        shadowColor: isToday ? Colors.blue.withOpacity(0.3) : null,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: isToday ? BorderSide(color: Colors.amber[300]!, width: 1.5) : BorderSide.none,
-        ),
-        child: Container(
-          decoration: isToday ? BoxDecoration(
+      child: GestureDetector(
+        onTap: () {
+          taskController.loadDailyDetail(widget.date, homeController.dailyDetails);
+          showModalBottomSheet(
+            useSafeArea: true,
+            enableDrag: false,
+            isScrollControlled: true,
+            context: context,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            builder: (_) => NoteDialog(date: widget.date),
+          );
+        },
+        child: Card(
+          elevation: isToday ? 8 : 4,
+          shadowColor: isToday ? Colors.blue.withOpacity(0.3) : null,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(colors: [Colors.blue[800]!, Colors.blue[200]!], begin: Alignment.topLeft, end: Alignment.bottomRight),
-          )
-              : BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(12)),
-          child: ExpansionTile(
-            leading: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Theme.of(context).brightness == Brightness.light ? colorScheme.outline : colorScheme.outlineVariant, width: 1.5),
-                shape: BoxShape.circle,
+            side: isToday
+                ? BorderSide(color: Colors.amber[300]!, width: 1.5)
+                : BorderSide.none,
+          ),
+          child: Container(
+            decoration: isToday
+                ? BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: [Colors.blue[800]!, Colors.blue[200]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: CircleAvatar(
-                backgroundColor: isToday ? Colors.tealAccent[400] : cardStatus['avatarColor'],
-                child: Icon(isToday ? Icons.event_available : cardStatus['avatarIcon'], color: isToday ? Colors.white : cardStatus['avatarIconColor']),
-              ),
-            ),
-            title: Text(
-              '${date.formatter.wN} ${date.day} ${date.formatter.mN} ${date.year}',
-              style: TextStyle(
-                color: isToday ? Colors.white : isFriday ? colorScheme.error : null,
-                fontWeight: isToday || isFriday ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-            subtitle: Text(
-              effectiveWork.isNotEmpty ? effectiveWork : 'no_effective_work'.tr,
-              style: TextStyle(color: isToday ? Colors.white70 : colorScheme.onSurface.withOpacity(0.7)),
-            ),
-            onExpansionChanged: (expanded) {
-              if (expanded && cardStatus['leaveType'] == null) {}
-            },
-            trailing: IconButton(
-              icon: Icon(Icons.edit, color: isToday ? Colors.white : null),
-              onPressed: () {
-                taskController.loadDailyDetail(date, homeController.dailyDetails);
-                showModalBottomSheet(
-                  useSafeArea: true,
-                  enableDrag: false,
-                  isScrollControlled: true,
-                  context: context,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                  builder: (_) => NoteDialog(date: date),
-                );
-              },
-            ),
-            children: [
-              Container(
-                decoration: BoxDecoration(color: colorScheme.surface, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12))),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: _buildDayDetails(context, date, cardStatus),
+            )
+                : BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? colorScheme.outline
+                            : colorScheme.outlineVariant,
+                        width: 1.5,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor:
+                      isToday ? Colors.tealAccent[400] : cardStatus['avatarColor'],
+                      child: Icon(
+                        isToday ? Icons.event_available : cardStatus['avatarIcon'],
+                        color: isToday ? Colors.white : cardStatus['avatarIconColor'],
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    '${widget.date.formatter.wN} ${widget.date.day} ${widget.date.formatter.mN} ${widget.date.year}',
+                    style: TextStyle(
+                      color: isToday
+                          ? Colors.white
+                          : isFriday
+                          ? colorScheme.error
+                          : null,
+                      fontWeight: isToday || isFriday ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  subtitle: Text(
+                    effectiveWork.isNotEmpty ? effectiveWork : 'no_effective_work'.tr,
+                    style: TextStyle(
+                        color: isToday
+                            ? Colors.white70
+                            : colorScheme.onSurface.withOpacity(0.7)),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(
+                      _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      color: isToday ? Colors.white : null,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    },
+                  ),
                 ),
-              ),
-            ],
+                AnimatedCrossFade(
+                  firstChild: const SizedBox.shrink(),
+                  secondChild: Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildDayDetails(context, widget.date, cardStatus),
+                    ),
+                  ),
+                  crossFadeState:
+                  _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                  duration: const Duration(milliseconds: 300),
+                  firstCurve: Curves.easeInOut,
+                  secondCurve: Curves.easeInOut,
+                  sizeCurve: Curves.easeInOut,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -97,7 +153,8 @@ class CalendarDayCard extends StatelessWidget {
   Widget _buildDayDetails(BuildContext context, Jalali date, Map<String, dynamic> cardStatus) {
     final colorScheme = Theme.of(context).colorScheme;
     final gregorianDate = date.toGregorian();
-    final formattedDate = '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
+    final formattedDate =
+        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = homeController.dailyDetails.firstWhereOrNull((d) => d.date == formattedDate);
 
     if (detail == null) {
@@ -129,7 +186,10 @@ class CalendarDayCard extends StatelessWidget {
     if (leaveType == 'کاری') {
       return Text(
         cardStatus['isComplete'] ? 'وضعیت: کامل'.tr : 'وضعیت: ناقص'.tr,
-        style: TextStyle(color: cardStatus['isComplete'] ? colorScheme.completedStatus : colorScheme.incompleteStatus),
+        style: TextStyle(
+            color: cardStatus['isComplete']
+                ? colorScheme.completedStatus
+                : colorScheme.incompleteStatus),
       );
     }
     return Text('وضعیت روز: $leaveType'.tr);
@@ -141,7 +201,8 @@ class CalendarDayCard extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text('$label: $value', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+      child: Text('$label: $value',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
     );
   }
 
