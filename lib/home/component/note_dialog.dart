@@ -72,19 +72,35 @@ class NoteDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Obx(() => CalculationSummary(controller: controller)),
+            CalculationSummary(controller: controller),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: controller.saveDailyDetail,
-                    icon: Icon(Icons.save, color: colorScheme.onPrimary, size: 24),
-                    label: Text('ذخیره'.tr, style: TextStyle(color: colorScheme.onPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+                    icon: Icon(
+                      Icons.save,
+                      color: colorScheme.onPrimary,
+                      size: 24,
+                    ),
+                    label: Text(
+                      'ذخیره'.tr,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 4,
                       shadowColor: colorScheme.primary.withOpacity(0.3),
                     ),

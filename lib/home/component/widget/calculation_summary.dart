@@ -6,7 +6,7 @@ import '../../controller/task_controller.dart';
 class CalculationSummary extends StatelessWidget {
   final TaskController controller;
 
-  const CalculationSummary({Key? key, required this.controller}) : super(key: key);
+  const CalculationSummary({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
