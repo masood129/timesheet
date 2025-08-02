@@ -87,6 +87,12 @@ class TaskController extends GetxController {
   final Rx<Project?> selectedTimerProject = Rx<Project?>(null);
   final RxString timerDuration = '00:00:00'.obs;
   DateTime? timerStartTime;
+
+  // Personal Timer-related variables
+  final RxBool isPersonalTimerRunning = false.obs;
+  final RxString personalTimerDuration = '00:00:00'.obs;
+  DateTime? personalTimerStartTime;
+
   Jalali? currentDate;
 
   @override
@@ -96,6 +102,11 @@ class TaskController extends GetxController {
     // Start updating timer duration every second
     ever(isTimerRunning, (_) {
       if (isTimerRunning.value) {
+        _updateTimerDuration();
+      }
+    });
+    ever(isPersonalTimerRunning, (_) {
+      if (isPersonalTimerRunning.value) {
         _updateTimerDuration();
       }
     });
@@ -120,7 +131,13 @@ class TaskController extends GetxController {
     _updateTimerDuration();
   }
 
-  stopTimer(Jalali date) async {
+  void startPersonalTimer() {
+    isPersonalTimerRunning.value = true;
+    personalTimerStartTime = DateTime.now();
+    _updateTimerDuration();
+  }
+
+  Future<void> stopTimer(Jalali date) async {
     if (!isTimerRunning.value || selectedTimerProject.value == null) return;
     isTimerRunning.value = false;
     final duration = DateTime.now().difference(timerStartTime!).inMinutes;
@@ -151,9 +168,24 @@ class TaskController extends GetxController {
     selectedTimerProject.value = null;
   }
 
+  Future<void> stopPersonalTimer(Jalali date) async {
+    if (!isPersonalTimerRunning.value) return;
+    isPersonalTimerRunning.value = false;
+    final duration = DateTime.now().difference(personalTimerStartTime!).inMinutes;
+    if (duration > 0) {
+      currentDate = date;
+      await loadDailyDetail(date, Get.find<HomeController>().dailyDetails);
+      final existingPersonalTime = _hhmmToMinutes(personalTimeController.text) ?? 0;
+      personalTimeController.text = _minutesToHHMM(existingPersonalTime + duration);
+      calculateStats();
+    }
+    personalTimerStartTime = null;
+    personalTimerDuration.value = '00:00:00';
+  }
+
   void _updateTimerDuration() {
     if (isTimerRunning.value && timerStartTime != null) {
-      Timer.periodic(Duration(seconds: 1), (timer) {
+      Timer.periodic(const Duration(seconds: 1), (timer) {
         if (!isTimerRunning.value) {
           timer.cancel();
           return;
@@ -163,6 +195,20 @@ class TaskController extends GetxController {
         final minutes = (duration % 3600) ~/ 60;
         final seconds = duration % 60;
         timerDuration.value = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+      });
+    }
+
+    if (isPersonalTimerRunning.value && personalTimerStartTime != null) {
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!isPersonalTimerRunning.value) {
+          timer.cancel();
+          return;
+        }
+        final duration = DateTime.now().difference(personalTimerStartTime!).inSeconds;
+        final hours = duration ~/ 3600;
+        final minutes = (duration % 3600) ~/ 60;
+        final seconds = duration % 60;
+        personalTimerDuration.value = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
       });
     }
   }

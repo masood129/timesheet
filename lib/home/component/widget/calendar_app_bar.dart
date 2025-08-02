@@ -68,10 +68,34 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Obx(() {
-        final year = homeController.currentYear.value;
-        final month = homeController.currentMonth.value;
-        final monthName = Jalali(year, month).formatter.mN;
-        return Text('${'calendar_title'.tr}: $monthName $year');
+        if (taskController.isTimerRunning.value && taskController.selectedTimerProject.value != null) {
+          final projectName = taskController.selectedTimerProject.value!.projectName;
+          final timerText = taskController.timerDuration.value;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                projectName,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                timerText,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ],
+          );
+        } else {
+          final year = homeController.currentYear.value;
+          final month = homeController.currentMonth.value;
+          final monthName = Jalali(year, month).formatter.mN;
+          return Text('${'calendar_title'.tr}: $monthName $year');
+        }
       }),
       actions: [
         IconButton(icon: const Icon(Icons.arrow_back), onPressed: homeController.previousMonth),
