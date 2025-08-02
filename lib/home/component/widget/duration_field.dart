@@ -1,0 +1,63 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../core/theme/app_styles.dart';
+
+class DurationField extends StatelessWidget {
+  final TextEditingController controller;
+  final bool isEnabled;
+
+  const DurationField({
+    Key? key,
+    required this.controller,
+    required this.isEnabled,
+  }) : super(key: key);
+
+  TimeOfDay _getInitialTime() {
+    if (controller.text.isNotEmpty &&
+        RegExp(r'^\d{2}:\d{2}$').hasMatch(controller.text)) {
+      final parts = controller.text.split(':');
+      final hours = int.tryParse(parts[0]) ?? 0;
+      final minutes = int.tryParse(parts[1]) ?? 0;
+      if (hours <= 23 && minutes <= 59) {
+        return TimeOfDay(hour: hours, minute: minutes);
+      }
+    }
+    return const TimeOfDay(hour: 0, minute: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
+      child: TextField(
+        readOnly: true,
+        controller: controller,
+        enabled: isEnabled,
+        decoration: AppStyles.inputDecoration(
+          context,
+          'task_duration',
+          Icons.timer,
+          isEnabled,
+        ),
+        onTap: isEnabled
+            ? () async {
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: _getInitialTime(),
+          );
+          if (picked != null) {
+            final hours = picked.hour;
+            final minutes = picked.minute;
+            if (hours <= 23 && minutes <= 59) {
+              controller.text =
+              '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+            } else {
+              Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+            }
+          }
+        }
+            : null,
+      ),
+    );
+  }
+}
