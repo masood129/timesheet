@@ -29,7 +29,7 @@ class MonthlyDetailsController extends GetxController {
       final fetchedProjects = await HomeApi().getProjects();
       projects.assignAll(fetchedProjects);
     } catch (e) {
-      Get.snackbar('خطا', 'دریافت پروژه‌ها با مشکل مواجه شد'.tr);
+      Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -61,7 +61,7 @@ class MonthlyDetailsController extends GetxController {
     if (!kIsWeb) {
       bool hasPermission = await _requestStoragePermission();
       if (!hasPermission) {
-        Get.snackbar('خطا', 'مجوز ذخیره‌سازی داده نشده است'.tr);
+        Get.snackbar('error'.tr, 'مجوز ذخیره‌سازی داده نشده است'.tr);
         return;
       }
     }
@@ -99,13 +99,11 @@ class MonthlyDetailsController extends GetxController {
 
       if (detail != null) {
         for (var task in detail.tasks) {
-          if (task.projectId != null) {
-            final projectIndex = projects.indexWhere((p) => p.id == task.projectId);
-            if (projectIndex != -1) {
-              projectDurations[projectIndex] = formatDuration(task.duration);
-            }
+          final projectIndex = projects.indexWhere((p) => p.id == task.projectId);
+          if (projectIndex != -1) {
+            projectDurations[projectIndex] = formatDuration(task.duration);
           }
-        }
+                }
       }
 
       sheet.appendRow([
@@ -133,16 +131,16 @@ class MonthlyDetailsController extends GetxController {
           bytes: excelData,
           mimeType: MimeType.microsoftExcel,
         );
-        Get.snackbar('موفقیت', 'فایل اکسل دانلود شد'.tr);
+        Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
       } else {
         final directory = await getTemporaryDirectory();
         final filePath = '${directory.path}/$fileName';
         final file = File(filePath);
         await file.writeAsBytes(excelData);
-        Get.snackbar('موفقیت', 'فایل اکسل در $filePath ذخیره شد'.tr);
+        Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطا در ذخیره/دانلود فایل اکسل: $e'.tr);
+      Get.snackbar('error'.tr, 'save_details_issue_snackbar'.tr + ': $e');
     }
   }
 }

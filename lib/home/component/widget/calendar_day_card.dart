@@ -205,7 +205,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         ],
         if (note != null && note.isNotEmpty) ...[
           Text(
-            'یادداشت: $note',
+            '${'note'.tr}: $note',
             style: TextStyle(
               fontSize: 12,
               color: colorScheme.onSurface,
@@ -244,7 +244,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isHoliday ? 'تعطیل' : 'رویدادها',
+          isHoliday ? 'holiday'.tr : 'events'.tr,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isHoliday ? colorScheme.onError : colorScheme.primary,
@@ -274,7 +274,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
               maxLines: 1,
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -284,7 +284,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     final leaveType = cardStatus['leaveType'];
     if (leaveType == 'کاری') {
       return Text(
-        cardStatus['isComplete'] ? 'وضعیت: کامل'.tr : 'وضعیت: ناقص'.tr,
+        cardStatus['isComplete'] ? 'working_day_complete'.tr : 'working_day_incomplete'.tr,
         style: TextStyle(
           fontSize: 12,
           color: cardStatus['isComplete']
@@ -295,7 +295,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
       );
     }
     return Text(
-      'وضعیت روز: $leaveType'.tr,
+      '${'leave_type'.tr}: $leaveType',
       style: TextStyle(
         fontSize: 12,
         color: colorScheme.onSurface,

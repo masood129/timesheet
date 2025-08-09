@@ -149,7 +149,7 @@ ThemeData mainTheme = ThemeData(
     foregroundColor: _lightColorScheme.onPrimary,
     elevation: 1,
     titleTextStyle: TextStyle(
-      fontFamily: 'Vazirmatn',
+      fontFamily: 'BNazanin',
       color: _lightColorScheme.onPrimary,
       fontSize: 20,
       fontWeight: FontWeight.w600,
@@ -187,7 +187,7 @@ ThemeData mainTheme = ThemeData(
   textTheme: const TextTheme().apply(
     bodyColor: _lightColorScheme.onSurface,
     displayColor: _lightColorScheme.onSurface,
-    fontFamily: 'Vazirmatn',
+    fontFamily: 'BNazanin',
   ).copyWith(
     titleLarge:
     TextStyle(color: _lightColorScheme.primary, fontWeight: FontWeight.bold),
@@ -201,14 +201,14 @@ ThemeData mainTheme = ThemeData(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       textStyle: const TextStyle(
-          fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w600),
+          fontFamily: 'BNazanin', fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: _lightColorScheme.primary,
       textStyle:
-      const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w600),
+      const TextStyle(fontFamily: 'BNazanin', fontWeight: FontWeight.w600),
     ),
   ),
   dividerTheme: DividerThemeData(
@@ -249,7 +249,7 @@ ThemeData darkTheme = ThemeData(
     foregroundColor: _darkColorScheme.onSurface,
     elevation: 1,
     titleTextStyle: TextStyle(
-      fontFamily: 'Vazirmatn',
+      fontFamily: 'BNazanin',
       color: _darkColorScheme.onSurface,
       fontSize: 20,
       fontWeight: FontWeight.w600,
@@ -286,7 +286,7 @@ ThemeData darkTheme = ThemeData(
   textTheme: const TextTheme().apply(
     bodyColor: _darkColorScheme.onSurface,
     displayColor: _darkColorScheme.onSurface,
-    fontFamily: 'Vazirmatn',
+    fontFamily: 'BNazanin',
   ).copyWith(
     titleLarge:
     TextStyle(color: _darkColorScheme.primary, fontWeight: FontWeight.bold),
@@ -300,14 +300,14 @@ ThemeData darkTheme = ThemeData(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       textStyle: const TextStyle(
-          fontFamily: 'Vazirmatn', fontSize: 16, fontWeight: FontWeight.w600),
+          fontFamily: 'BNazanin', fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: _darkColorScheme.primary,
       textStyle:
-      const TextStyle(fontFamily: 'Vazirmatn', fontWeight: FontWeight.w600),
+      const TextStyle(fontFamily: 'BNazanin', fontWeight: FontWeight.w600),
     ),
   ),
   dividerTheme: DividerThemeData(

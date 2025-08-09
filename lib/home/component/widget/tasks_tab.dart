@@ -6,7 +6,7 @@ import 'task_row.dart';
 class TasksTab extends StatelessWidget {
   final TaskController controller;
 
-  const TasksTab({Key? key, required this.controller}) : super(key: key);
+  const TasksTab({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

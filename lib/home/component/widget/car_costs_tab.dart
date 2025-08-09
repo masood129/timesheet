@@ -6,7 +6,7 @@ import 'car_cost_row.dart';
 class CarCostsTab extends StatelessWidget {
   final TaskController controller;
 
-  const CarCostsTab({Key? key, required this.controller}) : super(key: key);
+  const CarCostsTab({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

@@ -13,13 +13,13 @@ class TaskRow extends StatelessWidget {
   final Color disabledColor;
 
   const TaskRow({
-    Key? key,
+    super.key,
     required this.index,
     required this.controller,
     required this.isEnabled,
     required this.colorScheme,
     required this.disabledColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

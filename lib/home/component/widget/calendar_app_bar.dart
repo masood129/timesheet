@@ -4,7 +4,6 @@ import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/model/project_model.dart';
 import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
-import '../../view/monthly_details_view.dart';
 
 class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
   CalendarAppBar({super.key});
@@ -19,16 +18,16 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (context) {
         final colorScheme = Theme.of(context).colorScheme;
         return AlertDialog(
-          title: Text('تایمر پروژه'.tr, style: TextStyle(color: colorScheme.primary)),
+          title: Text('project_timer'.tr, style: TextStyle(color: colorScheme.primary)),
           content: Obx(
                 () => Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField(
                   value: taskController.selectedTimerProject.value,
-                  hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: colorScheme.onSurface)),
+                  hint: Text('select_project'.tr, style: TextStyle(color: colorScheme.onSurface)),
                   decoration: InputDecoration(
-                    labelText: 'پروژه'.tr,
+                    labelText: 'projects'.tr,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   items: taskController.projects.map((project) => DropdownMenuItem(value: project, child: Text(project.projectName))).toList(),
@@ -36,14 +35,14 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  taskController.isTimerRunning.value ? 'تایمر پروژه در حال اجرا: ${taskController.timerDuration.value}' : taskController.isPersonalTimerRunning.value ? 'تایمر شخصی در حال اجرا: ${taskController.personalTimerDuration.value}' : 'تایمر متوقف است',
+                  taskController.isTimerRunning.value ? '${'project_timer_running'.tr} ${taskController.timerDuration.value}' : taskController.isPersonalTimerRunning.value ? '${'personal_timer_running'.tr} ${taskController.personalTimerDuration.value}' : 'timer_stopped'.tr,
                   style: TextStyle(color: colorScheme.onSurface),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text('لغو'.tr, style: TextStyle(color: colorScheme.error))),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text('cancel'.tr, style: TextStyle(color: colorScheme.error))),
             Obx(
                   () => ElevatedButton(
                 onPressed: (taskController.selectedTimerProject.value == null && !taskController.isTimerRunning.value) || taskController.isPersonalTimerRunning.value
@@ -58,7 +57,7 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                child: Text(taskController.isTimerRunning.value ? 'توقف تایمر'.tr : 'شروع تایمر پروژه'.tr, style: TextStyle(color: colorScheme.onPrimary)),
+                child: Text(taskController.isTimerRunning.value ? 'stop_project_timer'.tr : 'start_project_timer'.tr, style: TextStyle(color: colorScheme.onPrimary)),
               ),
             ),
             Obx(
@@ -75,7 +74,7 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: colorScheme.secondary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                child: Text(taskController.isPersonalTimerRunning.value ? 'توقف تایمر شخصی'.tr : 'شروع تایمر شخصی'.tr, style: TextStyle(color: colorScheme.onSecondary)),
+                child: Text(taskController.isPersonalTimerRunning.value ? 'stop_personal_timer'.tr : 'start_personal_timer'.tr, style: TextStyle(color: colorScheme.onSecondary)),
               ),
             ),
           ],
@@ -116,7 +115,7 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'تایمر شخصی'.tr,
+                'personal_timer'.tr,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -141,8 +140,6 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(icon: const Icon(Icons.arrow_back), onPressed: homeController.previousMonth),
         IconButton(icon: const Icon(Icons.arrow_forward), onPressed: homeController.nextMonth),
-        IconButton(icon: const Icon(Icons.list), onPressed: () => Get.to(() => MonthlyDetailsView())),
-        // New toggle button
         Obx(() => IconButton(
           icon: Icon(
             homeController.isListView.value ? Icons.grid_view : Icons.list,

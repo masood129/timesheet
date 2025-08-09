@@ -77,8 +77,6 @@ class Messages extends Translations {
       "company_arrival_time": "ساعت ورود به شرکت:",
       "company_leave_time": "ساعت خروج از شرکت:",
       "task_duration": "مدت زمان تسک",
-
-      // New keys
       'invalid_time_format_error': 'فرمت زمان نامعتبر است',
       'calculations_title': 'محاسبات',
       'tasks_title_section': 'وظایف', // To differentiate from 'tasks' which is 'تسک‌ها:'
@@ -109,6 +107,13 @@ class Messages extends Translations {
       'personal_timer_running': 'تایمر شخصی در حال اجرا:',
       'timer_stopped': 'تایمر متوقف است',
       'select_project_for_timer': 'برای شروع تایمر، یک پروژه انتخاب کنید',
+      "export_to_excel": "خروجی اکسل",
+      "no_projects": "پروژه‌ای یافت نشد",
+      "working_day_incomplete": "روز کاری: ناقص",
+      "working_day_complete": "روز کاری: کامل",
+      "no_details_available": "بدون اطلاعات",
+      "no_tasks_recorded": "وظیفه‌ای ثبت نشده است",
+      "no_costs_recorded": "هزینه‌ای ثبت نشده است"
     },
     'en': {
       "failed_to_load_holidays": "Failed to load holiday data",
@@ -183,8 +188,6 @@ class Messages extends Translations {
       "company_arrival_time": "Company arrival time",
       "company_leave_time": "Company leave time",
       "task_duration": "Task duration",
-
-      // New keys
       'invalid_time_format_error': 'Invalid time format',
       'calculations_title': 'Calculations',
       'tasks_title_section': 'Tasks',
@@ -215,6 +218,13 @@ class Messages extends Translations {
       'personal_timer_running': 'Personal timer running:',
       'timer_stopped': 'Timer stopped',
       'select_project_for_timer': 'Select a project to start the timer',
+      "export_to_excel": "Export to Excel",
+      "no_projects": "No projects found",
+      "working_day_incomplete": "Working day: Incomplete",
+      "working_day_complete": "Working day: Complete",
+      "no_details_available": "No details available",
+      "no_tasks_recorded": "No tasks have been recorded",
+      "no_costs_recorded": "No costs have been recorded"
     },
   };
 }

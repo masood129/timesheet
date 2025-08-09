@@ -28,7 +28,7 @@ class MonthlyDetailsView extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.download, color: colorScheme.onPrimaryContainer),
-            tooltip: 'خروجی اکسل'.tr,
+            tooltip: 'export_to_excel'.tr,
             onPressed: controller.exportToExcel,
           ),
         ],

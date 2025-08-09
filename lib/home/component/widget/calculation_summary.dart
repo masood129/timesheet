@@ -15,7 +15,7 @@ class CalculationSummary extends StatelessWidget {
     return Obx(
           () => ExpansionTile(
         title: Text(
-          controller.summaryReport.value.isEmpty ? 'محاسبات'.tr : controller.summaryReport.value,
+          controller.summaryReport.value.isEmpty ? 'calculations_title'.tr : controller.summaryReport.value,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary),
         ),
         leading: Icon(Icons.calculate, color: colorScheme.primary, size: 20),
@@ -34,11 +34,11 @@ class CalculationSummary extends StatelessWidget {
                 _buildSummaryRow(context, Icons.access_time, controller.presenceDuration.value),
                 _buildSummaryRow(context, Icons.work, controller.effectiveWork.value),
                 const SizedBox(height: 8),
-                Text('زمان وظایف به تفکیک:'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.primary)),
+                Text('${'tasks_title_section'.tr}:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.primary)),
                 const SizedBox(height: 8),
                 _buildTaskList(context),
                 const SizedBox(height: 8),
-                Text('هزینه‌ها به تفکیک:'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.primary)),
+                Text('${'costs_title_section'.tr}:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: colorScheme.primary)),
                 const SizedBox(height: 8),
                 _buildCostList(context),
               ],
@@ -55,7 +55,7 @@ class CalculationSummary extends StatelessWidget {
       children: [
         Icon(icon, color: colorScheme.secondary, size: 18),
         const SizedBox(width: 8),
-        Text(text, style: TextStyle(fontSize: 14, color: colorScheme.onSurface)),
+        Text(text.isEmpty ? 'no_effective_work'.tr : text, style: TextStyle(fontSize: 14, color: colorScheme.onSurface)),
       ],
     );
   }
@@ -76,7 +76,7 @@ class CalculationSummary extends StatelessWidget {
           ),
         ),
         ).toList()
-            : [Text('وظیفه‌ای ثبت نشده است'.tr, style: TextStyle(fontSize: 14, color: colorScheme.onSurface))],
+            : [Text('no_tasks_recorded'.tr, style: TextStyle(fontSize: 14, color: colorScheme.onSurface))],
       ),
     );
   }
@@ -97,7 +97,7 @@ class CalculationSummary extends StatelessWidget {
           ),
         ),
         ).toList()
-            : [Text('هزینه‌ای ثبت نشده است'.tr, style: TextStyle(fontSize: 14, color: colorScheme.onSurface))],
+            : [Text('no_costs_recorded'.tr, style: TextStyle(fontSize: 14, color: colorScheme.onSurface))],
       ),
     );
   }

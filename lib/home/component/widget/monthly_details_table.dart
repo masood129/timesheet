@@ -12,11 +12,11 @@ class MonthlyDetailsTable extends StatelessWidget {
   final List<DailyDetail> dailyDetails;
 
   const MonthlyDetailsTable({
-    Key? key,
+    super.key,
     required this.daysInMonth,
     required this.projects,
     required this.dailyDetails,
-  }) : super(key: key);
+  });
 
   String _formatDuration(int? minutes) {
     if (minutes == null || minutes == 0) return '';
@@ -57,7 +57,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                 top: BorderSide(color: colorScheme.onSurface.withOpacity(0.3), width: 1),
                 bottom: BorderSide(color: colorScheme.onSurface.withOpacity(0.3), width: 1),
               ),
-              headingRowColor: MaterialStateProperty.all(colorScheme.primaryContainer.withOpacity(0.8)),
+              headingRowColor: WidgetStateProperty.all(colorScheme.primaryContainer.withOpacity(0.8)),
               dataTextStyle: TextStyle(fontSize: 11, color: colorScheme.onSurface),
               columns: [
                 DataColumn(label: Text('تاریخ'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: colorScheme.onPrimaryContainer))),
@@ -84,17 +84,15 @@ class MonthlyDetailsTable extends StatelessWidget {
 
                 if (detail != null) {
                   for (var task in detail.tasks) {
-                    if (task.projectId != null) {
-                      final projectIndex = projects.indexWhere((p) => p.id == task.projectId);
-                      if (projectIndex != -1) {
-                        projectDurations[projectIndex] = _formatDuration(task.duration);
-                      }
+                    final projectIndex = projects.indexWhere((p) => p.id == task.projectId);
+                    if (projectIndex != -1) {
+                      projectDurations[projectIndex] = _formatDuration(task.duration);
                     }
-                  }
+                                    }
                 }
 
                 return DataRow(
-                  color: MaterialStateProperty.all(index % 2 == 0 ? colorScheme.surface : colorScheme.surfaceVariant.withOpacity(0.5)),
+                  color: WidgetStateProperty.all(index % 2 == 0 ? colorScheme.surface : colorScheme.surfaceVariant.withOpacity(0.5)),
                   cells: [
                     DataCell(Text('${date.formatter.wN} ${date.day} ${date.formatter.mN}', style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w600))),
                     DataCell(Text(detail?.leaveType ?? '', style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)))),

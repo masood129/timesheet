@@ -219,7 +219,7 @@ class TaskController extends GetxController {
       final value = await HomeApi().getProjects();
       projects.assignAll(value);
     } catch (e) {
-      Get.snackbar('خطا', 'دریافت پروژه‌ها با مشکل مواجه شد');
+      Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);
     }
   }
 
@@ -412,7 +412,7 @@ class TaskController extends GetxController {
       addTaskRow();
       addCarCostRow();
 
-      Get.snackbar('خطا', 'بارگذاری جزئیات با مشکل مواجه شد');
+      Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
       calculateStats();
     }
   }
@@ -534,7 +534,7 @@ class TaskController extends GetxController {
     }
 
     if (hasTaskError || hasCarCostError) {
-      Get.snackbar('خطا', 'لطفاً برای تمام وظایف و هزینه‌های خودرو پروژه انتخاب کنید');
+      Get.snackbar('error'.tr, 'لطفاً برای تمام وظایف و هزینه‌های خودرو پروژه انتخاب کنید');
       return;
     }
 
@@ -594,10 +594,10 @@ class TaskController extends GetxController {
     try {
       await HomeApi().saveDailyDetail(detail);
       Get.back();
-      Get.snackbar('موفقیت', 'جزئیات ذخیره شد');
+      Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
       Get.find<HomeController>().fetchMonthlyDetails();
     } catch (e) {
-      Get.snackbar('خطا', 'ذخیره جزئیات با مشکل مواجه شد');
+      Get.snackbar('error'.tr, 'save_details_issue_snackbar'.tr);
     }
   }
 
@@ -700,11 +700,11 @@ class TaskController extends GetxController {
       final presence = leave - arrival;
       final effective = presence.inMinutes - personal;
 
-      summaryReport.value = 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
-      presenceDuration.value = 'مدت حضور: ${presence.inHours} ساعت و ${presence.inMinutes % 60} دقیقه';
-      effectiveWork.value = 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
-      taskTotalTime.value = 'مجموع زمان وظایف: ${totalTaskMinutes ~/ 60} ساعت و ${totalTaskMinutes % 60} دقیقه';
-      totalCost.value = 'مجموع هزینه: ${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
+      summaryReport.value = '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${ 'live_calc_hours_and_suffix'.tr}${effective % 60}${ 'live_calc_minutes_suffix'.tr}';
+      presenceDuration.value = '${'live_calc_presence_duration_prefix'.tr}${presence.inHours}${ 'live_calc_hours_and_suffix'.tr}${presence.inMinutes % 60}${ 'live_calc_minutes_suffix'.tr}';
+      effectiveWork.value = '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${ 'live_calc_hours_and_suffix'.tr}${effective % 60}${ 'live_calc_minutes_suffix'.tr}';
+      taskTotalTime.value = '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${ 'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${ 'live_calc_minutes_suffix'.tr}';
+      totalCost.value = '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
     } else {
       summaryReport.value = '';
       presenceDuration.value = '';

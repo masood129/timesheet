@@ -8,7 +8,7 @@ import 'time_picker_field.dart';
 class DailyDetailsTab extends StatelessWidget {
   final TaskController controller;
 
-  const DailyDetailsTab({Key? key, required this.controller}) : super(key: key);
+  const DailyDetailsTab({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

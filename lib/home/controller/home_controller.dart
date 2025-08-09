@@ -31,7 +31,6 @@ class HomeController extends GetxController {
 
   Future<void> loadHolidays() async {
     if (Get.context == null) {
-      print('Error: Get.context is null, cannot load holidays');
       return;
     }
 
@@ -53,22 +52,11 @@ class HomeController extends GetxController {
       for (var item in data1405) {
         combinedHolidays[item['date']] = item;
       }
-
       holidays.assignAll(combinedHolidays);
-
-      print('Holidays loaded successfully. Total entries: ${holidays.length}');
-      if (holidays.isNotEmpty) {
-        final sampleDate = holidays.keys.first;
-        print('Sample holiday entry for $sampleDate: ${holidays[sampleDate]}');
-      } else {
-        print('No holiday data loaded.');
-      }
     } catch (e) {
-      print('Error loading holidays: $e');
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_load_holidays'.tr);
       } else {
-        print('Cannot show snackbar: Get.context is null');
       }
     }
   }
@@ -148,8 +136,6 @@ class HomeController extends GetxController {
     } catch (e) {
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
-      } else {
-        print('Cannot show snackbar: Get.context is null');
       }
     } finally {
       isLoading.value = false;
@@ -266,7 +252,7 @@ class HomeController extends GetxController {
 
     bool isComplete = false;
     if (hasWorkingHours) {
-      final hasArrivalTime = detail!.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
+      final hasArrivalTime = detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
       final hasLeaveTime = detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
@@ -297,7 +283,7 @@ class HomeController extends GetxController {
       };
     }
 
-    if (detail!.leaveType != 'کاری') {
+    if (detail.leaveType != 'کاری') {
       IconData avatarIcon;
       Color avatarColor;
       Color avatarIconColor;

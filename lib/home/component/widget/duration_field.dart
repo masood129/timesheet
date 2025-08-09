@@ -7,10 +7,10 @@ class DurationField extends StatelessWidget {
   final bool isEnabled;
 
   const DurationField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.isEnabled,
-  }) : super(key: key);
+  });
 
   TimeOfDay _getInitialTime() {
     if (controller.text.isNotEmpty &&
@@ -28,7 +28,7 @@ class DurationField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
+      message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
       child: TextField(
         readOnly: true,
         controller: controller,
@@ -52,7 +52,7 @@ class DurationField extends StatelessWidget {
               controller.text =
               '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
             } else {
-              Get.snackbar('خطا', 'فرمت زمان نامعتبر است'.tr);
+              Get.snackbar('error'.tr, 'invalid_time_format_error'.tr);
             }
           }
         }
