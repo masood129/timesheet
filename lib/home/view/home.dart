@@ -36,14 +36,32 @@ class CalendarView extends StatelessWidget {
         final month = homeController.currentMonth.value;
         final daysInMonth = homeController.daysInMonth;
 
-        return ListView.builder(
-          itemCount: daysInMonth,
-          itemBuilder: (context, index) {
-            final day = index + 1;
-            final date = Jalali(year, month, day);
-            return CalendarDayCard(date: date);
-          },
-        );
+        final days = List.generate(daysInMonth, (index) => Jalali(year, month, index + 1));
+
+        return Obx(() {
+          if (homeController.isListView.value) {
+            return ListView.builder(
+              itemCount: daysInMonth,
+              itemBuilder: (context, index) {
+                return CalendarDayCard(date: days[index]);
+              },
+            );
+          } else {
+            return GridView.builder(
+              padding: const EdgeInsets.all(8.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 4.0,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: daysInMonth,
+              itemBuilder: (context, index) {
+                return CalendarDayCard(date: days[index]);
+              },
+            );
+          }
+        });
       }),
     );
   }

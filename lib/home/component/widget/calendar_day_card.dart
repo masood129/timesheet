@@ -72,6 +72,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                 color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(12)),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListTile(
                   leading: Container(
@@ -112,6 +113,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                             : colorScheme.onSurface.withOpacity(0.7)),
                   ),
                   trailing: IconButton(
+                    iconSize: 35,
                     icon: Icon(
                       _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       color: isToday ? Colors.white : null,
@@ -125,14 +127,15 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                 ),
                 AnimatedCrossFade(
                   firstChild: const SizedBox.shrink(),
-                  secondChild: Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: _buildDayDetails(context, widget.date, cardStatus),
+                  secondChild: ClipRect(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _buildDayDetails(context, widget.date, cardStatus),
+                      ),
                     ),
                   ),
                   crossFadeState:

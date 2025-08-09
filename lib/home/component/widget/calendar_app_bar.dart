@@ -142,6 +142,13 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(icon: const Icon(Icons.arrow_back), onPressed: homeController.previousMonth),
         IconButton(icon: const Icon(Icons.arrow_forward), onPressed: homeController.nextMonth),
         IconButton(icon: const Icon(Icons.list), onPressed: () => Get.to(() => MonthlyDetailsView())),
+        // New toggle button
+        Obx(() => IconButton(
+          icon: Icon(
+            homeController.isListView.value ? Icons.grid_view : Icons.list,
+          ),
+          onPressed: homeController.toggleView,
+        )),
         IconButton(icon: const Icon(Icons.timer), onPressed: () => _showTimerDialog(context)),
       ],
     );

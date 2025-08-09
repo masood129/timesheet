@@ -13,6 +13,9 @@ class HomeController extends GetxController {
   var dailyDetails = <DailyDetail>[].obs;
   var isLoading = true.obs;
 
+  // New state variable to track the view mode
+  var isListView = false.obs;
+
   int get daysInMonth =>
       calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
 
@@ -50,6 +53,11 @@ class HomeController extends GetxController {
     fetchMonthlyDetails();
   }
 
+  // New method to toggle the view mode
+  void toggleView() {
+    isListView.value = !isListView.value;
+  }
+
   Future<void> fetchMonthlyDetails() async {
     try {
       isLoading.value = true;
@@ -77,12 +85,12 @@ class HomeController extends GetxController {
       );
 
       final filteredDetails =
-          details.where((detail) {
-            final date = DateTime.parse(detail.date);
-            final jalali = Jalali.fromDateTime(date);
-            return jalali.year == currentYear.value &&
-                jalali.month == currentMonth.value;
-          }).toList();
+      details.where((detail) {
+        final date = DateTime.parse(detail.date);
+        final jalali = Jalali.fromDateTime(date);
+        return jalali.year == currentYear.value &&
+            jalali.month == currentMonth.value;
+      }).toList();
 
       dailyDetails.assignAll(filteredDetails);
     } catch (e) {
@@ -115,7 +123,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
 
     if (detail == null || detail.leaveType != 'کاری') {
@@ -148,7 +156,7 @@ class HomeController extends GetxController {
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
@@ -169,7 +177,7 @@ class HomeController extends GetxController {
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-        (sum, task) => sum + (task.duration ?? 0),
+            (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -184,10 +192,10 @@ class HomeController extends GetxController {
       }
       isComplete =
           hasArrivalTime &&
-          hasLeaveTime &&
-          effectiveWorkMinutes != null &&
-          totalTaskMinutes == effectiveWorkMinutes &&
-          effectiveWorkMinutes > 0;
+              hasLeaveTime &&
+              effectiveWorkMinutes != null &&
+              totalTaskMinutes == effectiveWorkMinutes &&
+              effectiveWorkMinutes > 0;
     } else {
       isComplete = true;
     }
@@ -198,13 +206,13 @@ class HomeController extends GetxController {
     if (detail.leaveType == 'کاری') {
       avatarIcon = isComplete ? Icons.check_circle : Icons.access_time;
       avatarColor =
-          isComplete
-              ? colorScheme.completedStatus
-              : colorScheme.incompleteStatus;
+      isComplete
+          ? colorScheme.completedStatus
+          : colorScheme.incompleteStatus;
       avatarIconColor =
-          isComplete
-              ? colorScheme.onCompletedStatus
-              : colorScheme.onIncompleteStatus;
+      isComplete
+          ? colorScheme.onCompletedStatus
+          : colorScheme.onIncompleteStatus;
     } else {
       switch (detail.leaveType) {
         case 'استحقاقی':

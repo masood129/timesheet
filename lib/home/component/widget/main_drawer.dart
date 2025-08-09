@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/theme.dart';
+import '../../view/monthly_details_view.dart';
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});
@@ -33,6 +34,14 @@ class MainDrawer extends StatelessWidget {
               final newLocale = Get.locale!.languageCode == 'fa' ? const Locale('en') : const Locale('fa');
               Get.updateLocale(newLocale);
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.calendar_month, color: colorScheme.primary),
+            title: Text('monthly_details'.tr, style: TextStyle(color: colorScheme.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => MonthlyDetailsView());
             },
           ),
         ],
