@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
@@ -12,9 +14,8 @@ class HomeController extends GetxController {
   var currentYear = Jalali.now().year.obs;
   var dailyDetails = <DailyDetail>[].obs;
   var isLoading = true.obs;
-
-  // New state variable to track the view mode
   var isListView = false.obs;
+  var holidays = <String, dynamic>{}.obs;
 
   int get daysInMonth =>
       calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
@@ -22,7 +23,60 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchMonthlyDetails();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadHolidays();
+      fetchMonthlyDetails();
+    });
+  }
+
+  Future<void> loadHolidays() async {
+    if (Get.context == null) {
+      print('Error: Get.context is null, cannot load holidays');
+      return;
+    }
+
+    try {
+      final String holidays1404 = await DefaultAssetBundle.of(
+        Get.context!,
+      ).loadString('assets/holidays/holidays_1404.json');
+      final String holidays1405 = await DefaultAssetBundle.of(
+        Get.context!,
+      ).loadString('assets/holidays/holidays_1405.json');
+
+      final List<dynamic> data1404 = jsonDecode(holidays1404);
+      final List<dynamic> data1405 = jsonDecode(holidays1405);
+
+      final Map<String, dynamic> combinedHolidays = {};
+      for (var item in data1404) {
+        combinedHolidays[item['date']] = item;
+      }
+      for (var item in data1405) {
+        combinedHolidays[item['date']] = item;
+      }
+
+      holidays.assignAll(combinedHolidays);
+
+      print('Holidays loaded successfully. Total entries: ${holidays.length}');
+      if (holidays.isNotEmpty) {
+        final sampleDate = holidays.keys.first;
+        print('Sample holiday entry for $sampleDate: ${holidays[sampleDate]}');
+      } else {
+        print('No holiday data loaded.');
+      }
+    } catch (e) {
+      print('Error loading holidays: $e');
+      if (Get.context != null) {
+        Get.snackbar('error'.tr, 'failed_to_load_holidays'.tr);
+      } else {
+        print('Cannot show snackbar: Get.context is null');
+      }
+    }
+  }
+
+  Map<String, dynamic>? getHolidayForDate(Jalali date) {
+    final formattedDate =
+        '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
+    return holidays[formattedDate];
   }
 
   void setNoteForDate(Jalali date, String note) {
@@ -53,7 +107,6 @@ class HomeController extends GetxController {
     fetchMonthlyDetails();
   }
 
-  // New method to toggle the view mode
   void toggleView() {
     isListView.value = !isListView.value;
   }
@@ -84,8 +137,7 @@ class HomeController extends GetxController {
         1,
       );
 
-      final filteredDetails =
-      details.where((detail) {
+      final filteredDetails = details.where((detail) {
         final date = DateTime.parse(detail.date);
         final jalali = Jalali.fromDateTime(date);
         return jalali.year == currentYear.value &&
@@ -94,7 +146,11 @@ class HomeController extends GetxController {
 
       dailyDetails.assignAll(filteredDetails);
     } catch (e) {
-      Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
+      if (Get.context != null) {
+        Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
+      } else {
+        print('Cannot show snackbar: Get.context is null');
+      }
     } finally {
       isLoading.value = false;
     }
@@ -126,13 +182,21 @@ class HomeController extends GetxController {
           (d) => d.date == formattedDate,
     );
 
-    if (detail == null || detail.leaveType != 'کاری') {
-      return '';
+    if (detail == null) {
+      return 'بدون عملکرد';
+    }
+
+    if (detail.leaveType != 'کاری') {
+      return detail.leaveType ?? 'بدون عملکرد';
     }
 
     final arrival = _parseTime(detail.arrivalTime);
     final leave = _parseTime(detail.leaveTime);
     final personal = detail.personalTime ?? 0;
+    final totalTaskMinutes = detail.tasks.fold<int>(
+      0,
+          (sum, task) => sum + (task.duration ?? 0),
+    );
 
     if (arrival != null && leave != null) {
       final presenceDuration = Duration(
@@ -140,12 +204,37 @@ class HomeController extends GetxController {
         minutes: leave.minute - arrival.minute,
       );
       final effective = presenceDuration.inMinutes - personal;
-      if (effective <= 0) {
-        return '';
-      }
       return 'کار مفید: ${effective ~/ 60} ساعت و ${effective % 60} دقیقه';
     }
-    return '';
+
+    return 'وظایف: ${totalTaskMinutes ~/ 60} ساعت و ${totalTaskMinutes % 60} دقیقه';
+  }
+
+  String getTooltipMessage(Jalali date) {
+    final gregorianDate = date.toGregorian();
+    final formattedDate =
+        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
+    final detail = dailyDetails.firstWhereOrNull(
+          (d) => d.date == formattedDate,
+    );
+    final holiday = getHolidayForDate(date);
+
+    if (holiday != null && holiday['isHoliday'] == true) {
+      final events = holiday['events'] as List<dynamic>? ?? [];
+      final eventDescriptions = events.map((e) => e['description'] as String).join(', ');
+      return eventDescriptions.isNotEmpty ? 'تعطیل: $eventDescriptions' : 'تعطیل';
+    }
+
+    if (detail == null) {
+      return 'بدون اطلاعات';
+    }
+
+    if (detail.leaveType != 'کاری') {
+      return detail.leaveType ?? 'بدون اطلاعات';
+    }
+
+    final isComplete = getCardStatus(date, Get.context!)['isComplete'] as bool;
+    return isComplete ? 'روز کاری: کامل' : 'روز کاری: ناقص';
   }
 
   Map<String, dynamic> getCardStatus(Jalali date, BuildContext context) {
@@ -159,7 +248,13 @@ class HomeController extends GetxController {
           (d) => d.date == formattedDate,
     );
 
-    if (detail == null) {
+    bool hasWorkingHours = detail != null &&
+        detail.arrivalTime != null &&
+        detail.arrivalTime!.isNotEmpty &&
+        detail.leaveTime != null &&
+        detail.leaveTime!.isNotEmpty;
+
+    if (detail == null && !hasWorkingHours) {
       return {
         'avatarColor': colorScheme.noDataStatus,
         'avatarIcon': Icons.calendar_today,
@@ -170,11 +265,9 @@ class HomeController extends GetxController {
     }
 
     bool isComplete = false;
-    if (detail.leaveType == 'کاری') {
-      final hasArrivalTime =
-          detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
-      final hasLeaveTime =
-          detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
+    if (hasWorkingHours) {
+      final hasArrivalTime = detail!.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
+      final hasLeaveTime = detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
             (sum, task) => sum + (task.duration ?? 0),
@@ -187,62 +280,66 @@ class HomeController extends GetxController {
           hours: leave.hour - arrival.hour,
           minutes: leave.minute - arrival.minute,
         );
-        effectiveWorkMinutes =
-            presenceDuration.inMinutes - (detail.personalTime ?? 0);
+        effectiveWorkMinutes = presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
-      isComplete =
-          hasArrivalTime &&
-              hasLeaveTime &&
-              effectiveWorkMinutes != null &&
-              totalTaskMinutes == effectiveWorkMinutes &&
-              effectiveWorkMinutes > 0;
-    } else {
-      isComplete = true;
+      isComplete = hasArrivalTime &&
+          hasLeaveTime &&
+          effectiveWorkMinutes != null &&
+          totalTaskMinutes == effectiveWorkMinutes &&
+          effectiveWorkMinutes > 0;
+
+      return {
+        'avatarColor': isComplete ? colorScheme.completedStatus : colorScheme.incompleteStatus,
+        'avatarIcon': isComplete ? Icons.check_circle : Icons.access_time,
+        'avatarIconColor': isComplete ? colorScheme.onCompletedStatus : colorScheme.onIncompleteStatus,
+        'leaveType': 'کاری',
+        'isComplete': isComplete,
+      };
     }
 
-    IconData avatarIcon;
-    Color avatarColor;
-    Color avatarIconColor;
-    if (detail.leaveType == 'کاری') {
-      avatarIcon = isComplete ? Icons.check_circle : Icons.access_time;
-      avatarColor =
-      isComplete
-          ? colorScheme.completedStatus
-          : colorScheme.incompleteStatus;
-      avatarIconColor =
-      isComplete
-          ? colorScheme.onCompletedStatus
-          : colorScheme.onIncompleteStatus;
-    } else {
+    if (detail!.leaveType != 'کاری') {
+      IconData avatarIcon;
+      Color avatarColor;
+      Color avatarIconColor;
       switch (detail.leaveType) {
         case 'استحقاقی':
           avatarIcon = Icons.beach_access;
           avatarColor = colorScheme.secondary;
           avatarIconColor = colorScheme.onSecondary;
+          isComplete = true;
           break;
         case 'استعلاجی':
           avatarIcon = Icons.local_hospital;
           avatarColor = colorScheme.error;
           avatarIconColor = colorScheme.onError;
+          isComplete = true;
           break;
         case 'هدیه':
           avatarIcon = Icons.card_giftcard;
           avatarColor = colorScheme.tertiary;
           avatarIconColor = colorScheme.onTertiary;
+          isComplete = true;
           break;
         default:
           avatarIcon = Icons.calendar_today;
           avatarColor = colorScheme.noDataStatus;
           avatarIconColor = colorScheme.onNoDataStatus;
       }
+      return {
+        'avatarColor': avatarColor,
+        'avatarIcon': avatarIcon,
+        'avatarIconColor': avatarIconColor,
+        'leaveType': detail.leaveType,
+        'isComplete': isComplete,
+      };
     }
 
     return {
-      'avatarColor': avatarColor,
-      'avatarIcon': avatarIcon,
-      'avatarIconColor': avatarIconColor,
-      'leaveType': detail.leaveType,
-      'isComplete': isComplete,
+      'avatarColor': colorScheme.noDataStatus,
+      'avatarIcon': Icons.calendar_today,
+      'avatarIconColor': colorScheme.onNoDataStatus,
+      'leaveType': null,
+      'isComplete': false,
     };
   }
 }

@@ -53,7 +53,7 @@ class CalendarView extends StatelessWidget {
                 crossAxisCount: 7,
                 crossAxisSpacing: 4.0,
                 mainAxisSpacing: 4.0,
-                childAspectRatio: 0.8,
+                childAspectRatio: 1.2, // Increased to prevent overflow
               ),
               itemCount: daysInMonth,
               itemBuilder: (context, index) {

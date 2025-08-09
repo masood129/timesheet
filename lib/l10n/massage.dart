@@ -4,8 +4,12 @@ class Messages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'fa': {
+      "failed_to_load_holidays": "خطا در بارگذاری داده‌های تعطیلات",
+      "holiday": "تعطیل",
+      "events": "رویدادها",
+      "no_performance": "بدون عملکرد",
+      "note": "یادداشت",
       'calendar_title': 'تقویم',
-      'note': 'یادداشت',
       'no_note': 'یادداشتی ثبت نشده',
       'save': 'ذخیره',
       'enter_note': 'متن یادداشت را وارد کنید',
@@ -107,6 +111,9 @@ class Messages extends Translations {
       'select_project_for_timer': 'برای شروع تایمر، یک پروژه انتخاب کنید',
     },
     'en': {
+      "failed_to_load_holidays": "Failed to load holiday data",
+      "holiday": "Holiday",
+      "events": "Events",
       'calendar_title': 'Calendar',
       'note': 'Note',
       'no_note': 'No note added',
