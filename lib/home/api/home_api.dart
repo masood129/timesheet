@@ -7,29 +7,16 @@ import '../model/daily_detail_model.dart';
 class HomeApi {
   final String baseUrl = 'http://localhost:3000';
   final coreAPI = CoreApi();
-  Map<String, String> defaultHeaders = {
+  final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',
   };
-
-  // تابع برای دریافت هدرها با توکن
-  Future<Map<String, String>> _getHeaders() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('jwt_token');
-    if (token != null) {
-      return {
-        ...defaultHeaders,
-        'Authorization': 'Bearer $token',
-      };
-    }
-    return defaultHeaders;
-  }
 
   // تابع ورود و دریافت توکن
   Future<String> login(String username) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/auth/login'),
-      headers: defaultHeaders,
+      headers: {...defaultHeaders, 'skip-auth': 'true'}, // رد کردن Interceptor برای ورود
       body: jsonEncode({'username': username}),
     );
     if (response == null) {
@@ -38,9 +25,10 @@ class HomeApi {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final token = data['token'] as String;
-      // ذخیره توکن
+      // ذخیره توکن و نام کاربری
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token);
+      await prefs.setString('username', username); // ذخیره نام کاربری
       return token;
     }
     if (response.statusCode == 400) {
@@ -52,17 +40,18 @@ class HomeApi {
     throw Exception('Failed to login: ${response.statusCode}');
   }
 
-  // تابع برای خروج (حذف توکن)
+  // تابع برای خروج
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
+    await prefs.remove('username');
   }
 
   // Projects Endpoints
   Future<List<Project>> getProjects() async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/projects'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -71,25 +60,19 @@ class HomeApi {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => Project.fromJson(e)).toList();
     }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
-    }
     throw Exception('Failed to fetch projects: ${response.statusCode}');
   }
 
   Future<Project> getProjectById(int id) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/projects/$id'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
     }
     if (response.statusCode == 200) {
       return Project.fromJson(jsonDecode(response.body));
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     if (response.statusCode == 404) {
       throw Exception('Project not found');
@@ -100,7 +83,7 @@ class HomeApi {
   Future<Project> createProject(Project project) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/projects'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
       body: jsonEncode(project.toJson()),
     );
     if (response == null) {
@@ -112,16 +95,13 @@ class HomeApi {
     if (response.statusCode == 400) {
       throw Exception('Invalid input or ID already exists');
     }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
-    }
     throw Exception('Failed to create project: ${response.statusCode}');
   }
 
   Future<Project> updateProject(int id, Map<String, dynamic> updates) async {
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/projects/$id'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
       body: jsonEncode(updates),
     );
     if (response == null) {
@@ -129,9 +109,6 @@ class HomeApi {
     }
     if (response.statusCode == 200) {
       return Project.fromJson(jsonDecode(response.body));
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     if (response.statusCode == 404) {
       throw Exception('Project not found');
@@ -145,16 +122,13 @@ class HomeApi {
   Future<void> deleteProject(int id) async {
     final response = await coreAPI.delete(
       Uri.parse('$baseUrl/projects/$id'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to delete: No response from server');
     }
     if (response.statusCode == 204) {
       return;
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     if (response.statusCode == 404) {
       throw Exception('Project not found');
@@ -171,16 +145,13 @@ class HomeApi {
 
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/$date?userId=$userId'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
     }
     if (response.statusCode == 200) {
       return DailyDetail.fromJson(jsonDecode(response.body));
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     if (response.statusCode == 404) {
       return null;
@@ -191,7 +162,7 @@ class HomeApi {
   Future<DailyDetail> saveDailyDetail(DailyDetail detail) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/daily-details'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
       body: jsonEncode(detail.toJson()),
     );
     if (response == null) {
@@ -203,9 +174,6 @@ class HomeApi {
     if (response.statusCode == 400) {
       throw Exception('Invalid input');
     }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
-    }
     throw Exception('Failed to save daily detail: ${response.statusCode}');
   }
 
@@ -216,7 +184,7 @@ class HomeApi {
       ) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/month/$year/$month?userId=$userId'),
-      headers: await _getHeaders(),
+      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -224,9 +192,6 @@ class HomeApi {
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => DailyDetail.fromJson(e)).toList();
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     throw Exception('Failed to fetch monthly details: ${response.statusCode}');
   }
@@ -247,7 +212,7 @@ class HomeApi {
     final url = Uri.parse(
       '$baseUrl/daily-details/range?startDate=$startDate&endDate=$endDate&userId=$userId',
     );
-    final response = await coreAPI.get(url, headers: await _getHeaders());
+    final response = await coreAPI.get(url, headers: defaultHeaders);
 
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -255,9 +220,6 @@ class HomeApi {
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => DailyDetail.fromJson(e)).toList();
-    }
-    if (response.statusCode == 401) {
-      throw Exception('Unauthorized: Invalid or missing token');
     }
     throw Exception('Failed to fetch date range details: ${response.statusCode}');
   }
