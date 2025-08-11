@@ -115,7 +115,7 @@ class CoreApi {
     Object? body,
   }) async {
     return _interceptRequest((updatedHeaders) async {
-      debugPrint('POST => $url');
+      debugPrint('POST : $url');
       debugPrint('Headers: $updatedHeaders');
       debugPrint('Body: $body');
       final response = await _client.post(
