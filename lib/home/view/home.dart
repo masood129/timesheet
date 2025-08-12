@@ -19,24 +19,14 @@ class CalendarView extends StatelessWidget {
       appBar: CalendarAppBar(),
       drawer: MainDrawer(),
       body: Obx(() {
-        if (homeController.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                Text('loading_calendar'.tr),
-              ],
-            ),
-          );
-        }
-
         final year = homeController.currentYear.value;
         final month = homeController.currentMonth.value;
         final daysInMonth = homeController.daysInMonth;
 
-        final days = List.generate(daysInMonth, (index) => Jalali(year, month, index + 1));
+        final days = List.generate(
+          daysInMonth,
+          (index) => Jalali(year, month, index + 1),
+        );
 
         return Obx(() {
           if (homeController.isListView.value) {

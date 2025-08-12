@@ -13,7 +13,6 @@ class HomeController extends GetxController {
   var currentMonth = Jalali.now().month.obs;
   var currentYear = Jalali.now().year.obs;
   var dailyDetails = <DailyDetail>[].obs;
-  var isLoading = true.obs;
   var isListView = false.obs;
   var holidays = <String, dynamic>{}.obs;
 
@@ -29,11 +28,9 @@ class HomeController extends GetxController {
   Future<void> initializeApp() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        isLoading.value = true;
         await loadHolidays();
         await fetchMonthlyDetails();
       } finally {
-        isLoading.value = false;
         FlutterNativeSplash.remove();
       }
     });
@@ -110,7 +107,6 @@ class HomeController extends GetxController {
 
   Future<void> fetchMonthlyDetails() async {
     try {
-      isLoading.value = true;
       final jalaliDate = Jalali(currentYear.value, currentMonth.value, 1);
       final daysInMonth =
           Jalali(currentYear.value, currentMonth.value).monthLength;
@@ -148,7 +144,6 @@ class HomeController extends GetxController {
         Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
       }
     } finally {
-      isLoading.value = false;
     }
   }
 
