@@ -143,7 +143,6 @@ class HomeController extends GetxController {
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
       }
-    } finally {
     }
   }
 

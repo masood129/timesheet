@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../component/widget/calendar_app_bar.dart';
 import '../component/widget/calendar_day_card.dart';
+import '../component/widget/custom_calendar.dart';
 import '../component/widget/main_drawer.dart';
 import '../controller/home_controller.dart';
 import '../controller/task_controller.dart';
@@ -25,31 +26,20 @@ class CalendarView extends StatelessWidget {
 
         final days = List.generate(
           daysInMonth,
-          (index) => Jalali(year, month, index + 1),
+              (index) => Jalali(year, month, index + 1),
         );
 
         return Obx(() {
           if (homeController.isListView.value) {
             return ListView.builder(
+              padding: const EdgeInsets.all(8.0),
               itemCount: daysInMonth,
               itemBuilder: (context, index) {
                 return CalendarDayCard(date: days[index]);
               },
             );
           } else {
-            return GridView.builder(
-              padding: const EdgeInsets.all(8.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-                crossAxisSpacing: 4.0,
-                mainAxisSpacing: 4.0,
-                childAspectRatio: 1.2, // Increased to prevent overflow
-              ),
-              itemCount: daysInMonth,
-              itemBuilder: (context, index) {
-                return CalendarDayCard(date: days[index]);
-              },
-            );
+            return CustomCalendarWidget();
           }
         });
       }),

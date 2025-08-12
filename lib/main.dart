@@ -18,8 +18,9 @@ Future<void> main() async {
   final username = Uri.base.queryParameters['id']; // 127.0.0.1:80/?id=myUserName
   Get.put(ThemeController());
 
-  if (username != null && username.isNotEmpty) {
-    await HomeApi().login(username);
+  // if (username != null && username.isNotEmpty) {
+  if (true) {
+    await HomeApi().login("user003"); //set username
     runApp(const MyApp());
   } else {
     FlutterNativeSplash.remove();
