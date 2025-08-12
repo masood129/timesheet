@@ -27,14 +27,16 @@ class HomeController extends GetxController {
   }
 
   Future<void> initializeApp() async {
-    try {
-      isLoading.value = true;
-      await loadHolidays();
-      await fetchMonthlyDetails();
-    } finally {
-      isLoading.value = false;
-      FlutterNativeSplash.remove();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        isLoading.value = true;
+        await loadHolidays();
+        await fetchMonthlyDetails();
+      } finally {
+        isLoading.value = false;
+        FlutterNativeSplash.remove();
+      }
+    });
   }
 
   Future<void> loadHolidays() async {
