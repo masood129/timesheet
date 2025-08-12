@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
@@ -23,10 +23,18 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadHolidays();
-      fetchMonthlyDetails();
-    });
+    initializeApp();
+  }
+
+  Future<void> initializeApp() async {
+    try {
+      isLoading.value = true;
+      await loadHolidays();
+      await fetchMonthlyDetails();
+    } finally {
+      isLoading.value = false;
+      FlutterNativeSplash.remove();
+    }
   }
 
   Future<void> loadHolidays() async {
@@ -56,7 +64,6 @@ class HomeController extends GetxController {
     } catch (e) {
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_load_holidays'.tr);
-      } else {
       }
     }
   }
@@ -125,12 +132,13 @@ class HomeController extends GetxController {
         1,
       );
 
-      final filteredDetails = details.where((detail) {
-        final date = DateTime.parse(detail.date);
-        final jalali = Jalali.fromDateTime(date);
-        return jalali.year == currentYear.value &&
-            jalali.month == currentMonth.value;
-      }).toList();
+      final filteredDetails =
+          details.where((detail) {
+            final date = DateTime.parse(detail.date);
+            final jalali = Jalali.fromDateTime(date);
+            return jalali.year == currentYear.value &&
+                jalali.month == currentMonth.value;
+          }).toList();
 
       dailyDetails.assignAll(filteredDetails);
     } catch (e) {
@@ -165,7 +173,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
@@ -181,7 +189,7 @@ class HomeController extends GetxController {
     final personal = detail.personalTime ?? 0;
     final totalTaskMinutes = detail.tasks.fold<int>(
       0,
-          (sum, task) => sum + (task.duration ?? 0),
+      (sum, task) => sum + (task.duration ?? 0),
     );
 
     if (arrival != null && leave != null) {
@@ -201,14 +209,18 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
     final holiday = getHolidayForDate(date);
 
     if (holiday != null && holiday['isHoliday'] == true) {
       final events = holiday['events'] as List<dynamic>? ?? [];
-      final eventDescriptions = events.map((e) => e['description'] as String).join(', ');
-      return eventDescriptions.isNotEmpty ? 'تعطیل: $eventDescriptions' : 'تعطیل';
+      final eventDescriptions = events
+          .map((e) => e['description'] as String)
+          .join(', ');
+      return eventDescriptions.isNotEmpty
+          ? 'تعطیل: $eventDescriptions'
+          : 'تعطیل';
     }
 
     if (detail == null) {
@@ -231,10 +243,11 @@ class HomeController extends GetxController {
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
 
-    bool hasWorkingHours = detail != null &&
+    bool hasWorkingHours =
+        detail != null &&
         detail.arrivalTime != null &&
         detail.arrivalTime!.isNotEmpty &&
         detail.leaveTime != null &&
@@ -252,11 +265,13 @@ class HomeController extends GetxController {
 
     bool isComplete = false;
     if (hasWorkingHours) {
-      final hasArrivalTime = detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
-      final hasLeaveTime = detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
+      final hasArrivalTime =
+          detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
+      final hasLeaveTime =
+          detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-            (sum, task) => sum + (task.duration ?? 0),
+        (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -266,18 +281,26 @@ class HomeController extends GetxController {
           hours: leave.hour - arrival.hour,
           minutes: leave.minute - arrival.minute,
         );
-        effectiveWorkMinutes = presenceDuration.inMinutes - (detail.personalTime ?? 0);
+        effectiveWorkMinutes =
+            presenceDuration.inMinutes - (detail.personalTime ?? 0);
       }
-      isComplete = hasArrivalTime &&
+      isComplete =
+          hasArrivalTime &&
           hasLeaveTime &&
           effectiveWorkMinutes != null &&
           totalTaskMinutes == effectiveWorkMinutes &&
           effectiveWorkMinutes > 0;
 
       return {
-        'avatarColor': isComplete ? colorScheme.completedStatus : colorScheme.incompleteStatus,
+        'avatarColor':
+            isComplete
+                ? colorScheme.completedStatus
+                : colorScheme.incompleteStatus,
         'avatarIcon': isComplete ? Icons.check_circle : Icons.access_time,
-        'avatarIconColor': isComplete ? colorScheme.onCompletedStatus : colorScheme.onIncompleteStatus,
+        'avatarIconColor':
+            isComplete
+                ? colorScheme.onCompletedStatus
+                : colorScheme.onIncompleteStatus,
         'leaveType': 'کاری',
         'isComplete': isComplete,
       };
