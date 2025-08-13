@@ -16,7 +16,7 @@ class HomeApi {
   Future<String> login(String username) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/auth/login'),
-      headers: {...defaultHeaders, 'skip-auth': 'true'}, // رد کردن Interceptor برای ورود
+      headers: {...defaultHeaders, 'skip-auth': 'true'},
       body: jsonEncode({'username': username}),
     );
     if (response == null) {
@@ -25,10 +25,13 @@ class HomeApi {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final token = data['token'] as String;
-      // ذخیره توکن و نام کاربری
+      final userId = data['userId'] as int;
+      final role = data['Role'] as String;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token);
-      await prefs.setString('username', username); // ذخیره نام کاربری
+      await prefs.setString('username', username);
+      await prefs.setString('Role', role);
+      await prefs.setInt('userId', userId);
       return token;
     }
     if (response.statusCode == 400) {
@@ -45,6 +48,33 @@ class HomeApi {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
     await prefs.remove('username');
+    await prefs.remove('userId');
+  }
+
+  // تابع برای ذخیره هزینه ورزش ماهیانه
+  Future<void> saveMonthlyGymCost(int year, int month, int cost) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
+    if (userId == null) {
+      throw Exception('User ID not found');
+    }
+
+    final response = await coreAPI.post(
+      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs'),
+      headers: defaultHeaders,
+      body: jsonEncode({
+        'userId': userId,
+        'year': year,
+        'month': month,
+        'cost': cost,
+      }),
+    );
+    if (response == null) {
+      throw Exception('Failed to post: No response from server');
+    }
+    if (response.statusCode != 201) {
+      throw Exception('Failed to save gym cost: ${response.statusCode}');
+    }
   }
 
   // Projects Endpoints

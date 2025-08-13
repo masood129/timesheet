@@ -25,6 +25,13 @@ class HomeController extends GetxController {
     initializeApp();
   }
 
+  saveMonthlyGymCost(int year, int month, int cost) async {
+    try {
+      await HomeApi().saveMonthlyGymCost(year, month, cost);
+    } catch (e) {
+      rethrow;
+    }
+  }
   Future<void> initializeApp() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
