@@ -3,11 +3,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
 import 'core/theme/theme.dart';
-import 'fail_login.dart';
-import 'home/api/home_api.dart';
+import 'home/controller/auth_controller.dart';
+import 'home/view/fail_login.dart';
 import 'home/view/home.dart';
+import 'home/view/login_view.dart';
 import 'l10n/massage.dart';
 
 Future<void> main() async {
@@ -15,21 +15,31 @@ Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   tz.initializeTimeZones();
 
-  final username = Uri.base.queryParameters['id']; // 127.0.0.1:80/?id=myUserName
   Get.put(ThemeController());
+  Get.put(AuthController());
 
-  // if (username != null && username.isNotEmpty) {
-  if (true) {
-    await HomeApi().login("user003"); //set username
-    runApp(const MyApp());
+  final authController = Get.find<AuthController>();
+  final username = Uri.base.queryParameters['id']; // 127.0.0.1:80/?id=myUserName
+
+  if (username != null && username.isNotEmpty) {
+    final success = await authController.login(username);
+    if (success) {
+      FlutterNativeSplash.remove();
+      runApp(const MyApp());
+    } else {
+      FlutterNativeSplash.remove();
+      runApp(const FailLogin());
+    }
   } else {
     FlutterNativeSplash.remove();
-    runApp(const FailLogin());
+    runApp(const MyApp(initialRoute: '/login'));
   }
 }
 
 class MyApp extends GetView<ThemeController> {
-  const MyApp({super.key});
+  final String? initialRoute;
+
+  const MyApp({super.key, this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +58,11 @@ class MyApp extends GetView<ThemeController> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('fa'), Locale('en')],
-      home: CalendarView(),
+      initialRoute: initialRoute ?? '/home',
+      getPages: [
+        GetPage(name: '/home', page: () => CalendarView()),
+        GetPage(name: '/login', page: () => LoginView()),
+      ],
     );
   }
 }

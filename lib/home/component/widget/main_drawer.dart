@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../../core/theme/theme.dart';
+import '../../../manager/view/manager_dashboard.dart';
+import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
 import '../../view/monthly_details_view.dart';
 
@@ -9,6 +12,7 @@ class MainDrawer extends StatelessWidget {
 
   final ThemeController themeController = Get.find<ThemeController>();
   final HomeController homeController = Get.find<HomeController>();
+  final AuthController authController = Get.find<AuthController>();
 
   void _showGymCostDialog(BuildContext context) {
     final yearController = TextEditingController();
@@ -145,6 +149,26 @@ class MainDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               _showGymCostDialog(context);
+            },
+          ),
+          Obx(() => authController.user.value != null &&
+              ['group_manager', 'general_manager', 'finance_manager']
+                  .contains(authController.user.value!['Role'])
+              ? ListTile(
+            leading: Icon(Icons.dashboard, color: colorScheme.primary),
+            title: Text('manager_dashboard'.tr, style: TextStyle(color: colorScheme.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => ManagerDashboard());
+            },
+          )
+              : const SizedBox.shrink()),
+          ListTile(
+            leading: Icon(Icons.logout, color: colorScheme.primary),
+            title: Text('logout'.tr, style: TextStyle(color: colorScheme.onSurface)),
+            onTap: () {
+              authController.logout();
+              Navigator.pop(context);
             },
           ),
         ],

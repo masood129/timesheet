@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class FailLogin extends StatelessWidget {
   const FailLogin({super.key});
@@ -50,7 +51,9 @@ class FailLogin extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
-                      onPressed: () {}, //TODO:add function to restart or exit
+                      onPressed: () {
+                        Get.offAllNamed('/login');
+                      },
                       icon: const Icon(Icons.refresh),
                       label: const Text("تلاش مجدد"),
                       style: ElevatedButton.styleFrom(
