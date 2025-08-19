@@ -151,6 +151,7 @@ class MainDrawer extends StatelessWidget {
               _showGymCostDialog(context);
             },
           ),
+
           Obx(() => authController.user.value != null &&
               ['group_manager', 'general_manager', 'finance_manager']
                   .contains(authController.user.value!['Role'])

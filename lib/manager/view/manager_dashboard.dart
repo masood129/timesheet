@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:timesheet/manager/controller/manager_controller.dart';
 import '../../home/controller/auth_controller.dart';
-import '../../home/controller/report_controller.dart';
+import '../model/report_model.dart';
 
 class ManagerDashboard extends StatelessWidget {
   ManagerDashboard({super.key});
 
   final AuthController authController = Get.find<AuthController>();
-  final ReportController reportController = Get.put(ReportController());
+  final ManagerController reportController = Get.put(ManagerController());
 
   @override
   Widget build(BuildContext context) {
@@ -27,29 +28,51 @@ class ManagerDashboard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Obx(() => DropdownButtonFormField<int>(
-              value: reportController.selectedYear.value,
-              decoration: InputDecoration(
-                labelText: 'year'.tr,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            Obx(
+              () => DropdownButtonFormField<int>(
+                value: reportController.selectedYear.value,
+                decoration: InputDecoration(
+                  labelText: 'year'.tr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items:
+                    List.generate(5, (index) => Jalali.now().year - 2 + index)
+                        .map(
+                          (year) => DropdownMenuItem(
+                            value: year,
+                            child: Text(year.toString()),
+                          ),
+                        )
+                        .toList(),
+                onChanged:
+                    (value) => reportController.selectedYear.value = value!,
               ),
-              items: List.generate(5, (index) => Jalali.now().year - 2 + index)
-                  .map((year) => DropdownMenuItem(value: year, child: Text(year.toString())))
-                  .toList(),
-              onChanged: (value) => reportController.selectedYear.value = value!,
-            )),
+            ),
             const SizedBox(height: 16),
-            Obx(() => DropdownButtonFormField<int>(
-              value: reportController.selectedMonth.value,
-              decoration: InputDecoration(
-                labelText: 'month'.tr,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            Obx(
+              () => DropdownButtonFormField<int>(
+                value: reportController.selectedMonth.value,
+                decoration: InputDecoration(
+                  labelText: 'month'.tr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items:
+                    List.generate(12, (index) => index + 1)
+                        .map(
+                          (month) => DropdownMenuItem(
+                            value: month,
+                            child: Text(Jalali(2023, month).formatter.mN),
+                          ),
+                        )
+                        .toList(),
+                onChanged:
+                    (value) => reportController.selectedMonth.value = value!,
               ),
-              items: List.generate(12, (index) => index + 1)
-                  .map((month) => DropdownMenuItem(value: month, child: Text(Jalali(2023, month).formatter.mN)))
-                  .toList(),
-              onChanged: (value) => reportController.selectedMonth.value = value!,
-            )),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => reportController.fetchReports(),
@@ -57,26 +80,38 @@ class ManagerDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: Obx(() => ListView.builder(
-                itemCount: reportController.reports.length,
-                itemBuilder: (context, index) {
-                  final report = reportController.reports[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text('report_by'.trParams({'username': report['Username']})),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('hours'.trParams({'hours': report['TotalHours'].toString()})),
-                          Text('gym_cost'.trParams({'cost': report['GymCost'].toString()})),
-                          Text('status'.trParams({'status': report['Status']})),
-                        ],
+              child: Obx(
+                () => ListView.builder(
+                  itemCount: reportController.reports.length,
+                  itemBuilder: (context, index) {
+                    final report = reportController.reports[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(
+                          'report_by'.trParams({'username': report.username}),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'hours'.trParams({
+                                'hours': report.totalHours.toString(),
+                              }),
+                            ),
+                            Text(
+                              'gym_cost'.trParams({
+                                'cost': report.gymCost.toString(),
+                              }),
+                            ),
+                            Text('status'.trParams({'status': report.status})),
+                          ],
+                        ),
+                        trailing: _buildActionButton(context, report),
                       ),
-                      trailing: _buildActionButton(context, report),
-                    ),
-                  );
-                },
-              )),
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),
@@ -84,32 +119,51 @@ class ManagerDashboard extends StatelessWidget {
     );
   }
 
-  Widget? _buildActionButton(BuildContext context, Map<String, dynamic> report) {
+  Widget? _buildActionButton(BuildContext context, Report report) {
     final role = authController.user.value?['Role'];
-    final status = report['Status'];
+    final status = report.status;
     if (role == 'group_manager' && status == 'submitted_to_group_manager') {
       return PopupMenuButton<String>(
         onSelected: (value) async {
           final comment = await _showCommentDialog(context);
           if (comment != null) {
             if (value == 'to_general') {
-              await reportController.approveGroupManager(report['ReportId'], comment, true);
+              await reportController.approveGroupManager(
+                report.reportId,
+                comment,
+                true,
+              );
             } else {
-              await reportController.approveGroupManager(report['ReportId'], comment, false);
+              await reportController.approveGroupManager(
+                report.reportId,
+                comment,
+                false,
+              );
             }
           }
         },
-        itemBuilder: (context) => [
-          PopupMenuItem(value: 'to_general', child: Text('submit_to_general_manager'.tr)),
-          PopupMenuItem(value: 'to_finance', child: Text('submit_to_finance'.tr)),
-        ],
+        itemBuilder:
+            (context) => [
+              PopupMenuItem(
+                value: 'to_general',
+                child: Text('submit_to_general_manager'.tr),
+              ),
+              PopupMenuItem(
+                value: 'to_finance',
+                child: Text('submit_to_finance'.tr),
+              ),
+            ],
       );
-    } else if (role == 'general_manager' && status == 'submitted_to_general_manager') {
+    } else if (role == 'general_manager' &&
+        status == 'submitted_to_general_manager') {
       return ElevatedButton(
         onPressed: () async {
           final comment = await _showCommentDialog(context);
           if (comment != null) {
-            await reportController.approveGeneralManager(report['ReportId'], comment);
+            await reportController.approveGeneralManager(
+              report.reportId,
+              comment,
+            );
           }
         },
         child: Text('approve'.tr),
@@ -119,7 +173,7 @@ class ManagerDashboard extends StatelessWidget {
         onPressed: () async {
           final comment = await _showCommentDialog(context);
           if (comment != null) {
-            await reportController.approveFinance(report['ReportId'], comment);
+            await reportController.approveFinance(report.reportId, comment);
           }
         },
         child: Text('final_approve'.tr),
@@ -132,23 +186,24 @@ class ManagerDashboard extends StatelessWidget {
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('enter_comment'.tr),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(labelText: 'comment'.tr),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('cancel'.tr),
+      builder:
+          (context) => AlertDialog(
+            title: Text('enter_comment'.tr),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(labelText: 'comment'.tr),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('cancel'.tr),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, controller.text),
+                child: Text('submit'.tr),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text('submit'.tr),
-          ),
-        ],
-      ),
     );
   }
 }
