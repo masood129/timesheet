@@ -12,6 +12,11 @@ class HomeApi {
     'accept': 'application/json',
   };
 
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt_token');
+  }
+
   // تابع ورود و دریافت توکن
   Future<String> login(String username) async {
     final response = await coreAPI.post(
@@ -252,5 +257,93 @@ class HomeApi {
       return data.map((e) => DailyDetail.fromJson(e)).toList();
     }
     throw Exception('Failed to fetch date range details: ${response.statusCode}');
+  }
+
+  // New Manager Endpoints
+  Future<dynamic> fetchMonthlyReportsForGroup(int startYear, int startMonth, int endYear, int endMonth) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('Authentication token not found');
+    }
+
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/monthly-reports/group/range/$startYear/$startMonth/$endYear/$endMonth'),
+      headers: {
+        ...defaultHeaders,
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+
+    return response;
+  }
+
+  Future<dynamic> approveReportAsGroupManager(int reportId, String comment, bool toGeneralManager) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('Authentication token not found');
+    }
+
+    final response = await coreAPI.put(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/approve-group-manager'),
+      headers: {
+        ...defaultHeaders,
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'comment': comment, 'toGeneralManager': toGeneralManager}),
+    );
+
+    if (response == null) {
+      throw Exception('Failed to approve: No response from server');
+    }
+
+    return response;
+  }
+
+  Future<dynamic> approveReportAsGeneralManager(int reportId, String comment) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('Authentication token not found');
+    }
+
+    final response = await coreAPI.put(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/approve-general-manager'),
+      headers: {
+        ...defaultHeaders,
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'comment': comment}),
+    );
+
+    if (response == null) {
+      throw Exception('Failed to approve: No response from server');
+    }
+
+    return response;
+  }
+
+  Future<dynamic> approveReportAsFinance(int reportId, String comment) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('Authentication token not found');
+    }
+
+    final response = await coreAPI.put(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/approve-finance'),
+      headers: {
+        ...defaultHeaders,
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'comment': comment}),
+    );
+
+    if (response == null) {
+      throw Exception('Failed to approve: No response from server');
+    }
+
+    return response;
   }
 }

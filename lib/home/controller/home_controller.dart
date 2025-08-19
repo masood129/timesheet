@@ -4,7 +4,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
-import '../api/home_api.dart';
+import '../api/api_calls.dart';
 import '../model/daily_detail_model.dart';
 
 class HomeController extends GetxController {
