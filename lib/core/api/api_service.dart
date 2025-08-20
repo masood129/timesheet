@@ -1,9 +1,19 @@
+// api_service.dart (modified with Singleton pattern)
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class CoreApi {
+  static final CoreApi _instance = CoreApi._internal();
+
+  factory CoreApi() {
+    return _instance;
+  }
+
+  CoreApi._internal();
+
   final _client = http.Client();
   final String baseUrl = 'http://localhost:3000';
 
@@ -53,9 +63,9 @@ class CoreApi {
 
   // Interceptor برای مدیریت درخواست‌ها
   Future<http.Response?> _interceptRequest(
-    Future<http.Response> Function(Map<String, String>) request,
-    Map<String, String>? headers,
-  ) async {
+      Future<http.Response> Function(Map<String, String>) request,
+      Map<String, String>? headers,
+      ) async {
     try {
       // اگر درخواست برای /auth/login است، نیازی به توکن نیست
       if (headers != null && headers.containsKey('skip-auth')) {
@@ -110,10 +120,10 @@ class CoreApi {
   }
 
   Future<http.Response?> post(
-    Uri url, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _interceptRequest((updatedHeaders) async {
       debugPrint('POST : $url');
       debugPrint('Headers: $updatedHeaders');
@@ -129,10 +139,10 @@ class CoreApi {
   }
 
   Future<http.Response?> delete(
-    Uri url, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _interceptRequest((updatedHeaders) async {
       debugPrint('DELETE => $url');
       debugPrint('Headers: $updatedHeaders');
@@ -148,10 +158,10 @@ class CoreApi {
   }
 
   Future<http.Response?> put(
-    Uri url, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _interceptRequest((updatedHeaders) async {
       debugPrint('PUT => $url');
       debugPrint('Headers: $updatedHeaders');
@@ -167,10 +177,10 @@ class CoreApi {
   }
 
   Future<http.Response?> patch(
-    Uri url, {
-    Map<String, String>? headers,
-    Object? body,
-  }) async {
+      Uri url, {
+        Map<String, String>? headers,
+        Object? body,
+      }) async {
     return _interceptRequest((updatedHeaders) async {
       debugPrint('PATCH => $url');
       debugPrint('Headers: $updatedHeaders');

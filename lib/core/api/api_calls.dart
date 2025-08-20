@@ -1,3 +1,5 @@
+// api_calls.dart (modified with Singleton pattern and using CoreApi singleton)
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
 import 'dart:convert';
@@ -5,8 +7,16 @@ import '../../home/model/project_model.dart';
 import '../../home/model/daily_detail_model.dart';
 
 class HomeApi {
+  static final HomeApi _instance = HomeApi._internal();
+
+  factory HomeApi() {
+    return _instance;
+  }
+
+  HomeApi._internal();
+
   final String baseUrl = 'http://localhost:3000';
-  final coreAPI = CoreApi();
+  final coreAPI = CoreApi(); // Using singleton instance
   final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',
@@ -213,10 +223,10 @@ class HomeApi {
   }
 
   Future<List<DailyDetail>> getMonthlyDetails(
-      int year,
-      int month,
-      int userId,
-      ) async {
+    int year,
+    int month,
+    int userId,
+  ) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/month/$year/$month?userId=$userId'),
       headers: defaultHeaders,
@@ -232,10 +242,10 @@ class HomeApi {
   }
 
   Future<List<DailyDetail>> getDateRangeDetails(
-      String startDate,
-      String endDate,
-      int userId,
-      ) async {
+    String startDate,
+    String endDate,
+    int userId,
+  ) async {
     final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateFormat.hasMatch(startDate) || !dateFormat.hasMatch(endDate)) {
       throw Exception('Invalid date format. Use YYYY-MM-DD');
@@ -256,22 +266,28 @@ class HomeApi {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((e) => DailyDetail.fromJson(e)).toList();
     }
-    throw Exception('Failed to fetch date range details: ${response.statusCode}');
+    throw Exception(
+      'Failed to fetch date range details: ${response.statusCode}',
+    );
   }
 
   // New Manager Endpoints
-  Future<dynamic> fetchMonthlyReportsForGroup(int startYear, int startMonth, int endYear, int endMonth) async {
+  Future<dynamic> fetchMonthlyReportsForGroup(
+    int startYear,
+    int startMonth,
+    int endYear,
+    int endMonth,
+  ) async {
     final token = await _getToken();
     if (token == null) {
       throw Exception('Authentication token not found');
     }
 
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/monthly-reports/group/range/$startYear/$startMonth/$endYear/$endMonth'),
-      headers: {
-        ...defaultHeaders,
-        'Authorization': 'Bearer $token',
-      },
+      Uri.parse(
+        '$baseUrl/monthly-reports/group/range/$startYear/$startMonth/$endYear/$endMonth',
+      ),
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
     );
 
     if (response == null) {
@@ -281,7 +297,11 @@ class HomeApi {
     return response;
   }
 
-  Future<dynamic> approveReportAsGroupManager(int reportId, String comment, bool toGeneralManager) async {
+  Future<dynamic> approveReportAsGroupManager(
+    int reportId,
+    String comment,
+    bool toGeneralManager,
+  ) async {
     final token = await _getToken();
     if (token == null) {
       throw Exception('Authentication token not found');
@@ -289,11 +309,11 @@ class HomeApi {
 
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-group-manager'),
-      headers: {
-        ...defaultHeaders,
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'comment': comment, 'toGeneralManager': toGeneralManager}),
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
+      body: jsonEncode({
+        'comment': comment,
+        'toGeneralManager': toGeneralManager,
+      }),
     );
 
     if (response == null) {
@@ -303,7 +323,10 @@ class HomeApi {
     return response;
   }
 
-  Future<dynamic> approveReportAsGeneralManager(int reportId, String comment) async {
+  Future<dynamic> approveReportAsGeneralManager(
+    int reportId,
+    String comment,
+  ) async {
     final token = await _getToken();
     if (token == null) {
       throw Exception('Authentication token not found');
@@ -311,10 +334,7 @@ class HomeApi {
 
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-general-manager'),
-      headers: {
-        ...defaultHeaders,
-        'Authorization': 'Bearer $token',
-      },
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
       body: jsonEncode({'comment': comment}),
     );
 
@@ -333,10 +353,7 @@ class HomeApi {
 
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-finance'),
-      headers: {
-        ...defaultHeaders,
-        'Authorization': 'Bearer $token',
-      },
+      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
       body: jsonEncode({'comment': comment}),
     );
 

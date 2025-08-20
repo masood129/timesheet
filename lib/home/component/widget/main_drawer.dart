@@ -8,6 +8,7 @@ import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
 import '../../view/monthly_details_view.dart';
 import 'gym_cost_dialog.dart'; // import فایل جدید
+import 'monthly_report_dialog.dart'; // import دیالوگ جدید برای گزارش ماهانه
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});
@@ -73,6 +74,17 @@ class MainDrawer extends StatelessWidget {
               showGymCostDialog(context, homeController);
             },
           ),
+          const Divider(),
+          ListTile(
+            leading: Icon(Icons.send_to_mobile, color: colorScheme.primary),
+            title: Text('ارسال ساعات ماهانه',
+                style: TextStyle(color: colorScheme.onSurface)),
+            onTap: () {
+              Navigator.pop(context);
+              showMonthlyReportDialog(context, homeController); // فراخوانی دیالوگ جدید
+            },
+          ),
+          const Divider(),
           Obx(() => authController.user.value != null &&
               ['group_manager', 'general_manager', 'finance_manager']
                   .contains(authController.user.value!['Role'])
