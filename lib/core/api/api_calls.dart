@@ -1,8 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
 import 'dart:convert';
-import '../model/project_model.dart';
-import '../model/daily_detail_model.dart';
+import '../../home/model/project_model.dart';
+import '../../home/model/daily_detail_model.dart';
 
 class HomeApi {
   final String baseUrl = 'http://localhost:3000';

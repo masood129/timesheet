@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../api/api_calls.dart';
+import '../../core/api/api_calls.dart';
 
 class AuthController extends GetxController {
   var user = Rxn<Map<String, dynamic>>(); // اطلاعات کاربر (userId, Username, Role)
