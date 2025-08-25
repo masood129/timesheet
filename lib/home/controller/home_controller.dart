@@ -113,7 +113,32 @@ class HomeController extends GetxController {
     isListView.value = !isListView.value;
   }
 
-  Future<void> submitMonthlyReport(int year,int month) async {
+  Future<void> submitMonthlyReport(int year, int month) async {
+    // First, ensure monthly details are fetched
+    await fetchMonthlyDetails();
+
+    // Check for incomplete working days
+    bool hasIncompleteDays = false;
+    String errorMessage = 'روزهای ناقص: ';
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = Jalali(year, month, day);
+      final status = getCardStatus(date, Get.context!); // Assuming Get.context is available; adjust if needed
+      if (status['leaveType'] == 'کاری' && !(status['isComplete'] as bool)) {
+        hasIncompleteDays = true;
+        errorMessage += '${date.day}, ';
+      }
+    }
+
+    if (hasIncompleteDays) {
+      errorMessage = errorMessage.trim().replaceAll(RegExp(r',\s*$'), ''); // Remove trailing comma
+      if (Get.context != null) {
+        Get.snackbar('خطا', '$errorMessage - ساعات پروژه و ساعات مفید مطابقت ندارند');
+      }
+      return; // Or throw Exception('Incomplete days');
+    }
+
+    // Proceed if all working days are complete
     await HomeApi().createJalaliMonthlyReport(year, month);
   }
 
