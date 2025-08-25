@@ -1,8 +1,8 @@
-// api_calls.dart (modified with Singleton pattern and using CoreApi singleton)
-
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
 import 'dart:convert';
+import '../../home/model/monthly_report_model.dart';
 import '../../home/model/project_model.dart';
 import '../../home/model/daily_detail_model.dart';
 
@@ -13,10 +13,15 @@ class HomeApi {
     return _instance;
   }
 
-  HomeApi._internal();
+  late final String baseUrl; // تغییر به late برای init در constructor
 
-  final String baseUrl = 'http://localhost:3000';
-  final coreAPI = CoreApi(); // Using singleton instance
+  HomeApi._internal() {
+    baseUrl =
+        // dotenv.env['API_BASE_URL'] ??
+        'http://localhost:3000'; // گرفتن از env یا default
+  }
+
+  final coreAPI = CoreApi();
   final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',
@@ -182,14 +187,15 @@ class HomeApi {
   }
 
   // DailyDetails Endpoints
-  Future<DailyDetail?> getDailyDetail(String date, int userId) async {
+  Future<DailyDetail?> getDailyDetail(String date) async {
+    // حذف int userId
     final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateFormat.hasMatch(date)) {
       throw Exception('Invalid date format. Use YYYY-MM-DD');
     }
 
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/daily-details/$date?userId=$userId'),
+      Uri.parse('$baseUrl/daily-details/$date'),
       headers: defaultHeaders,
     );
     if (response == null) {
@@ -222,13 +228,10 @@ class HomeApi {
     throw Exception('Failed to save daily detail: ${response.statusCode}');
   }
 
-  Future<List<DailyDetail>> getMonthlyDetails(
-    int year,
-    int month,
-    int userId,
-  ) async {
+  Future<List<DailyDetail>> getMonthlyDetails(int year, int month) async {
+    // حذف int userId
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/daily-details/month/$year/$month?userId=$userId'),
+      Uri.parse('$baseUrl/daily-details/month/$year/$month'),
       headers: defaultHeaders,
     );
     if (response == null) {
@@ -241,11 +244,32 @@ class HomeApi {
     throw Exception('Failed to fetch monthly details: ${response.statusCode}');
   }
 
+  // اضافه کردن endpoint جدید برای دریافت جزئیات ماهیانه با تاریخ شمسی
+  Future<List<DailyDetail>> getJalaliMonthlyDetails(
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/daily-details/jalali/month/$jalaliYear/$jalaliMonth'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => DailyDetail.fromJson(e)).toList();
+    }
+    throw Exception(
+      'Failed to fetch jalali monthly details: ${response.statusCode}',
+    );
+  }
+
   Future<List<DailyDetail>> getDateRangeDetails(
     String startDate,
     String endDate,
-    int userId,
   ) async {
+    // حذف int userId
     final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateFormat.hasMatch(startDate) || !dateFormat.hasMatch(endDate)) {
       throw Exception('Invalid date format. Use YYYY-MM-DD');
@@ -255,7 +279,7 @@ class HomeApi {
     }
 
     final url = Uri.parse(
-      '$baseUrl/daily-details/range?startDate=$startDate&endDate=$endDate&userId=$userId',
+      '$baseUrl/daily-details/range?startDate=$startDate&endDate=$endDate',
     );
     final response = await coreAPI.get(url, headers: defaultHeaders);
 
@@ -271,8 +295,116 @@ class HomeApi {
     );
   }
 
-  // New Manager Endpoints
-  Future<dynamic> fetchMonthlyReportsForGroup(
+  // Monthly Reports Endpoints - Gregorian
+  Future<void> createMonthlyReport(int year, int month) async {
+    final response = await coreAPI.post(
+      Uri.parse('$baseUrl/monthly-reports/$year/$month'),
+      headers: defaultHeaders,
+      body: jsonEncode({}), // body خالی
+    );
+    if (response == null) {
+      throw Exception('Failed to create report: No response from server');
+    }
+    if (response.statusCode != 201) {
+      throw Exception(
+        'Failed to create monthly report: ${response.statusCode}',
+      );
+    }
+  }
+
+  // اضافه کردن endpoint جدید برای ایجاد گزارش با تاریخ شمسی
+  Future<void> createJalaliMonthlyReport(
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
+    final response = await coreAPI.post(
+      Uri.parse('$baseUrl/monthly-reports/jalali/$jalaliYear/$jalaliMonth'),
+      headers: defaultHeaders,
+      body: jsonEncode({}), // body خالی
+    );
+    if (response == null) {
+      throw Exception('Failed to create report: No response from server');
+    }
+    if (response.statusCode != 201) {
+      throw Exception(
+        'Failed to create jalali monthly report: ${response.statusCode}',
+      );
+    }
+  }
+
+  Future<void> submitReportToGroupManager(int reportId) async {
+    final response = await coreAPI.put(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/submit-to-group-manager'),
+      headers: defaultHeaders,
+      body: jsonEncode({}), // body خالی
+    );
+    if (response == null) {
+      throw Exception('Failed to submit report: No response from server');
+    }
+    if (response.statusCode != 200) {
+      throw Exception('Failed to submit report: ${response.statusCode}');
+    }
+  }
+
+  Future<MonthlyReport> getMonthlyReportById(int reportId) async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/monthly-reports/$reportId'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      return MonthlyReport.fromJson(jsonDecode(response.body));
+    }
+    if (response.statusCode == 404) {
+      throw Exception('Report not found');
+    }
+    throw Exception('Failed to fetch report: ${response.statusCode}');
+  }
+
+  Future<List<MonthlyReport>> getMonthlyReportsForGroup(
+    int year,
+    int month,
+  ) async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/monthly-reports/group/$year/$month'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => MonthlyReport.fromJson(e)).toList();
+    }
+    throw Exception('Failed to fetch group reports: ${response.statusCode}');
+  }
+
+  // اضافه کردن endpoint جدید برای دریافت گزارش‌های گروه با تاریخ شمسی
+  Future<List<MonthlyReport>> getJalaliMonthlyReportsForGroup(
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
+    final response = await coreAPI.get(
+      Uri.parse(
+        '$baseUrl/monthly-reports/jalali/group/$jalaliYear/$jalaliMonth',
+      ),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => MonthlyReport.fromJson(e)).toList();
+    }
+    throw Exception(
+      'Failed to fetch jalali group reports: ${response.statusCode}',
+    );
+  }
+
+  Future<List<MonthlyReport>> fetchMonthlyReportsForGroup(
     int startYear,
     int startMonth,
     int endYear,
@@ -294,10 +426,17 @@ class HomeApi {
       throw Exception('Failed to fetch: No response from server');
     }
 
-    return response;
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data
+          .map((e) => MonthlyReport.fromJson(e))
+          .toList(); // تغییر به List<MonthlyReport>
+    }
+    throw Exception('Failed to fetch range reports: ${response.statusCode}');
   }
 
-  Future<dynamic> approveReportAsGroupManager(
+  Future<Map<String, dynamic>> approveReportAsGroupManager(
+    // تغییر به Map برای json
     int reportId,
     String comment,
     bool toGeneralManager,
@@ -320,10 +459,16 @@ class HomeApi {
       throw Exception('Failed to approve: No response from server');
     }
 
-    return response;
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body); // یا MonthlyReport اگر نیاز باشه
+    }
+    throw Exception(
+      'Failed to approve as group manager: ${response.statusCode}',
+    );
   }
 
-  Future<dynamic> approveReportAsGeneralManager(
+  Future<Map<String, dynamic>> approveReportAsGeneralManager(
+    // تغییر به Map
     int reportId,
     String comment,
   ) async {
@@ -342,10 +487,19 @@ class HomeApi {
       throw Exception('Failed to approve: No response from server');
     }
 
-    return response;
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception(
+      'Failed to approve as general manager: ${response.statusCode}',
+    );
   }
 
-  Future<dynamic> approveReportAsFinance(int reportId, String comment) async {
+  Future<Map<String, dynamic>> approveReportAsFinance(
+    int reportId,
+    String comment,
+  ) async {
+    // تغییر به Map
     final token = await _getToken();
     if (token == null) {
       throw Exception('Authentication token not found');
@@ -361,6 +515,27 @@ class HomeApi {
       throw Exception('Failed to approve: No response from server');
     }
 
-    return response;
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to approve as finance: ${response.statusCode}');
+  }
+
+  // اضافه کردن endpoint برای تست تاریخ شمسی
+  Future<Map<String, dynamic>> testJalaliDate(
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/test/jalali/$jalaliYear/$jalaliMonth'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to test: No response from server');
+    }
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Failed to test jalali date: ${response.statusCode}');
   }
 }

@@ -2,21 +2,24 @@ import 'package:get/get.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/api/api_calls.dart';
-import 'dart:convert';
 import '../../home/controller/auth_controller.dart';
-import '../model/report_model.dart';
+import '../../home/model/monthly_report_model.dart';
 
 class ManagerController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
   final HomeApi homeApi = HomeApi();
-  var reports = <Report>[].obs;
+  var reports = <MonthlyReport>[].obs;
   var selectedYear = Jalali.now().year.obs;
   var selectedMonth = Jalali.now().month.obs;
 
   Future<void> fetchReports() async {
     try {
       Jalali jalaliStart = Jalali(selectedYear.value, selectedMonth.value, 1);
-      Jalali jalaliEnd = Jalali(selectedYear.value, selectedMonth.value, jalaliStart.monthLength);
+      Jalali jalaliEnd = Jalali(
+        selectedYear.value,
+        selectedMonth.value,
+        jalaliStart.monthLength,
+      );
       Gregorian gregorianStart = jalaliStart.toGregorian();
       Gregorian gregorianEnd = jalaliEnd.toGregorian();
 
@@ -27,29 +30,32 @@ class ManagerController extends GetxController {
         gregorianEnd.month,
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = jsonDecode(response.body);
-        reports.value = jsonData.map((json) => Report.fromJson(json)).toList();
+      if (response.isNotEmpty) {
+        reports.value = response;
       } else {
-        Get.snackbar('خطا', 'خطا در دریافت گزارش‌ها: ${response.body}'.tr);
+        Get.snackbar('خطا', 'خطا در دریافت گزارش‌ها: '.tr);
       }
     } catch (e) {
       Get.snackbar('خطا', 'خطای سرور: $e'.tr);
     }
   }
 
-  Future<void> approveGroupManager(int reportId, String comment, bool toGeneralManager) async {
+  Future<void> approveGroupManager(
+    int reportId,
+    String comment,
+    bool toGeneralManager,
+  ) async {
     try {
       final response = await homeApi.approveReportAsGroupManager(
         reportId,
         comment,
         toGeneralManager,
       );
-      if (response.statusCode == 200) {
+      if (response.isNotEmpty) {
         Get.snackbar('موفقیت', 'گزارش تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: ${response.body}'.tr);
+        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
       Get.snackbar('خطا', 'خطای سرور: $e'.tr);
@@ -62,11 +68,11 @@ class ManagerController extends GetxController {
         reportId,
         comment,
       );
-      if (response.statusCode == 200) {
+      if (response.isNotEmpty) {
         Get.snackbar('موفقیت', 'گزارش تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: ${response.body}'.tr);
+        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
       Get.snackbar('خطا', 'خطای سرور: $e'.tr);
@@ -75,15 +81,12 @@ class ManagerController extends GetxController {
 
   Future<void> approveFinance(int reportId, String comment) async {
     try {
-      final response = await homeApi.approveReportAsFinance(
-        reportId,
-        comment,
-      );
-      if (response.statusCode == 200) {
+      final response = await homeApi.approveReportAsFinance(reportId, comment);
+      if (response.isNotEmpty) {
         Get.snackbar('موفقیت', 'گزارش نهایی تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: ${response.body}'.tr);
+        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
       Get.snackbar('خطا', 'خطای سرور: $e'.tr);
