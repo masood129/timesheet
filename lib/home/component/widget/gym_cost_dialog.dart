@@ -12,6 +12,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
   final yearController = TextEditingController(text: currentYear.toString());
   final monthController = TextEditingController(text: currentMonth.toString());
   final costController = TextEditingController();
+  final hourController = TextEditingController();
 
   final months = List.generate(12, (index) => index + 1);
   final monthNames = [
@@ -126,6 +127,19 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   }
                 },
               ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: hourController,
+                decoration: InputDecoration(
+                  labelText: 'ساعت'.tr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  suffixIcon: Icon(Icons.lock_clock),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
             ],
           ),
         ),
@@ -137,7 +151,9 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
           ),
           ElevatedButton(
             onPressed: () async {
-              if (monthController.text.isEmpty || costController.text.isEmpty) {
+              if (monthController.text.isEmpty ||
+                  costController.text.isEmpty ||
+                  hourController.text.isEmpty ) {
                 Get.snackbar('خطا', 'لطفاً همه فیلدها را پر کنید'.tr);
                 return;
               }
@@ -148,6 +164,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   int.parse(yearController.text),
                   int.parse(monthController.text),
                   int.parse(cleanCost),
+                  int.parse(hourController.text),
                 );
                 Get.snackbar('موفقیت', 'هزینه ورزش ثبت شد'.tr);
                 Navigator.pop(context);

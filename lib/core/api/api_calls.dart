@@ -72,7 +72,7 @@ class HomeApi {
   }
 
   // تابع برای ذخیره هزینه ورزش ماهیانه
-  Future<void> saveMonthlyGymCost(int year, int month, int cost) async {
+  Future<void> saveMonthlyGymCost(int year, int month, int cost,int hours) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');
     if (userId == null) {
@@ -80,13 +80,14 @@ class HomeApi {
     }
 
     final response = await coreAPI.post(
-      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs'),
+      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs/jalali'),
       headers: defaultHeaders,
       body: jsonEncode({
         'userId': userId,
         'year': year,
         'month': month,
         'cost': cost,
+        'hours': hours,
       }),
     );
     if (response == null) {

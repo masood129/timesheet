@@ -25,9 +25,9 @@ class HomeController extends GetxController {
     initializeApp();
   }
 
-  saveMonthlyGymCost(int year, int month, int cost) async {
+  saveMonthlyGymCost(int year, int month, int cost,int hours) async {
     try {
-      await HomeApi().saveMonthlyGymCost(year, month, cost);
+      await HomeApi().saveMonthlyGymCost(year, month, cost, hours);
     } catch (e) {
       rethrow;
     }
