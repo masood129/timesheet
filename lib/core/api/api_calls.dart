@@ -85,7 +85,7 @@ class HomeApi {
     }
 
     final response = await coreAPI.post(
-      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs/jalali'),
+      Uri.parse('$baseUrl/monthly-gym-costs'), // اصلاح endpoint بر اساس کد JS
       headers: defaultHeaders,
       body: jsonEncode({
         'userId': userId,
@@ -103,20 +103,33 @@ class HomeApi {
     }
   }
 
-  Future<bool> checkMonthlyReportSubmitted(int jalaliYear, int jalaliMonth) async {
+  Future<String?> checkMonthlyReportStatus(
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/monthly-reports/check-submitted/jalali/$jalaliYear/$jalaliMonth'),
+      Uri.parse(
+        '$baseUrl/monthly-reports/check-submitted/jalali/$jalaliYear/$jalaliMonth',
+      ),
       headers: defaultHeaders,
     );
     if (response == null) {
-      return false; // اگر پاسخی نبود، فرض بر ارسال نشده
+      throw Exception('Failed to fetch: No response from server');
     }
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['isSubmitted'] as bool? ?? false;
+      final data = jsonDecode(response.body);
+      return data['status']
+          as String?; // مستقیماً status را برمی‌گرداند (ممکن است null باشد)
     }
-    return false; // در صورت خطا، false برگردان
+    if (response.statusCode == 400) {
+      throw Exception('Invalid Jalali year or month');
+    }
+    if (response.statusCode == 403) {
+      throw Exception('Access denied');
+    }
+    throw Exception('Failed to check report status: ${response.statusCode}');
   }
-  
+
   // Projects Endpoints
   Future<List<Project>> getProjects() async {
     final response = await coreAPI.get(
@@ -488,7 +501,6 @@ class HomeApi {
   }
 
   Future<Map<String, dynamic>> approveReportAsGeneralManager(
-    // تغییر به Map
     int reportId,
     String comment,
   ) async {
@@ -541,21 +553,31 @@ class HomeApi {
     throw Exception('Failed to approve as finance: ${response.statusCode}');
   }
 
-  // اضافه کردن endpoint برای تست تاریخ شمسی
-  Future<Map<String, dynamic>> testJalaliDate(
-    int jalaliYear,
-    int jalaliMonth,
-  ) async {
-    final response = await coreAPI.get(
-      Uri.parse('$baseUrl/test/jalali/$jalaliYear/$jalaliMonth'),
+  Future<void> exitDraft(int reportId) async {
+    final response = await coreAPI.delete(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/exit-draft'),
       headers: defaultHeaders,
     );
     if (response == null) {
-      throw Exception('Failed to test: No response from server');
+      throw Exception('Failed to exit draft: No response from server');
     }
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to exit draft: ${response.statusCode}');
     }
-    throw Exception('Failed to test jalali date: ${response.statusCode}');
+  }
+
+  // رد گزارش و بازگشت به draft
+  Future<void> rejectToDraft(int reportId, String comment) async {
+    final response = await coreAPI.put(
+      Uri.parse('$baseUrl/monthly-reports/$reportId/reject-to-draft'),
+      headers: defaultHeaders,
+      body: jsonEncode({'comment': comment}),
+    );
+    if (response == null) {
+      throw Exception('Failed to reject: No response from server');
+    }
+    if (response.statusCode != 200) {
+      throw Exception('Failed to reject to draft: ${response.statusCode}');
+    }
   }
 }

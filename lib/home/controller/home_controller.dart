@@ -17,7 +17,9 @@ class HomeController extends GetxController {
   var dailyDetails = <DailyDetail>[].obs;
   var isListView = false.obs;
   var holidays = <String, dynamic>{}.obs;
-  var isMonthSubmitted = false.obs;
+  var monthStatus = Rx<String?>(
+    null,
+  ); // استفاده از Rx<String?> برای نگهداری null
 
   int get daysInMonth =>
       calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
@@ -29,8 +31,9 @@ class HomeController extends GetxController {
   }
 
   Future<void> openNoteDialog(BuildContext context, Jalali date) async {
-    if (isMonthSubmitted.value) {
-      showMonthLockedDialog();
+    if (monthStatus.value != null) {
+      // فقط اگر null باشد، ادیت ممکن است
+      showMonthLockedDialog(monthStatus.value!);
       return;
     }
 
@@ -44,25 +47,50 @@ class HomeController extends GetxController {
       context: context,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) => NoteDialog(date: date),
     );
   }
 
-  void showMonthLockedDialog() {
+  void showMonthLockedDialog(String status) {
+    String message;
+    switch (status) {
+      case 'draft':
+        message =
+            'ساعات کاری این ماه در حال پیش‌نویس است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+        break;
+      case 'submitted_to_general_manager':
+        message =
+            'ساعات کاری این ماه به مدیر کل ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+        break;
+      case 'approved':
+        message =
+            'ساعات کاری این ماه تایید شده است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+        break;
+      case 'submitted_to_group_manager':
+        message =
+            'ساعات کاری این ماه به مدیر گروه ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+        break;
+      case 'submitted_to_finance':
+        message =
+            'ساعات کاری این ماه به امور مالی ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+        break;
+      default:
+        message =
+            'ساعات کاری این ماه ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.';
+    }
+
     Get.defaultDialog(
       title: 'اطلاعیه',
-      content: const Text('ساعات کاری این ماه ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.'),
+      content: Text(message),
       actions: [
-        TextButton(
-          onPressed: () => Get.back(),
-          child: const Text('تأیید'),
-        ),
+        TextButton(onPressed: () => Get.back(), child: const Text('تأیید')),
       ],
     );
   }
 
-  saveMonthlyGymCost(int year, int month, int cost,int hours) async {
+  saveMonthlyGymCost(int year, int month, int cost, int hours) async {
     try {
       await HomeApi().saveMonthlyGymCost(year, month, cost, hours);
     } catch (e) {
@@ -160,7 +188,10 @@ class HomeController extends GetxController {
 
     for (int day = 1; day <= daysInMonth; day++) {
       final date = Jalali(year, month, day);
-      final status = getCardStatus(date, Get.context!); // Assuming Get.context is available; adjust if needed
+      final status = getCardStatus(
+        date,
+        Get.context!,
+      ); // Assuming Get.context is available; adjust if needed
       if (status['leaveType'] == 'کاری' && !(status['isComplete'] as bool)) {
         hasIncompleteDays = true;
         errorMessage += '${date.day}, ';
@@ -168,16 +199,22 @@ class HomeController extends GetxController {
     }
 
     if (hasIncompleteDays) {
-      errorMessage = errorMessage.trim().replaceAll(RegExp(r',\s*$'), ''); // Remove trailing comma
+      errorMessage = errorMessage.trim().replaceAll(
+        RegExp(r',\s*$'),
+        '',
+      ); // Remove trailing comma
       if (Get.context != null) {
-        Get.snackbar('خطا', '$errorMessage - ساعات پروژه و ساعات مفید مطابقت ندارند');
+        Get.snackbar(
+          'خطا',
+          '$errorMessage - ساعات پروژه و ساعات مفید مطابقت ندارند',
+        );
       }
       return; // Or throw Exception('Incomplete days');
     }
 
     // Proceed if all working days are complete
     await HomeApi().createJalaliMonthlyReport(year, month);
-    isMonthSubmitted.value = await HomeApi().checkMonthlyReportSubmitted(currentYear.value, currentMonth.value);
+    await fetchMonthlyDetails(); // بروزرسانی وضعیت پس از ارسال
   }
 
   Future<void> fetchMonthlyDetails() async {
@@ -202,19 +239,22 @@ class HomeController extends GetxController {
       final details = await HomeApi().getDateRangeDetails(startDate, endDate);
 
       final filteredDetails =
-      details.where((detail) {
-        final date = DateTime.parse(detail.date);
-        final jalali = Jalali.fromDateTime(date);
-        return jalali.year == currentYear.value &&
-            jalali.month == currentMonth.value;
-      }).toList();
+          details.where((detail) {
+            final date = DateTime.parse(detail.date);
+            final jalali = Jalali.fromDateTime(date);
+            return jalali.year == currentYear.value &&
+                jalali.month == currentMonth.value;
+          }).toList();
 
       dailyDetails.assignAll(filteredDetails);
 
-      // Check if the monthly report is submitted
-      isMonthSubmitted.value = await HomeApi().checkMonthlyReportSubmitted(currentYear.value, currentMonth.value);
+      final status = await HomeApi().checkMonthlyReportStatus(
+        currentYear.value,
+        currentMonth.value,
+      );
+      monthStatus.value = status; // بدون جایگزینی، اگر null باشد، null می‌ماند
     } catch (e) {
-      isMonthSubmitted.value = false; // In case of error, assume not submitted
+      monthStatus.value = null; // In case of error, assume null
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
       }
@@ -244,7 +284,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
@@ -260,7 +300,7 @@ class HomeController extends GetxController {
     final personal = detail.personalTime ?? 0;
     final totalTaskMinutes = detail.tasks.fold<int>(
       0,
-          (sum, task) => sum + (task.duration ?? 0),
+      (sum, task) => sum + (task.duration ?? 0),
     );
 
     if (arrival != null && leave != null) {
@@ -280,7 +320,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
     final holiday = getHolidayForDate(date);
 
@@ -314,15 +354,15 @@ class HomeController extends GetxController {
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-          (d) => d.date == formattedDate,
+      (d) => d.date == formattedDate,
     );
 
     bool hasWorkingHours =
         detail != null &&
-            detail.arrivalTime != null &&
-            detail.arrivalTime!.isNotEmpty &&
-            detail.leaveTime != null &&
-            detail.leaveTime!.isNotEmpty;
+        detail.arrivalTime != null &&
+        detail.arrivalTime!.isNotEmpty &&
+        detail.leaveTime != null &&
+        detail.leaveTime!.isNotEmpty;
 
     if (detail == null && !hasWorkingHours) {
       return {
@@ -342,7 +382,7 @@ class HomeController extends GetxController {
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-            (sum, task) => sum + (task.duration ?? 0),
+        (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -357,21 +397,21 @@ class HomeController extends GetxController {
       }
       isComplete =
           hasArrivalTime &&
-              hasLeaveTime &&
-              effectiveWorkMinutes != null &&
-              totalTaskMinutes == effectiveWorkMinutes &&
-              effectiveWorkMinutes > 0;
+          hasLeaveTime &&
+          effectiveWorkMinutes != null &&
+          totalTaskMinutes == effectiveWorkMinutes &&
+          effectiveWorkMinutes > 0;
 
       return {
         'avatarColor':
-        isComplete
-            ? colorScheme.completedStatus
-            : colorScheme.incompleteStatus,
+            isComplete
+                ? colorScheme.completedStatus
+                : colorScheme.incompleteStatus,
         'avatarIcon': isComplete ? Icons.check_circle : Icons.access_time,
         'avatarIconColor':
-        isComplete
-            ? colorScheme.onCompletedStatus
-            : colorScheme.onIncompleteStatus,
+            isComplete
+                ? colorScheme.onCompletedStatus
+                : colorScheme.onIncompleteStatus,
         'leaveType': 'کاری',
         'isComplete': isComplete,
       };
