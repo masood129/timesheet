@@ -72,7 +72,12 @@ class HomeApi {
   }
 
   // تابع برای ذخیره هزینه ورزش ماهیانه
-  Future<void> saveMonthlyGymCost(int year, int month, int cost,int hours) async {
+  Future<void> saveMonthlyGymCost(
+    int year,
+    int month,
+    int cost,
+    int hours,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');
     if (userId == null) {
@@ -98,6 +103,20 @@ class HomeApi {
     }
   }
 
+  Future<bool> checkMonthlyReportSubmitted(int jalaliYear, int jalaliMonth) async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/monthly-reports/check-submitted/jalali/$jalaliYear/$jalaliMonth'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      return false; // اگر پاسخی نبود، فرض بر ارسال نشده
+    }
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['isSubmitted'] as bool? ?? false;
+    }
+    return false; // در صورت خطا، false برگردان
+  }
+  
   // Projects Endpoints
   Future<List<Project>> getProjects() async {
     final response = await coreAPI.get(

@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
 import '../../core/api/api_calls.dart';
+import '../component/note_dialog.dart';
 import '../model/daily_detail_model.dart';
+import '../controller/task_controller.dart';
 
 class HomeController extends GetxController {
   final CalendarModel calendarModel = CalendarModel();
@@ -15,6 +17,7 @@ class HomeController extends GetxController {
   var dailyDetails = <DailyDetail>[].obs;
   var isListView = false.obs;
   var holidays = <String, dynamic>{}.obs;
+  var isMonthSubmitted = false.obs;
 
   int get daysInMonth =>
       calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
@@ -23,6 +26,40 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     initializeApp();
+  }
+
+  Future<void> openNoteDialog(BuildContext context, Jalali date) async {
+    if (isMonthSubmitted.value) {
+      showMonthLockedDialog();
+      return;
+    }
+
+    final taskController = Get.find<TaskController>();
+    await taskController.loadDailyDetail(date, dailyDetails);
+
+    showModalBottomSheet(
+      useSafeArea: true,
+      enableDrag: false,
+      isScrollControlled: true,
+      context: context,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => NoteDialog(date: date),
+    );
+  }
+
+  void showMonthLockedDialog() {
+    Get.defaultDialog(
+      title: 'اطلاعیه',
+      content: const Text('ساعات کاری این ماه ارسال شده است. امکان ویرایش جزئیات روزانه وجود ندارد.'),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text('تأیید'),
+        ),
+      ],
+    );
   }
 
   saveMonthlyGymCost(int year, int month, int cost,int hours) async {
@@ -140,6 +177,7 @@ class HomeController extends GetxController {
 
     // Proceed if all working days are complete
     await HomeApi().createJalaliMonthlyReport(year, month);
+    isMonthSubmitted.value = await HomeApi().checkMonthlyReportSubmitted(currentYear.value, currentMonth.value);
   }
 
   Future<void> fetchMonthlyDetails() async {
@@ -164,15 +202,19 @@ class HomeController extends GetxController {
       final details = await HomeApi().getDateRangeDetails(startDate, endDate);
 
       final filteredDetails =
-          details.where((detail) {
-            final date = DateTime.parse(detail.date);
-            final jalali = Jalali.fromDateTime(date);
-            return jalali.year == currentYear.value &&
-                jalali.month == currentMonth.value;
-          }).toList();
+      details.where((detail) {
+        final date = DateTime.parse(detail.date);
+        final jalali = Jalali.fromDateTime(date);
+        return jalali.year == currentYear.value &&
+            jalali.month == currentMonth.value;
+      }).toList();
 
       dailyDetails.assignAll(filteredDetails);
+
+      // Check if the monthly report is submitted
+      isMonthSubmitted.value = await HomeApi().checkMonthlyReportSubmitted(currentYear.value, currentMonth.value);
     } catch (e) {
+      isMonthSubmitted.value = false; // In case of error, assume not submitted
       if (Get.context != null) {
         Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
       }
@@ -202,7 +244,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
 
     if (detail == null) {
@@ -218,7 +260,7 @@ class HomeController extends GetxController {
     final personal = detail.personalTime ?? 0;
     final totalTaskMinutes = detail.tasks.fold<int>(
       0,
-      (sum, task) => sum + (task.duration ?? 0),
+          (sum, task) => sum + (task.duration ?? 0),
     );
 
     if (arrival != null && leave != null) {
@@ -238,7 +280,7 @@ class HomeController extends GetxController {
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
     final holiday = getHolidayForDate(date);
 
@@ -272,15 +314,15 @@ class HomeController extends GetxController {
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
     final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
+          (d) => d.date == formattedDate,
     );
 
     bool hasWorkingHours =
         detail != null &&
-        detail.arrivalTime != null &&
-        detail.arrivalTime!.isNotEmpty &&
-        detail.leaveTime != null &&
-        detail.leaveTime!.isNotEmpty;
+            detail.arrivalTime != null &&
+            detail.arrivalTime!.isNotEmpty &&
+            detail.leaveTime != null &&
+            detail.leaveTime!.isNotEmpty;
 
     if (detail == null && !hasWorkingHours) {
       return {
@@ -300,7 +342,7 @@ class HomeController extends GetxController {
           detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
       final totalTaskMinutes = detail.tasks.fold<int>(
         0,
-        (sum, task) => sum + (task.duration ?? 0),
+            (sum, task) => sum + (task.duration ?? 0),
       );
       final arrival = _parseTime(detail.arrivalTime);
       final leave = _parseTime(detail.leaveTime);
@@ -315,21 +357,21 @@ class HomeController extends GetxController {
       }
       isComplete =
           hasArrivalTime &&
-          hasLeaveTime &&
-          effectiveWorkMinutes != null &&
-          totalTaskMinutes == effectiveWorkMinutes &&
-          effectiveWorkMinutes > 0;
+              hasLeaveTime &&
+              effectiveWorkMinutes != null &&
+              totalTaskMinutes == effectiveWorkMinutes &&
+              effectiveWorkMinutes > 0;
 
       return {
         'avatarColor':
-            isComplete
-                ? colorScheme.completedStatus
-                : colorScheme.incompleteStatus,
+        isComplete
+            ? colorScheme.completedStatus
+            : colorScheme.incompleteStatus,
         'avatarIcon': isComplete ? Icons.check_circle : Icons.access_time,
         'avatarIconColor':
-            isComplete
-                ? colorScheme.onCompletedStatus
-                : colorScheme.onIncompleteStatus,
+        isComplete
+            ? colorScheme.onCompletedStatus
+            : colorScheme.onIncompleteStatus,
         'leaveType': 'کاری',
         'isComplete': isComplete,
       };

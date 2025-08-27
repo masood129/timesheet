@@ -29,7 +29,8 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     final cardStatus = homeController.getCardStatus(widget.date, context);
     final effectiveWork = homeController.calculateEffectiveWork(widget.date);
     final today = Jalali.now();
-    final isToday = widget.date.year == today.year &&
+    final isToday =
+        widget.date.year == today.year &&
         widget.date.month == today.month &&
         widget.date.day == today.day;
     final holiday = homeController.getHolidayForDate(widget.date);
@@ -39,52 +40,44 @@ class _CalendarDayCardState extends State<CalendarDayCard>
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
       child: GestureDetector(
         onTap: () {
-          taskController.loadDailyDetail(widget.date, homeController.dailyDetails);
-          showModalBottomSheet(
-            useSafeArea: true,
-            enableDrag: false,
-            isScrollControlled: true,
-            context: context,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-            builder: (_) => NoteDialog(date: widget.date),
-          );
+          homeController.openNoteDialog(context, widget.date);
         },
         child: Card(
           elevation: isToday ? 8 : 4,
           shadowColor: isToday ? Colors.blue.withOpacity(0.3) : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: isToday
-                ? BorderSide(color: Colors.amber[300]!, width: 1.5)
-                : isHoliday
-                ? BorderSide(color: Colors.red[300]!, width: 1.5)
-                : BorderSide.none,
+            side:
+                isToday
+                    ? BorderSide(color: Colors.amber[300]!, width: 1.5)
+                    : isHoliday
+                    ? BorderSide(color: Colors.red[300]!, width: 1.5)
+                    : BorderSide.none,
           ),
           child: Container(
-            decoration: isToday
-                ? BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(
-                colors: [Colors.blue[800]!, Colors.blue[200]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            )
-                : isHoliday
-                ? BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(
-                colors: [Colors.red[600]!, Colors.red[200]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            )
-                : BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration:
+                isToday
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [Colors.blue[800]!, Colors.blue[200]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    )
+                    : isHoliday
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [Colors.red[600]!, Colors.red[200]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    )
+                    : BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -95,24 +88,27 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.light
-                              ? colorScheme.outline
-                              : colorScheme.outlineVariant,
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? colorScheme.outline
+                                  : colorScheme.outlineVariant,
                           width: 1.5,
                         ),
                         shape: BoxShape.circle,
                       ),
                       child: CircleAvatar(
-                        backgroundColor: isToday
-                            ? Colors.tealAccent[400]
-                            : cardStatus['avatarColor'],
+                        backgroundColor:
+                            isToday
+                                ? Colors.tealAccent[400]
+                                : cardStatus['avatarColor'],
                         child: Icon(
                           isToday
                               ? Icons.event_available
                               : cardStatus['avatarIcon'],
-                          color: isToday
-                              ? Colors.white
-                              : cardStatus['avatarIconColor'],
+                          color:
+                              isToday
+                                  ? Colors.white
+                                  : cardStatus['avatarIconColor'],
                         ),
                       ),
                     ),
@@ -121,14 +117,16 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     '${widget.date.formatter.wN} ${widget.date.day}',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isToday || isHoliday
-                          ? Colors.white
-                          : isFriday
-                          ? colorScheme.error
-                          : null,
-                      fontWeight: isToday || isFriday || isHoliday
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      color:
+                          isToday || isHoliday
+                              ? Colors.white
+                              : isFriday
+                              ? colorScheme.error
+                              : null,
+                      fontWeight:
+                          isToday || isFriday || isHoliday
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -136,9 +134,10 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     effectiveWork,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isToday || isHoliday
-                          ? Colors.white70
-                          : colorScheme.onSurface.withOpacity(0.7),
+                      color:
+                          isToday || isHoliday
+                              ? Colors.white70
+                              : colorScheme.onSurface.withOpacity(0.7),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -167,13 +166,19 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                       child: SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: _buildDayDetails(context, widget.date, cardStatus),
+                          child: _buildDayDetails(
+                            context,
+                            widget.date,
+                            cardStatus,
+                          ),
                         ),
                       ),
                     ),
                   ),
                   crossFadeState:
-                  _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                      _isExpanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
                   duration: const Duration(milliseconds: 300),
                   firstCurve: Curves.easeInOut,
                   secondCurve: Curves.easeInOut,
@@ -187,12 +192,18 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     );
   }
 
-  Widget _buildDayDetails(BuildContext context, Jalali date, Map<String, dynamic> cardStatus) {
+  Widget _buildDayDetails(
+    BuildContext context,
+    Jalali date,
+    Map<String, dynamic> cardStatus,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final gregorianDate = date.toGregorian();
     final formattedDate =
         '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
-    final detail = homeController.dailyDetails.firstWhereOrNull((d) => d.date == formattedDate);
+    final detail = homeController.dailyDetails.firstWhereOrNull(
+      (d) => d.date == formattedDate,
+    );
     final holiday = homeController.getHolidayForDate(date);
     final note = homeController.getNoteForDate(date);
 
@@ -206,10 +217,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         if (note != null && note.isNotEmpty) ...[
           Text(
             '${'note'.tr}: $note',
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.onSurface,
-            ),
+            style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
@@ -222,9 +230,17 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         if (detail != null) ...[
           _buildDetailRow(context, 'arrival_time'.tr, detail.arrivalTime),
           _buildDetailRow(context, 'leave_time'.tr, detail.leaveTime),
-          _buildDetailRow(context, 'personal_time'.tr, '${detail.personalTime ?? 0} ${'minute'.tr}'),
+          _buildDetailRow(
+            context,
+            'personal_time'.tr,
+            '${detail.personalTime ?? 0} ${'minute'.tr}',
+          ),
           _buildDetailRow(context, 'go_cost'.tr, detail.goCost?.toString()),
-          _buildDetailRow(context, 'return_cost'.tr, detail.returnCost?.toString()),
+          _buildDetailRow(
+            context,
+            'return_cost'.tr,
+            detail.returnCost?.toString(),
+          ),
           _buildCarCostsRow(context, detail),
           _buildDetailRow(context, 'description'.tr, detail.description),
           _buildTaskSection(context, detail),
@@ -235,7 +251,10 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     );
   }
 
-  Widget _buildHolidaySection(BuildContext context, Map<String, dynamic> holiday) {
+  Widget _buildHolidaySection(
+    BuildContext context,
+    Map<String, dynamic> holiday,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final events = holiday['events'] as List<dynamic>? ?? [];
     final isHoliday = holiday['isHoliday'] == true;
@@ -253,7 +272,8 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         ),
         ...events.map((event) {
           final description = event['description'] as String;
-          final additionalDescription = event['additional_description'] as String? ?? '';
+          final additionalDescription =
+              event['additional_description'] as String? ?? '';
           final isEventHoliday = event['isHoliday'] == true;
           final isReligious = event['isReligious'] == true;
           return Padding(
@@ -262,13 +282,14 @@ class _CalendarDayCardState extends State<CalendarDayCard>
               '- $description${additionalDescription.isNotEmpty ? ' ($additionalDescription)' : ''}',
               style: TextStyle(
                 fontSize: 14,
-                color: isHoliday
-                    ? colorScheme.onError
-                    : isEventHoliday
-                    ? colorScheme.onError
-                    : isReligious
-                    ? colorScheme.secondary
-                    : colorScheme.onSurface,
+                color:
+                    isHoliday
+                        ? colorScheme.onError
+                        : isEventHoliday
+                        ? colorScheme.onError
+                        : isReligious
+                        ? colorScheme.secondary
+                        : colorScheme.onSurface,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -279,27 +300,30 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     );
   }
 
-  Widget _buildStatusText(BuildContext context, Map<String, dynamic> cardStatus) {
+  Widget _buildStatusText(
+    BuildContext context,
+    Map<String, dynamic> cardStatus,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final leaveType = cardStatus['leaveType'];
     if (leaveType == 'کاری') {
       return Text(
-        cardStatus['isComplete'] ? 'working_day_complete'.tr : 'working_day_incomplete'.tr,
+        cardStatus['isComplete']
+            ? 'working_day_complete'.tr
+            : 'working_day_incomplete'.tr,
         style: TextStyle(
           fontSize: 12,
-          color: cardStatus['isComplete']
-              ? colorScheme.completedStatus
-              : colorScheme.incompleteStatus,
+          color:
+              cardStatus['isComplete']
+                  ? colorScheme.completedStatus
+                  : colorScheme.incompleteStatus,
         ),
         overflow: TextOverflow.ellipsis,
       );
     }
     return Text(
       '${'leave_type'.tr}: $leaveType',
-      style: TextStyle(
-        fontSize: 12,
-        color: colorScheme.onSurface,
-      ),
+      style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
       overflow: TextOverflow.ellipsis,
     );
   }

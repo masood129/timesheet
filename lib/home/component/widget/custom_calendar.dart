@@ -21,9 +21,14 @@ class CustomCalendarWidget extends StatelessWidget {
     final firstWeekday = firstDayOfMonth.weekDay; // 1 (Saturday) to 7 (Friday)
 
     // Create a list of days including padding for weekday alignment
-    final days = List.generate(daysInMonth, (index) => Jalali(year, month, index + 1));
-    final totalSlots = daysInMonth + (firstWeekday - 1); // Add padding for empty slots
-    final adjustedSlots = (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
+    final days = List.generate(
+      daysInMonth,
+      (index) => Jalali(year, month, index + 1),
+    );
+    final totalSlots =
+        daysInMonth + (firstWeekday - 1); // Add padding for empty slots
+    final adjustedSlots =
+        (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
 
     return Column(
       children: [
@@ -32,28 +37,32 @@ class CustomCalendarWidget extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              'شنبه',
-              'یک‌شنبه',
-              'دوشنبه',
-              'سه‌شنبه',
-              'چهارشنبه',
-              'پنج‌شنبه',
-              'جمعه'
-            ].asMap().entries.map((entry) {
-              return Expanded(
-                child: Text(
-                  entry.value,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'BNazanin',
-                    color: entry.key == 6 ? colorScheme.error : colorScheme.onSurface,
-                    fontSize: 12,
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                [
+                  'شنبه',
+                  'یک‌شنبه',
+                  'دوشنبه',
+                  'سه‌شنبه',
+                  'چهارشنبه',
+                  'پنج‌شنبه',
+                  'جمعه',
+                ].asMap().entries.map((entry) {
+                  return Expanded(
+                    child: Text(
+                      entry.value,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'BNazanin',
+                        color:
+                            entry.key == 6
+                                ? colorScheme.error
+                                : colorScheme.onSurface,
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ),
         // Calendar grid
@@ -163,8 +172,8 @@ class CustomCalendarWidget extends StatelessWidget {
                   'وضعیت',
                   cardStatus['leaveType'] == 'کاری'
                       ? (cardStatus['isComplete']
-                      ? 'روز کاری: کامل'
-                      : 'روز کاری: ناقص')
+                          ? 'روز کاری: کامل'
+                          : 'روز کاری: ناقص')
                       : cardStatus['leaveType'] ?? 'بدون اطلاعات',
                 ),
               ],
@@ -223,7 +232,10 @@ class CustomCalendarWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHolidaySection(BuildContext context, Map<String, dynamic> holiday) {
+  Widget _buildHolidaySection(
+    BuildContext context,
+    Map<String, dynamic> holiday,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final events = holiday['events'] as List<dynamic>? ?? [];
     final isHoliday = holiday['isHoliday'] == true;
@@ -252,13 +264,14 @@ class CustomCalendarWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: 'BNazanin',
-                color: isHoliday
-                    ? colorScheme.error
-                    : isEventHoliday
-                    ? colorScheme.error
-                    : isReligious
-                    ? colorScheme.secondary
-                    : colorScheme.onSurface,
+                color:
+                    isHoliday
+                        ? colorScheme.error
+                        : isEventHoliday
+                        ? colorScheme.error
+                        : isReligious
+                        ? colorScheme.secondary
+                        : colorScheme.onSurface,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
