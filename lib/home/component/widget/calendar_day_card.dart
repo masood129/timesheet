@@ -5,7 +5,6 @@ import 'package:timesheet/core/theme/theme.dart';
 
 import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
-import '../note_dialog.dart';
 
 class CalendarDayCard extends StatefulWidget {
   final Jalali date;

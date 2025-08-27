@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
-import '../../controller/task_controller.dart';
-import '../note_dialog.dart';
 
 class GridCalendarDayCard extends StatelessWidget {
   final Jalali date;
@@ -14,7 +12,6 @@ class GridCalendarDayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final homeController = Get.find<HomeController>();
-    final taskController = Get.find<TaskController>();
 
     return Obx(() {
       final isFriday = date.weekDay == 7;
