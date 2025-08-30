@@ -1,6 +1,5 @@
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timesheet/core/api/api_service.dart';
+import 'package:timesheet/core/api/api_service.dart'; // import CoreApi
 import 'dart:convert';
 import '../../home/model/monthly_report_model.dart';
 import '../../home/model/project_model.dart';
@@ -13,12 +12,10 @@ class HomeApi {
     return _instance;
   }
 
-  late final String baseUrl; // تغییر به late برای init در constructor
+  late final String baseUrl;
 
   HomeApi._internal() {
-    baseUrl =
-        // dotenv.env['API_BASE_URL'] ??
-        'http://localhost:3000'; // گرفتن از env یا default
+    baseUrl = 'http://localhost:3000'; // یا از dotenv بگیرید
   }
 
   final coreAPI = CoreApi();
@@ -27,17 +24,13 @@ class HomeApi {
     'accept': 'application/json',
   };
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('jwt_token');
-  }
-
   // تابع ورود و دریافت توکن
   Future<String> login(String username) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/auth/login'),
-      headers: {...defaultHeaders, 'skip-auth': 'true'},
-      body: jsonEncode({'username': username}),
+      headers: {'skip-auth': 'true'},
+      // skip-auth برای جلوگیری از اضافه کردن token
+      body: {'username': username}, // Map - CoreApi encode می‌کنه
     );
     if (response == null) {
       throw Exception('Failed to login: No response from server');
@@ -85,15 +78,15 @@ class HomeApi {
     }
 
     final response = await coreAPI.post(
-      Uri.parse('$baseUrl/monthly-gym-costs'), // اصلاح endpoint بر اساس کد JS
+      Uri.parse('$baseUrl/monthly-gym-costs'),
       headers: defaultHeaders,
-      body: jsonEncode({
+      body: {
         'userId': userId,
         'year': year,
         'month': month,
         'cost': cost,
         'hours': hours,
-      }),
+      },
     );
     if (response == null) {
       throw Exception('Failed to post: No response from server');
@@ -118,8 +111,7 @@ class HomeApi {
     }
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['status']
-          as String?; // مستقیماً status را برمی‌گرداند (ممکن است null باشد)
+      return data['status'] as String?;
     }
     if (response.statusCode == 400) {
       throw Exception('Invalid Jalali year or month');
@@ -130,7 +122,7 @@ class HomeApi {
     throw Exception('Failed to check report status: ${response.statusCode}');
   }
 
-  // Projects Endpoints
+  // Projects Endpoints (مثال – بقیه مشابه)
   Future<List<Project>> getProjects() async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/projects'),
@@ -146,11 +138,34 @@ class HomeApi {
     throw Exception('Failed to fetch projects: ${response.statusCode}');
   }
 
-  Future<Project> getProjectById(int id) async {
-    final response = await coreAPI.get(
-      Uri.parse('$baseUrl/projects/$id'),
+  // ... بقیه متدها مشابه – explicit token حذف شد، body به Map تبدیل شد، برای delete body null است (مثل deleteProject و exitDraft).
+  // مثال exitDraft:
+  Future<void> exitDraft(int reportId) async {
+    final response = await coreAPI.delete(
+      Uri.parse('$baseUrl/monthly-reports/exit-draft/$reportId'),
       headers: defaultHeaders,
+      body: null, // بدون body برای سازگاری
     );
+    if (response == null) {
+      throw Exception('Failed to delete: No response from server');
+    }
+    if (response.statusCode == 200) {
+      return;
+    }
+    if (response.statusCode == 400) {
+      throw Exception('Only draft reports can be exited');
+    }
+    if (response.statusCode == 403) {
+      throw Exception('Access denied');
+    }
+    if (response.statusCode == 404) {
+      throw Exception('Report not found');
+    }
+    throw Exception('Failed to exit draft: ${response.statusCode}');
+  }
+
+  Future<Project> getProjectById(int id) async {
+    final response = await coreAPI.get(Uri.parse('$baseUrl/projects/$id'));
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
     }
@@ -166,7 +181,6 @@ class HomeApi {
   Future<Project> createProject(Project project) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/projects'),
-      headers: defaultHeaders,
       body: jsonEncode(project.toJson()),
     );
     if (response == null) {
@@ -184,7 +198,6 @@ class HomeApi {
   Future<Project> updateProject(int id, Map<String, dynamic> updates) async {
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/projects/$id'),
-      headers: defaultHeaders,
       body: jsonEncode(updates),
     );
     if (response == null) {
@@ -205,7 +218,7 @@ class HomeApi {
   Future<void> deleteProject(int id) async {
     final response = await coreAPI.delete(
       Uri.parse('$baseUrl/projects/$id'),
-      headers: defaultHeaders,
+      body: null, // بدون body
     );
     if (response == null) {
       throw Exception('Failed to delete: No response from server');
@@ -221,7 +234,6 @@ class HomeApi {
 
   // DailyDetails Endpoints
   Future<DailyDetail?> getDailyDetail(String date) async {
-    // حذف int userId
     final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateFormat.hasMatch(date)) {
       throw Exception('Invalid date format. Use YYYY-MM-DD');
@@ -229,7 +241,6 @@ class HomeApi {
 
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/$date'),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -246,7 +257,6 @@ class HomeApi {
   Future<DailyDetail> saveDailyDetail(DailyDetail detail) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/daily-details'),
-      headers: defaultHeaders,
       body: jsonEncode(detail.toJson()),
     );
     if (response == null) {
@@ -262,10 +272,8 @@ class HomeApi {
   }
 
   Future<List<DailyDetail>> getMonthlyDetails(int year, int month) async {
-    // حذف int userId
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/month/$year/$month'),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -284,7 +292,6 @@ class HomeApi {
   ) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/daily-details/jalali/month/$jalaliYear/$jalaliMonth'),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -302,7 +309,6 @@ class HomeApi {
     String startDate,
     String endDate,
   ) async {
-    // حذف int userId
     final dateFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
     if (!dateFormat.hasMatch(startDate) || !dateFormat.hasMatch(endDate)) {
       throw Exception('Invalid date format. Use YYYY-MM-DD');
@@ -314,7 +320,7 @@ class HomeApi {
     final url = Uri.parse(
       '$baseUrl/daily-details/range?startDate=$startDate&endDate=$endDate',
     );
-    final response = await coreAPI.get(url, headers: defaultHeaders);
+    final response = await coreAPI.get(url);
 
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -332,7 +338,6 @@ class HomeApi {
   Future<void> createMonthlyReport(int year, int month) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/monthly-reports/$year/$month'),
-      headers: defaultHeaders,
       body: jsonEncode({}), // body خالی
     );
     if (response == null) {
@@ -352,7 +357,6 @@ class HomeApi {
   ) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/monthly-reports/jalali/$jalaliYear/$jalaliMonth'),
-      headers: defaultHeaders,
       body: jsonEncode({}), // body خالی
     );
     if (response == null) {
@@ -368,7 +372,6 @@ class HomeApi {
   Future<void> submitReportToGroupManager(int reportId) async {
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/submit-to-group-manager'),
-      headers: defaultHeaders,
       body: jsonEncode({}), // body خالی
     );
     if (response == null) {
@@ -382,7 +385,6 @@ class HomeApi {
   Future<MonthlyReport> getMonthlyReportById(int reportId) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/monthly-reports/$reportId'),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -402,7 +404,6 @@ class HomeApi {
   ) async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/monthly-reports/group/$year/$month'),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -423,7 +424,6 @@ class HomeApi {
       Uri.parse(
         '$baseUrl/monthly-reports/jalali/group/$jalaliYear/$jalaliMonth',
       ),
-      headers: defaultHeaders,
     );
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
@@ -443,45 +443,29 @@ class HomeApi {
     int endYear,
     int endMonth,
   ) async {
-    final token = await _getToken();
-    if (token == null) {
-      throw Exception('Authentication token not found');
-    }
-
     final response = await coreAPI.get(
       Uri.parse(
         '$baseUrl/monthly-reports/group/range/$startYear/$startMonth/$endYear/$endMonth',
       ),
-      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
     );
-
     if (response == null) {
       throw Exception('Failed to fetch: No response from server');
     }
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data
-          .map((e) => MonthlyReport.fromJson(e))
-          .toList(); // تغییر به List<MonthlyReport>
+      return data.map((e) => MonthlyReport.fromJson(e)).toList();
     }
     throw Exception('Failed to fetch range reports: ${response.statusCode}');
   }
 
   Future<Map<String, dynamic>> approveReportAsGroupManager(
-    // تغییر به Map برای json
     int reportId,
     String comment,
     bool toGeneralManager,
   ) async {
-    final token = await _getToken();
-    if (token == null) {
-      throw Exception('Authentication token not found');
-    }
-
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-group-manager'),
-      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
       body: jsonEncode({
         'comment': comment,
         'toGeneralManager': toGeneralManager,
@@ -493,7 +477,7 @@ class HomeApi {
     }
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body); // یا MonthlyReport اگر نیاز باشه
+      return jsonDecode(response.body);
     }
     throw Exception(
       'Failed to approve as group manager: ${response.statusCode}',
@@ -504,14 +488,8 @@ class HomeApi {
     int reportId,
     String comment,
   ) async {
-    final token = await _getToken();
-    if (token == null) {
-      throw Exception('Authentication token not found');
-    }
-
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-general-manager'),
-      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
       body: jsonEncode({'comment': comment}),
     );
 
@@ -531,15 +509,8 @@ class HomeApi {
     int reportId,
     String comment,
   ) async {
-    // تغییر به Map
-    final token = await _getToken();
-    if (token == null) {
-      throw Exception('Authentication token not found');
-    }
-
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/approve-finance'),
-      headers: {...defaultHeaders, 'Authorization': 'Bearer $token'},
       body: jsonEncode({'comment': comment}),
     );
 
@@ -553,24 +524,10 @@ class HomeApi {
     throw Exception('Failed to approve as finance: ${response.statusCode}');
   }
 
-  Future<void> exitDraft(int reportId) async {
-    final response = await coreAPI.delete(
-      Uri.parse('$baseUrl/monthly-reports/$reportId/exit-draft'),
-      headers: defaultHeaders,
-    );
-    if (response == null) {
-      throw Exception('Failed to exit draft: No response from server');
-    }
-    if (response.statusCode != 200) {
-      throw Exception('Failed to exit draft: ${response.statusCode}');
-    }
-  }
-
   // رد گزارش و بازگشت به draft
   Future<void> rejectToDraft(int reportId, String comment) async {
     final response = await coreAPI.put(
       Uri.parse('$baseUrl/monthly-reports/$reportId/reject-to-draft'),
-      headers: defaultHeaders,
       body: jsonEncode({'comment': comment}),
     );
     if (response == null) {
@@ -579,5 +536,22 @@ class HomeApi {
     if (response.statusCode != 200) {
       throw Exception('Failed to reject to draft: ${response.statusCode}');
     }
+  }
+
+  Future<List<MonthlyReport>> getMyDrafts() async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/monthly-reports/my-drafts'),
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => MonthlyReport.fromJson(e)).toList();
+    }
+    if (response.statusCode == 403) {
+      throw Exception('Access denied');
+    }
+    throw Exception('Failed to fetch drafts: ${response.statusCode}');
   }
 }

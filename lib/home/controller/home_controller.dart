@@ -4,6 +4,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
+import 'package:timesheet/home/model/monthly_report_model.dart';
 import '../../core/api/api_calls.dart';
 import '../component/note_dialog.dart';
 import '../model/daily_detail_model.dart';
@@ -17,17 +18,49 @@ class HomeController extends GetxController {
   var dailyDetails = <DailyDetail>[].obs;
   var isListView = false.obs;
   var holidays = <String, dynamic>{}.obs;
-  var monthStatus = Rx<String?>(
-    null,
-  ); // استفاده از Rx<String?> برای نگهداری null
+  var monthStatus = Rx<String?>(null); // استفاده از Rx<String?> برای نگهداری null
+  List<MonthlyReport> drafts = <MonthlyReport>[].obs; // لیست drafts (json objects)
 
-  int get daysInMonth =>
-      calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+  int get daysInMonth => calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
 
   @override
   void onInit() {
     super.onInit();
     initializeApp();
+  }
+
+  Future<List<MonthlyReport>> fetchMyDrafts() async {
+    try {
+      final reportList = await HomeApi().getMyDrafts();
+      return reportList;
+    } catch (e) {
+      Get.snackbar('خطا', 'خطا در دریافت پیش‌نویس‌ها: $e');
+      return [];
+    }
+  }
+
+// متد جدید برای ارسال draft به مدیر گروه
+  Future<void> submitDraftToManager(int reportId) async {
+    try {
+      await HomeApi().submitReportToGroupManager(reportId);
+      // بروزرسانی لیست drafts پس از ارسال
+      await fetchMyDrafts();
+      await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
+    } catch (e) {
+      Get.snackbar('خطا', 'خطا در ارسال پیش‌نویس: $e');
+    }
+  }
+
+// متد جدید برای حذف draft
+  Future<void> exitDraft(int reportId) async {
+    try {
+      await HomeApi().exitDraft(reportId);
+      // بروزرسانی لیست drafts پس از حذف
+      await fetchMyDrafts();
+      await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
+    } catch (e) {
+      Get.snackbar('خطا', 'خطا در حذف پیش‌نویس: $e');
+    }
   }
 
   Future<void> openNoteDialog(BuildContext context, Jalali date) async {

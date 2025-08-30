@@ -122,13 +122,13 @@ class ManagerDashboard extends StatelessWidget {
           if (comment != null) {
             if (value == 'to_general') {
               await reportController.approveGroupManager(
-                report.reportId,
+                report.reportId!,
                 comment,
                 true,
               );
             } else {
               await reportController.approveGroupManager(
-                report.reportId,
+                report.reportId!,
                 comment,
                 false,
               );
@@ -154,7 +154,7 @@ class ManagerDashboard extends StatelessWidget {
           final comment = await _showCommentDialog(context);
           if (comment != null) {
             await reportController.approveGeneralManager(
-              report.reportId,
+              report.reportId!,
               comment,
             );
           }
@@ -166,7 +166,7 @@ class ManagerDashboard extends StatelessWidget {
         onPressed: () async {
           final comment = await _showCommentDialog(context);
           if (comment != null) {
-            await reportController.approveFinance(report.reportId, comment);
+            await reportController.approveFinance(report.reportId!, comment);
           }
         },
         child: Text('final_approve'.tr),

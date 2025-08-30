@@ -1,6 +1,6 @@
-// api_service.dart (modified with Singleton pattern)
+// api_service.dart (modified with Singleton pattern, response printing, and conditional debug)
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // برای kDebugMode
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -34,7 +34,7 @@ class CoreApi {
     try {
       final username = await _getUsername();
       if (username == null) {
-        debugPrint('No username found for token refresh');
+        if (kDebugMode) debugPrint('No username found for token refresh');
         return null;
       }
       final response = await _client.post(
@@ -50,29 +50,40 @@ class CoreApi {
         final token = data['token'] as String;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
-        debugPrint('Token refreshed successfully');
+        if (kDebugMode) debugPrint('Token refreshed successfully');
         return token;
       }
-      debugPrint('Failed to refresh token: ${response.statusCode}');
+      if (kDebugMode) debugPrint('Failed to refresh token: ${response.statusCode}');
       return null;
     } catch (e) {
-      debugPrint('Refresh token error: $e');
+      if (kDebugMode) debugPrint('Refresh token error: $e');
       return null;
     }
   }
 
+  // Helper برای encode body اگر Map باشه
+  String? _encodeBody(Object? body) {
+    if (body is Map) {
+      return jsonEncode(body);
+    } else if (body is String) {
+      return body;
+    }
+    return null; // بدون body پیشفرض
+  }
+
   // Interceptor برای مدیریت درخواست‌ها
   Future<http.Response?> _interceptRequest(
-      Future<http.Response> Function(Map<String, String>) request,
+      Future<http.Response> Function(Map<String, String>, String?) request,
       Map<String, String>? headers,
+      Object? body,
       ) async {
     try {
       // اگر درخواست برای /auth/login است، نیازی به توکن نیست
       if (headers != null && headers.containsKey('skip-auth')) {
         final updatedHeaders = Map<String, String>.from(headers);
         updatedHeaders.remove('skip-auth'); // حذف هدر موقت
-        debugPrint('Skipping auth');
-        return await request(updatedHeaders);
+        if (kDebugMode) debugPrint('Skipping auth');
+        return await request(updatedHeaders, _encodeBody(body));
       }
 
       // افزودن هدر Authorization اگر توکن موجود باشد
@@ -85,38 +96,40 @@ class CoreApi {
       };
 
       // اجرای درخواست
-      final response = await request(updatedHeaders);
+      final encodedBody = _encodeBody(body);
+      final response = await request(updatedHeaders, encodedBody);
 
       // مدیریت خطای 401
       if (response.statusCode == 401) {
-        debugPrint('Unauthorized: Attempting to refresh token');
+        if (kDebugMode) debugPrint('Unauthorized: Attempting to refresh token');
         final newToken = await _refreshToken();
         if (newToken != null) {
           // بازنویسی هدرها با توکن جدید
           updatedHeaders['Authorization'] = 'Bearer $newToken';
           // تکرار درخواست با توکن جدید
-          return await request(updatedHeaders);
+          return await request(updatedHeaders, encodedBody);
         } else {
-          // اگر رفرش توکن ممکن نبود، خطا پرتاب کنید
           throw Exception('Unauthorized: Please log in again');
         }
       }
 
       return response;
     } catch (e) {
-      debugPrint('Interceptor error: $e');
+      if (kDebugMode) debugPrint('Interceptor error: $e');
       rethrow;
     }
   }
 
   Future<http.Response?> get(Uri url, {Map<String, String>? headers}) async {
-    return _interceptRequest((updatedHeaders) async {
-      debugPrint('GET => $url');
-      debugPrint('Headers: $updatedHeaders');
+    return _interceptRequest((updatedHeaders, encodedBody) async {
+      if (kDebugMode) {
+        debugPrint('GET => $url');
+        debugPrint('Headers: $updatedHeaders');
+      }
       final response = await _client.get(url, headers: updatedHeaders);
-      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
       return response;
-    }, headers);
+    }, headers, null); // بدون body
   }
 
   Future<http.Response?> post(
@@ -124,18 +137,20 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
-    return _interceptRequest((updatedHeaders) async {
-      debugPrint('POST : $url');
-      debugPrint('Headers: $updatedHeaders');
-      debugPrint('Body: $body');
+    return _interceptRequest((updatedHeaders, encodedBody) async {
+      if (kDebugMode) {
+        debugPrint('POST => $url');
+        debugPrint('Headers: $updatedHeaders');
+        debugPrint('Body: $encodedBody');
+      }
       final response = await _client.post(
         url,
         headers: updatedHeaders,
-        body: body ?? {},
+        body: encodedBody,
       );
-      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
       return response;
-    }, headers);
+    }, headers, body);
   }
 
   Future<http.Response?> delete(
@@ -143,18 +158,20 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
-    return _interceptRequest((updatedHeaders) async {
-      debugPrint('DELETE => $url');
-      debugPrint('Headers: $updatedHeaders');
-      debugPrint('Body: $body');
+    return _interceptRequest((updatedHeaders, encodedBody) async {
+      if (kDebugMode) {
+        debugPrint('DELETE => $url');
+        debugPrint('Headers: $updatedHeaders');
+        debugPrint('Body: $encodedBody');
+      }
       final response = await _client.delete(
         url,
         headers: updatedHeaders,
-        body: body ?? {},
+        body: encodedBody,
       );
-      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
       return response;
-    }, headers);
+    }, headers, body);
   }
 
   Future<http.Response?> put(
@@ -162,18 +179,20 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
-    return _interceptRequest((updatedHeaders) async {
-      debugPrint('PUT => $url');
-      debugPrint('Headers: $updatedHeaders');
-      debugPrint('Body: $body');
+    return _interceptRequest((updatedHeaders, encodedBody) async {
+      if (kDebugMode) {
+        debugPrint('PUT => $url');
+        debugPrint('Headers: $updatedHeaders');
+        debugPrint('Body: $encodedBody');
+      }
       final response = await _client.put(
         url,
         headers: updatedHeaders,
-        body: body ?? {},
+        body: encodedBody,
       );
-      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
       return response;
-    }, headers);
+    }, headers, body);
   }
 
   Future<http.Response?> patch(
@@ -181,17 +200,19 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
-    return _interceptRequest((updatedHeaders) async {
-      debugPrint('PATCH => $url');
-      debugPrint('Headers: $updatedHeaders');
-      debugPrint('Body: $body');
+    return _interceptRequest((updatedHeaders, encodedBody) async {
+      if (kDebugMode) {
+        debugPrint('PATCH => $url');
+        debugPrint('Headers: $updatedHeaders');
+        debugPrint('Body: $encodedBody');
+      }
       final response = await _client.patch(
         url,
         headers: updatedHeaders,
-        body: body ?? {},
+        body: encodedBody,
       );
-      debugPrint('Response [${response.statusCode}]: ${response.body}');
+      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
       return response;
-    }, headers);
+    }, headers, body);
   }
 }
