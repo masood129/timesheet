@@ -28,8 +28,7 @@ class HomeApi {
   Future<String> login(String username) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/auth/login'),
-      headers: {'skip-auth': 'true'},
-      // skip-auth برای جلوگیری از اضافه کردن token
+      headers: {...defaultHeaders, 'skip-auth': 'true'},
       body: {'username': username}, // Map - CoreApi encode می‌کنه
     );
     if (response == null) {
