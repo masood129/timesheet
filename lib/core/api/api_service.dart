@@ -1,5 +1,3 @@
-// api_service.dart (modified with Singleton pattern, response printing, and conditional debug)
-
 import 'package:flutter/foundation.dart'; // برای kDebugMode
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,14 +59,12 @@ class CoreApi {
     }
   }
 
-  // Helper برای encode body اگر Map باشه
   String? _encodeBody(Object? body) {
-    if (body is Map) {
-      return jsonEncode(body);
-    } else if (body is String) {
-      return body;
+    if (body == null) return null;
+    if (body is String && body.trim() == "{}") {
+      return jsonEncode({}); // تبدیل به JSON خالی درست
     }
-    return null; // بدون body پیشفرض
+    return jsonEncode(body);
   }
 
   // Interceptor برای مدیریت درخواست‌ها
