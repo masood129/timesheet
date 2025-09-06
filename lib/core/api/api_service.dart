@@ -61,10 +61,15 @@ class CoreApi {
 
   String? _encodeBody(Object? body) {
     if (body == null) return null;
-    if (body is String && body.trim() == "{}") {
-      return jsonEncode({}); // تبدیل به JSON خالی درست
+    if (body is String) {
+      try {
+        jsonDecode(body);  // اگر string اما JSON معتبر باشه، بدون encode برگردون
+        return body;
+      } catch (_) {
+        return jsonEncode(body);  // اگر string ساده باشه، encode کن
+      }
     }
-    return jsonEncode(body);
+    return jsonEncode(body);  // اگر Map یا Object باشه، encode کن
   }
 
   // Interceptor برای مدیریت درخواست‌ها
