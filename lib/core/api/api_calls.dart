@@ -77,7 +77,7 @@ class HomeApi {
     }
 
     final response = await coreAPI.post(
-      Uri.parse('$baseUrl/monthly-gym-costs'),
+      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs'),
       headers: defaultHeaders,
       body: {
         'userId': userId,

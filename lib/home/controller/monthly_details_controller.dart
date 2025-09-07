@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,6 +10,7 @@ import 'package:file_saver/file_saver.dart';
 import 'package:timesheet/home/controller/home_controller.dart';
 import 'package:timesheet/core/api/api_calls.dart';
 import 'package:timesheet/home/model/project_model.dart';
+import '../model/leavetype_model.dart';
 
 class MonthlyDetailsController extends GetxController {
   final HomeController homeController = Get.find<HomeController>();
@@ -22,7 +23,6 @@ class MonthlyDetailsController extends GetxController {
     fetchProjects();
   }
 
-  // تابع برای دریافت پروژه‌ها
   Future<void> fetchProjects() async {
     try {
       isLoading.value = true;
@@ -35,10 +35,9 @@ class MonthlyDetailsController extends GetxController {
     }
   }
 
-  // تابع برای بررسی و درخواست مجوز ذخیره‌سازی (فقط برای موبایل)
   Future<bool> _requestStoragePermission() async {
     if (kIsWeb) {
-      return true; // در وب نیازی به مجوز نیست
+      return true;
     }
     var status = await Permission.storage.status;
     if (!status.isGranted) {
@@ -47,7 +46,6 @@ class MonthlyDetailsController extends GetxController {
     return status.isGranted;
   }
 
-  // تابع برای تبدیل دقیقه به فرمت HH:MM
   String formatDuration(int? minutes) {
     if (minutes == null || minutes == 0) return '';
     final hours = minutes ~/ 60;
@@ -55,9 +53,7 @@ class MonthlyDetailsController extends GetxController {
     return '${hours.toString().padLeft(2, '0')}:${remainingMinutes.toString().padLeft(2, '0')}';
   }
 
-  // تابع برای ایجاد و ذخیره/دانلود فایل اکسل
   Future<void> exportToExcel() async {
-    // بررسی مجوز ذخیره‌سازی (فقط برای موبایل)
     if (!kIsWeb) {
       bool hasPermission = await _requestStoragePermission();
       if (!hasPermission) {
@@ -66,14 +62,11 @@ class MonthlyDetailsController extends GetxController {
       }
     }
 
-    // ایجاد فایل اکسل
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
 
-    // لیست پروژه‌ها
     final projectList = projects.isEmpty ? ['no_project'.tr] : projects.map((p) => p.projectName).toList();
 
-    // اضافه کردن هدرها
     final headers = [
       TextCellValue('تاریخ'.tr),
       TextCellValue('نوع مرخصی'.tr),
@@ -84,7 +77,6 @@ class MonthlyDetailsController extends GetxController {
     ];
     sheet.appendRow(headers);
 
-    // پر کردن داده‌ها برای تمام روزهای ماه
     final daysInMonth = homeController.daysInMonth;
     for (int day = 1; day <= daysInMonth; day++) {
       final date = Jalali(homeController.currentYear.value, homeController.currentMonth.value, day);
@@ -103,12 +95,12 @@ class MonthlyDetailsController extends GetxController {
           if (projectIndex != -1) {
             projectDurations[projectIndex] = formatDuration(task.duration);
           }
-                }
+        }
       }
 
       sheet.appendRow([
         TextCellValue('${date.formatter.wN} ${date.day} ${date.formatter.mN}'),
-        TextCellValue(detail?.leaveType ?? ''),
+        TextCellValue(detail?.leaveType?.displayName ?? ''),
         TextCellValue(detail?.arrivalTime ?? ''),
         TextCellValue(detail?.leaveTime ?? ''),
         TextCellValue(detail?.personalTime != null ? formatDuration(detail!.personalTime) : ''),
@@ -116,13 +108,11 @@ class MonthlyDetailsController extends GetxController {
       ]);
     }
 
-    // نام فایل
     final year = homeController.currentYear.value;
     final month = homeController.currentMonth.value;
     final monthName = Jalali(year, month).formatter.mN;
     final fileName = 'Monthly_Details_${monthName}_$year.xlsx';
 
-    // ذخیره یا دانلود فایل
     try {
       final excelData = Uint8List.fromList(excel.encode()!);
       if (kIsWeb) {

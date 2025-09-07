@@ -1,8 +1,10 @@
+// daily_details_tab.dart (بروزرسانی شده)
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import '../../../core/theme/app_styles.dart';
 import '../../controller/task_controller.dart';
+import '../../model/leavetype_model.dart';
 import 'time_picker_field.dart';
 
 class DailyDetailsTab extends StatelessWidget {
@@ -40,7 +42,7 @@ class DailyDetailsTab extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Row(
             children: [
               Expanded(child: TimePickerField(labelKey: 'arrival_time_hint', controller: controller.arrivalTimeController, icon: Icons.login, isEnabled: isEnabled)),
@@ -52,13 +54,13 @@ class DailyDetailsTab extends StatelessWidget {
           );
         }),
         const SizedBox(height: 10),
-        Obx(() => DropdownButtonFormField<String>(
-          value: controller.leaveType.value.isEmpty ? null : controller.leaveType.value,
+        Obx(() => DropdownButtonFormField<LeaveType>(
+          value: controller.leaveType.value,
           hint: Text('وضعیت روز'.tr, style: TextStyle(color: disabledColor)),
           decoration: AppStyles.inputDecoration(context, 'leave_type', Icons.leave_bags_at_home, true),
-          items: ['کاری', 'استحقاقی', 'استعلاجی', 'هدیه'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(color: colorScheme.onSurface)))).toList(),
+          items: LeaveType.values.map((e) => DropdownMenuItem(value: e, child: Text(e.displayName, style: TextStyle(color: colorScheme.onSurface)))).toList(),
           onChanged: (val) {
-            controller.leaveType.value = val ?? '';
+            controller.leaveType.value = val ?? LeaveType.work;
             controller.calculateStats();
           },
         )),
@@ -70,7 +72,7 @@ class DailyDetailsTab extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Row(
             children: [
               Expanded(

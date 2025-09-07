@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import '../../controller/task_controller.dart';
+import '../../model/leavetype_model.dart';
 import 'task_row.dart';
 
 class TasksTab extends StatelessWidget {
@@ -18,7 +19,7 @@ class TasksTab extends StatelessWidget {
         Text('تسک‌ها'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary)),
         const SizedBox(height: 8),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Column(
             children: List.generate(
               controller.selectedProjects.length,
@@ -33,7 +34,7 @@ class TasksTab extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(

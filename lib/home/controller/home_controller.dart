@@ -9,6 +9,7 @@ import '../../core/api/api_calls.dart';
 import '../component/note_dialog.dart';
 import '../model/daily_detail_model.dart';
 import '../controller/task_controller.dart';
+import '../model/leavetype_model.dart';
 
 class HomeController extends GetxController {
   final CalendarModel calendarModel = CalendarModel();
@@ -18,10 +19,14 @@ class HomeController extends GetxController {
   var dailyDetails = <DailyDetail>[].obs;
   var isListView = false.obs;
   var holidays = <String, dynamic>{}.obs;
-  var monthStatus = Rx<String?>(null); // استفاده از Rx<String?> برای نگهداری null
-  List<MonthlyReport> drafts = <MonthlyReport>[].obs; // لیست drafts (json objects)
+  var monthStatus = Rx<String?>(
+    null,
+  ); // استفاده از Rx<String?> برای نگهداری null
+  List<MonthlyReport> drafts =
+      <MonthlyReport>[].obs; // لیست drafts (json objects)
 
-  int get daysInMonth => calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+  int get daysInMonth =>
+      calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
 
   @override
   void onInit() {
@@ -39,7 +44,7 @@ class HomeController extends GetxController {
     }
   }
 
-// متد جدید برای ارسال draft به مدیر گروه
+  // متد جدید برای ارسال draft به مدیر گروه
   Future<void> submitDraftToManager(int reportId) async {
     try {
       await HomeApi().submitReportToGroupManager(reportId);
@@ -51,7 +56,7 @@ class HomeController extends GetxController {
     }
   }
 
-// متد جدید برای حذف draft
+  // متد جدید برای حذف draft
   Future<void> exitDraft(int reportId) async {
     try {
       await HomeApi().exitDraft(reportId);
@@ -225,7 +230,8 @@ class HomeController extends GetxController {
         date,
         Get.context!,
       ); // Assuming Get.context is available; adjust if needed
-      if (status['leaveType'] == 'کاری' && !(status['isComplete'] as bool)) {
+      if (status['leaveType'] == LeaveType.work &&
+          !(status['isComplete'] as bool)) {
         hasIncompleteDays = true;
         errorMessage += '${date.day}, ';
       }
@@ -324,8 +330,10 @@ class HomeController extends GetxController {
       return 'بدون عملکرد';
     }
 
-    if (detail.leaveType != 'کاری') {
-      return detail.leaveType ?? 'بدون عملکرد';
+    if (detail.leaveType != LeaveType.work) {
+      // تغییر به enum
+      return detail.leaveType?.displayName ??
+          'بدون عملکرد'; // استفاده از displayName برای نمایش
     }
 
     final arrival = _parseTime(detail.arrivalTime);
@@ -371,8 +379,10 @@ class HomeController extends GetxController {
       return 'بدون اطلاعات';
     }
 
-    if (detail.leaveType != 'کاری') {
-      return detail.leaveType ?? 'بدون اطلاعات';
+    if (detail.leaveType != LeaveType.work) {
+      // تغییر به enum
+      return detail.leaveType?.displayName ??
+          'بدون اطلاعات'; // استفاده از displayName
     }
 
     final isComplete = getCardStatus(date, Get.context!)['isComplete'] as bool;
@@ -445,29 +455,30 @@ class HomeController extends GetxController {
             isComplete
                 ? colorScheme.onCompletedStatus
                 : colorScheme.onIncompleteStatus,
-        'leaveType': 'کاری',
+        'leaveType': LeaveType.work, // تغییر به enum
         'isComplete': isComplete,
       };
     }
 
-    if (detail.leaveType != 'کاری') {
+    if (detail.leaveType != LeaveType.work) {
+      // تغییر به enum
       IconData avatarIcon;
       Color avatarColor;
       Color avatarIconColor;
       switch (detail.leaveType) {
-        case 'استحقاقی':
+        case LeaveType.annualLeave:
           avatarIcon = Icons.beach_access;
           avatarColor = colorScheme.secondary;
           avatarIconColor = colorScheme.onSecondary;
           isComplete = true;
           break;
-        case 'استعلاجی':
+        case LeaveType.sickLeave:
           avatarIcon = Icons.local_hospital;
           avatarColor = colorScheme.error;
           avatarIconColor = colorScheme.onError;
           isComplete = true;
           break;
-        case 'هدیه':
+        case LeaveType.giftLeave:
           avatarIcon = Icons.card_giftcard;
           avatarColor = colorScheme.tertiary;
           avatarIconColor = colorScheme.onTertiary;
@@ -482,7 +493,7 @@ class HomeController extends GetxController {
         'avatarColor': avatarColor,
         'avatarIcon': avatarIcon,
         'avatarIconColor': avatarIconColor,
-        'leaveType': detail.leaveType,
+        'leaveType': detail.leaveType, // enum برمی‌گرداند
         'isComplete': isComplete,
       };
     }

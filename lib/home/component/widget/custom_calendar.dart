@@ -1,7 +1,9 @@
+// custom_calendar.dart (بروزرسانی شده)
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
+import '../../model/leavetype_model.dart';
 import 'grid_calendar_day_card.dart';
 
 class CustomCalendarWidget extends StatelessWidget {
@@ -16,23 +18,19 @@ class CustomCalendarWidget extends StatelessWidget {
     final month = homeController.currentMonth.value;
     final daysInMonth = homeController.daysInMonth;
 
-    // Calculate the first day of the month and its weekday
     final firstDayOfMonth = Jalali(year, month, 1);
-    final firstWeekday = firstDayOfMonth.weekDay; // 1 (Saturday) to 7 (Friday)
+    final firstWeekday = firstDayOfMonth.weekDay;
 
-    // Create a list of days including padding for weekday alignment
     final days = List.generate(
       daysInMonth,
       (index) => Jalali(year, month, index + 1),
     );
-    final totalSlots =
-        daysInMonth + (firstWeekday - 1); // Add padding for empty slots
+    final totalSlots = daysInMonth + (firstWeekday - 1);
     final adjustedSlots =
         (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
 
     return Column(
       children: [
-        // Weekday headers
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: Row(
@@ -65,7 +63,6 @@ class CustomCalendarWidget extends StatelessWidget {
                 }).toList(),
           ),
         ),
-        // Calendar grid
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.all(8.0),
@@ -73,24 +70,21 @@ class CustomCalendarWidget extends StatelessWidget {
               crossAxisCount: 7,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 4.0,
-              childAspectRatio: 0.9, // Adjusted for larger cards
+              childAspectRatio: 0.9,
             ),
             itemCount: adjustedSlots,
             itemBuilder: (context, index) {
               if (index < firstWeekday - 1) {
-                // Empty slots before the first day
                 return Container();
               }
               final dayIndex = index - (firstWeekday - 1);
               if (dayIndex >= daysInMonth) {
-                // Empty slots after the last day
                 return Container();
               }
               return GridCalendarDayCard(date: days[dayIndex]);
             },
           ),
         ),
-        // Button for showing day details
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
@@ -155,26 +149,22 @@ class CustomCalendarWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Effective Work
                 _buildDetailRow(context, 'کار مفید', effectiveWork),
                 const SizedBox(height: 8),
-                // Holiday Information
                 if (holiday != null) ...[
                   _buildHolidaySection(context, holiday),
                   const SizedBox(height: 8),
                 ],
-                // Note
                 if (note != null && note.isNotEmpty)
                   _buildDetailRow(context, 'یادداشت', note),
-                // Status
                 _buildDetailRow(
                   context,
                   'وضعیت',
-                  cardStatus['leaveType'] == 'کاری'
+                  cardStatus['leaveType'] == LeaveType.work
                       ? (cardStatus['isComplete']
                           ? 'روز کاری: کامل'
                           : 'روز کاری: ناقص')
-                      : cardStatus['leaveType'] ?? 'بدون اطلاعات',
+                      : cardStatus['leaveType']?.displayName ?? 'بدون اطلاعات',
                 ),
               ],
             ),
@@ -254,7 +244,8 @@ class CustomCalendarWidget extends StatelessWidget {
         ),
         ...events.map((event) {
           final description = event['description'] as String;
-          final additionalDescription = event['additional_description'] as String? ?? '';
+          final additionalDescription =
+              event['additional_description'] as String? ?? '';
           final isEventHoliday = event['isHoliday'] == true;
           final isReligious = event['isReligious'] == true;
           return Padding(

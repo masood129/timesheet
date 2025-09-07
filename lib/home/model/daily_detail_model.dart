@@ -1,12 +1,14 @@
 import 'package:timesheet/home/model/personal_car_cost_model.dart';
 import 'package:timesheet/home/model/task_model.dart';
 
+import 'leavetype_model.dart'; // import enum
+
 class DailyDetail {
   final String date;
   final int userId;
   final String? arrivalTime;
   final String? leaveTime;
-  final String? leaveType;
+  final LeaveType? leaveType; // تغییر از String? به LeaveType?
   final int? personalTime;
   final String? description;
   final int? goCost;
@@ -19,14 +21,14 @@ class DailyDetail {
     required this.userId,
     this.arrivalTime,
     this.leaveTime,
-    this.leaveType,
     this.personalTime,
     this.description,
     this.goCost,
     this.returnCost,
     this.tasks = const [],
     this.personalCarCosts = const [],
-  });
+    String? leaveTypeString, // برای سازگاری با backend
+  }) : leaveType = LeaveTypeExtension.fromString(leaveTypeString);
 
   factory DailyDetail.fromJson(Map<String, dynamic> json) {
     return DailyDetail(
@@ -38,7 +40,7 @@ class DailyDetail {
       leaveTime: json['LeaveTime'] != null
           ? json['LeaveTime'].toString().split('T')[1].substring(0, 8) // فقط زمان (HH:MM:SS)
           : null,
-      leaveType: json['LeaveType'],
+      leaveTypeString: json['LeaveType'],
       personalTime: json['PersonalTime'],
       description: json['Description'],
       goCost: json['GoCost'],
@@ -60,7 +62,7 @@ class DailyDetail {
       'userId': userId,
       'arrivalTime': arrivalTime,
       'leaveTime': leaveTime,
-      'leaveType': leaveType,
+      'leaveType': leaveType?.apiValue,
       'personalTime': personalTime,
       'description': description,
       'goCost': goCost,

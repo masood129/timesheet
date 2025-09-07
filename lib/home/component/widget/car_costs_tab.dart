@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/Get.dart';
 import '../../controller/task_controller.dart';
+import '../../model/leavetype_model.dart';
 import 'car_cost_row.dart';
 
 class CarCostsTab extends StatelessWidget {
@@ -18,7 +19,7 @@ class CarCostsTab extends StatelessWidget {
         Text('هزینه‌های ماشین شخصی'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary)),
         const SizedBox(height: 8),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Column(
             children: List.generate(
               controller.selectedCarCostProjects.length,
@@ -33,7 +34,7 @@ class CarCostsTab extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isEnabled = controller.leaveType.value == 'کاری';
+          final isEnabled = controller.leaveType.value == LeaveType.work;
           return Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
