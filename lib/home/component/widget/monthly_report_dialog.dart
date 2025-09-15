@@ -33,7 +33,7 @@ void showMonthlyReportDialog(
 
   Get.dialog(
     AlertDialog(
-      title: Text('تایید ارسال گزارش ماهانه'.tr, textAlign: TextAlign.center),
+      title: Text('پیش نویس گزارش ماهانه'.tr, textAlign: TextAlign.center),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -4,7 +4,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
-import 'package:timesheet/home/model/monthly_report_model.dart';
+import 'package:timesheet/home/model/draft_report_model.dart';
 import '../../core/api/api_calls.dart';
 import '../component/note_dialog.dart';
 import '../model/daily_detail_model.dart';
@@ -22,8 +22,8 @@ class HomeController extends GetxController {
   var monthStatus = Rx<String?>(
     null,
   ); // استفاده از Rx<String?> برای نگهداری null
-  List<MonthlyReport> drafts =
-      <MonthlyReport>[].obs; // لیست drafts (json objects)
+  List<DraftReportModel> drafts =
+      <DraftReportModel>[].obs; // لیست drafts (json objects)
 
   int get daysInMonth =>
       calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
@@ -34,7 +34,7 @@ class HomeController extends GetxController {
     initializeApp();
   }
 
-  Future<List<MonthlyReport>> fetchMyDrafts() async {
+  Future<List<DraftReportModel>> fetchMyDrafts() async {
     try {
       final reportList = await HomeApi().getMyDrafts();
       return reportList;

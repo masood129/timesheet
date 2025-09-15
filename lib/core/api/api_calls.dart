@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart'; // import CoreApi
+import 'package:timesheet/home/model/draft_report_model.dart';
 import 'dart:convert';
 import '../../home/model/monthly_report_model.dart';
 import '../../home/model/project_model.dart';
@@ -77,7 +78,7 @@ class HomeApi {
     }
 
     final response = await coreAPI.post(
-      Uri.parse('$baseUrl/monthly-reports/monthly-gym-costs'),
+      Uri.parse('$baseUrl/monthly-reports/jalali-monthly-gym-costs'),
       headers: defaultHeaders,
       body: {
         'userId': userId,
@@ -537,7 +538,7 @@ class HomeApi {
     }
   }
 
-  Future<List<MonthlyReport>> getMyDrafts() async {
+  Future<List<DraftReportModel>> getMyDrafts() async {
     final response = await coreAPI.get(
       Uri.parse('$baseUrl/monthly-reports/my-drafts'),
     );
@@ -546,7 +547,7 @@ class HomeApi {
     }
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => MonthlyReport.fromJson(e)).toList();
+      return data.map((e) => DraftReportModel.fromJson(e)).toList();
     }
     if (response.statusCode == 403) {
       throw Exception('Access denied');
