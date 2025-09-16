@@ -88,7 +88,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.send_to_mobile, color: colorScheme.primary),
             title: Text(
-              'ارسال ساعات ماهانه',
+              'ذخیره پیش نویس ساعات ماهانه',
               style: TextStyle(color: colorScheme.onSurface),
             ),
             onTap: () {

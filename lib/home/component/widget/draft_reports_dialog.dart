@@ -6,9 +6,9 @@ import '../../controller/home_controller.dart';
 import '../../model/draft_report_model.dart';
 
 void showDraftReportsDialog(
-  BuildContext context,
-  HomeController homeController,
-) {
+    BuildContext context,
+    HomeController homeController,
+    ) {
   final currentYear = Jalali.now().year;
 
   // محاسبه maxHeight و maxWidth خارج از Obx برای جلوگیری از مشکلات timing در layout
@@ -40,8 +40,17 @@ void showDraftReportsDialog(
   // لیست ماه‌های موجود در drafts (observable برای reactivity)
   var availableMonths = <int>[].obs;
 
+  // لیست تمام drafts (local برای دسترسی آسان و بدون وابستگی به controller)
+  var allDrafts = <DraftReportModel>[];
+
   // بارگیری drafts و استخراج ماه‌های منحصربه‌فرد
   homeController.fetchMyDrafts().then((drafts) {
+    allDrafts = drafts;
+    // اصلاح‌شده: تنظیم homeController.drafts اگر لازم باشد، اما از allDrafts استفاده می‌کنیم
+    if (homeController.drafts is RxList<DraftReportModel>) {
+      (homeController.drafts as RxList<DraftReportModel>).assignAll(drafts);
+    }
+
     availableMonths.assignAll(
       drafts
           .map((draft) => draft.jalaliMonth ?? 0)
@@ -52,8 +61,8 @@ void showDraftReportsDialog(
     availableMonths.sort(); // مرتب‌سازی صعودی ماه‌ها
     if (availableMonths.isNotEmpty) {
       selectedMonth.value = availableMonths.first;
-      final draft = drafts.firstWhereOrNull(
-        (draft) => draft.jalaliMonth == selectedMonth.value,
+      final draft = allDrafts.firstWhereOrNull(
+            (draft) => draft.jalaliMonth == selectedMonth.value,
       );
       if (draft != null) {
         selectedReportId.value = draft.reportId;
@@ -109,17 +118,20 @@ void showDraftReportsDialog(
                     selectedMonth,
                     availableMonths,
                     monthNames,
-                    (newMonth) {
+                        (newMonth) {
                       if (newMonth != null) {
                         selectedMonth.value = newMonth;
-                        // به‌روزرسانی reportId و جزئیات بر اساس ماه انتخاب‌شده
-                        final drafts = homeController.drafts;
-                        final draft = drafts.firstWhereOrNull(
-                          (draft) => draft.jalaliMonth == newMonth,
+                        // به‌روزرسانی reportId و جزئیات بر اساس ماه انتخاب‌شده با استفاده از allDrafts
+                        final draft = allDrafts.firstWhereOrNull(
+                              (draft) => draft.jalaliMonth == newMonth,
                         );
                         if (draft != null) {
                           selectedReportId.value = draft.reportId;
                           selectedDraftDetails.value = draft;
+                        } else {
+                          // اگر draft پیدا نشد، ریست کن
+                          selectedReportId.value = null;
+                          selectedDraftDetails.value = null;
                         }
                       }
                     },
@@ -146,21 +158,21 @@ void showDraftReportsDialog(
         ),
         // دکمه ارسال به مدیر (غیرفعال اگر انتخابی نباشد)
         Obx(
-          () => ElevatedButton.icon(
+              () => ElevatedButton.icon(
             onPressed:
-                availableMonths.isEmpty || selectedReportId.value == null
-                    ? null
-                    : () async {
-                      Get.back(); // بستن دیالوگ
-                      await homeController.submitDraftToManager(
-                        selectedReportId.value!,
-                      );
-                      Get.snackbar(
-                        'موفقیت',
-                        'پیش‌نویس با موفقیت به مدیر گروه ارسال شد.',
-                        backgroundColor: Colors.green,
-                      );
-                    },
+            availableMonths.isEmpty || selectedReportId.value == null
+                ? null
+                : () async {
+              Get.back(); // بستن دیالوگ
+              await homeController.submitDraftToManager(
+                selectedReportId.value!,
+              );
+              Get.snackbar(
+                'موفقیت',
+                'پیش‌نویس با موفقیت به مدیر گروه ارسال شد.',
+                backgroundColor: Colors.green,
+              );
+            },
             icon: const Icon(Icons.send),
             label: Text('ارسال به مدیر گروه'.tr),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
@@ -168,19 +180,19 @@ void showDraftReportsDialog(
         ),
         // دکمه حذف پیش‌نویس (غیرفعال اگر انتخابی نباشد)
         Obx(
-          () => ElevatedButton.icon(
+              () => ElevatedButton.icon(
             onPressed:
-                availableMonths.isEmpty || selectedReportId.value == null
-                    ? null
-                    : () async {
-                      Get.back(); // بستن دیالوگ
-                      await homeController.exitDraft(selectedReportId.value!);
-                      Get.snackbar(
-                        'موفقیت',
-                        'پیش‌نویس با موفقیت حذف شد.',
-                        backgroundColor: Colors.orange,
-                      );
-                    },
+            availableMonths.isEmpty || selectedReportId.value == null
+                ? null
+                : () async {
+              Get.back(); // بستن دیالوگ
+              await homeController.exitDraft(selectedReportId.value!);
+              Get.snackbar(
+                'موفقیت',
+                'پیش‌نویس با موفقیت حذف شد.',
+                backgroundColor: Colors.orange,
+              );
+            },
             icon: const Icon(Icons.delete),
             label: Text('حذف پیش‌نویس'.tr),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
@@ -188,6 +200,23 @@ void showDraftReportsDialog(
         ),
       ],
     ),
+  );
+}
+
+/// تابع کمکی برای فرمت کردن دقیقه به HH:MM
+String formatMinutesToHHMM(int? minutes) {
+  if (minutes == null || minutes < 0) return 'نامشخص';
+  int hours = minutes ~/ 60;
+  int mins = minutes % 60;
+  return '${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}';
+}
+
+/// تابع کمکی برای فرمت کردن هزینه به صورت سه‌تایی با کاما
+String formatCurrency(int? amount) {
+  if (amount == null || amount < 0) return 'نامشخص';
+  return amount.toString().replaceAllMapped(
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (Match m) => '${m[1]},',
   );
 }
 
@@ -224,11 +253,11 @@ Widget _buildYearCard(int currentYear) {
 
 /// دراپ‌داون انتخاب ماه با استایل زیبا
 Widget _buildMonthDropdown(
-  Rx<int?> selectedMonth,
-  RxList<int> availableMonths,
-  List<String> monthNames,
-  Function(int?) onChanged,
-) {
+    Rx<int?> selectedMonth,
+    RxList<int> availableMonths,
+    List<String> monthNames,
+    Function(int?) onChanged,
+    ) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -253,12 +282,12 @@ Widget _buildMonthDropdown(
           ),
         ),
         items:
-            availableMonths.map((month) {
-              return DropdownMenuItem(
-                value: month,
-                child: Text(monthNames[month - 1]),
-              );
-            }).toList(),
+        availableMonths.map((month) {
+          return DropdownMenuItem(
+            value: month,
+            child: Text(monthNames[month - 1]),
+          );
+        }).toList(),
         onChanged: onChanged,
       ),
     ),
@@ -293,12 +322,12 @@ Widget _buildDraftDetailsCard(DraftReportModel draft, List<String> monthNames) {
           _buildDetailRow('ماه', monthNames[(draft.jalaliMonth ?? 1) - 1]),
           _buildDetailRow(
             'جمع ساعت کاری کل',
-            '${draft.totalHours ?? 'نامشخص'}',
+            formatMinutesToHHMM(draft.totalHours),
           ),
-          _buildDetailRow('هزینه باشگاه', '${draft.gymCost ?? 'نامشخص'} تومان'),
+          _buildDetailRow('هزینه باشگاه', '${formatCurrency(draft.gymCost)} تومان'),
           _buildDetailRow(
             'هزینه رفت و آمد به شرکت',
-            '${draft.totalCommuteCost ?? 'نامشخص'} تومان',
+            '${formatCurrency(draft.totalCommuteCost)} تومان',
           ),
           _buildDetailRow(
             'گروه مربوطه',
@@ -383,10 +412,10 @@ Widget _buildProjectHoursSection(DraftReportModel draft) {
             itemBuilder: (context, index) {
               final hour = hours[index];
               final projectId = hour.projectId?.toString() ?? 'نامشخص';
-              final totalHours = hour.totalHours?.toString() ?? 'نامشخص';
+              final totalHours = formatMinutesToHHMM(hour.totalHours);
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [Text('پروژه $projectId'), Text('$totalHours ساعت')],
+                children: [Text('پروژه $projectId'), Text('$totalHours')],
               );
             },
           ),
@@ -431,7 +460,7 @@ Widget _buildProjectCostsSection(DraftReportModel draft) {
             itemBuilder: (context, index) {
               final cost = costs[index];
               final projectId = cost.projectId?.toString() ?? 'نامشخص';
-              final costAmount = cost.cost?.toString() ?? 'نامشخص';
+              final costAmount = formatCurrency(cost.cost);
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [Text('پروژه $projectId'), Text('$costAmount تومان')],

@@ -16,12 +16,6 @@ class ManagerDashboard extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('manager_dashboard'.tr),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authController.logout(),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

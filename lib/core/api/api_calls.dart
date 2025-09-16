@@ -92,7 +92,8 @@ class HomeApi {
       throw Exception('Failed to post: No response from server');
     }
     if (response.statusCode != 201) {
-      throw Exception('Failed to save gym cost: ${response.statusCode}');
+      // throw Exception('Failed to save gym cost: ${response.statusCode}');
+      throw Exception(response.body);
     }
   }
 
