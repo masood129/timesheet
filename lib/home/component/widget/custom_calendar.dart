@@ -160,7 +160,8 @@ class CustomCalendarWidget extends StatelessWidget {
                 _buildDetailRow(
                   context,
                   'وضعیت',
-                  cardStatus['leaveType'] == LeaveType.work
+                  cardStatus['leaveType'] == LeaveType.work ||
+                          cardStatus['leaveType'] == LeaveType.mission
                       ? (cardStatus['isComplete']
                           ? 'روز کاری: کامل'
                           : 'روز کاری: ناقص')

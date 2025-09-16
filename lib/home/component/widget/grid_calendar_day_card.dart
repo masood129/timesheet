@@ -20,8 +20,8 @@ class GridCalendarDayCard extends StatelessWidget {
       final today = Jalali.now();
       final isToday =
           date.year == today.year &&
-              date.month == today.month &&
-              date.day == today.day;
+          date.month == today.month &&
+          date.day == today.day;
       final holiday = homeController.getHolidayForDate(date);
       final isHoliday = holiday != null && holiday['isHoliday'] == true;
       final cardStatus = homeController.getCardStatus(date, context);
@@ -34,43 +34,43 @@ class GridCalendarDayCard extends StatelessWidget {
         },
         child: Card(
           elevation:
-          isToday
-              ? 6
-              : isHoliday
-              ? 4
-              : 2,
+              isToday
+                  ? 6
+                  : isHoliday
+                  ? 4
+                  : 2,
           shadowColor:
-          isToday
-              ? Colors.blue.withOpacity(0.4)
-              : isHoliday
-              ? Colors.red.withOpacity(0.3)
-              : colorScheme.shadow.withOpacity(0.2),
+              isToday
+                  ? Colors.blue.withOpacity(0.4)
+                  : isHoliday
+                  ? Colors.red.withOpacity(0.3)
+                  : colorScheme.shadow.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
             side:
-            isToday
-                ? BorderSide(color: Colors.amber[300]!, width: 1.5)
-                : isHoliday
-                ? BorderSide(color: Colors.red[300]!, width: 1.5)
-                : BorderSide.none,
+                isToday
+                    ? BorderSide(color: Colors.amber[300]!, width: 1.5)
+                    : isHoliday
+                    ? BorderSide(color: Colors.red[300]!, width: 1.5)
+                    : BorderSide.none,
           ),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               gradient:
-              isToday
-                  ? LinearGradient(
-                colors: [Colors.blue[700]!, Colors.blue[200]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-                  : isHoliday
-                  ? LinearGradient(
-                colors: [Colors.red[600]!, Colors.red[200]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-                  : null,
+                  isToday
+                      ? LinearGradient(
+                        colors: [Colors.blue[700]!, Colors.blue[200]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                      : isHoliday
+                      ? LinearGradient(
+                        colors: [Colors.red[600]!, Colors.red[200]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                      : null,
               color: isToday || isHoliday ? null : colorScheme.surface,
             ),
             padding: const EdgeInsets.all(6.0),
@@ -86,11 +86,11 @@ class GridCalendarDayCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         fontFamily: 'BNazanin',
                         color:
-                        isToday || isHoliday
-                            ? Colors.white
-                            : isFriday
-                            ? colorScheme.error
-                            : colorScheme.onSurface,
+                            isToday || isHoliday
+                                ? Colors.white
+                                : isFriday
+                                ? colorScheme.error
+                                : colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -100,11 +100,11 @@ class GridCalendarDayCard extends StatelessWidget {
                         fontSize: 12,
                         fontFamily: 'BNazanin',
                         color:
-                        isToday || isHoliday
-                            ? Colors.white70
-                            : isFriday
-                            ? colorScheme.error.withOpacity(0.7)
-                            : colorScheme.onSurface.withOpacity(0.7),
+                            isToday || isHoliday
+                                ? Colors.white70
+                                : isFriday
+                                ? colorScheme.error.withOpacity(0.7)
+                                : colorScheme.onSurface.withOpacity(0.7),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -112,16 +112,17 @@ class GridCalendarDayCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       cardStatus['leaveType'] != null &&
-                          cardStatus['leaveType'] != LeaveType.work
+                              cardStatus['leaveType'] != LeaveType.work &&
+                              cardStatus['leaveType'] != LeaveType.mission
                           ? (cardStatus['leaveType'] as LeaveType).displayName
                           : effectiveWork,
                       style: TextStyle(
                         fontSize: 10,
                         fontFamily: 'BNazanin',
                         color:
-                        isToday || isHoliday
-                            ? Colors.white70
-                            : colorScheme.onSurface.withOpacity(0.6),
+                            isToday || isHoliday
+                                ? Colors.white70
+                                : colorScheme.onSurface.withOpacity(0.6),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -139,27 +140,27 @@ class GridCalendarDayCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(
                           color:
-                          isToday || isHoliday
-                              ? Colors.white54
-                              : colorScheme.outline,
+                              isToday || isHoliday
+                                  ? Colors.white54
+                                  : colorScheme.outline,
                           width: 1,
                         ),
                       ),
                       child: CircleAvatar(
                         radius: 10,
                         backgroundColor:
-                        isToday
-                            ? Colors.tealAccent[400]
-                            : cardStatus['avatarColor'],
+                            isToday
+                                ? Colors.tealAccent[400]
+                                : cardStatus['avatarColor'],
                         child: Icon(
                           isToday
                               ? Icons.event_available
                               : cardStatus['avatarIcon'],
                           size: 14,
                           color:
-                          isToday
-                              ? Colors.white
-                              : cardStatus['avatarIconColor'],
+                              isToday
+                                  ? Colors.white
+                                  : cardStatus['avatarIconColor'],
                         ),
                       ),
                     ),
@@ -173,9 +174,9 @@ class GridCalendarDayCard extends StatelessWidget {
                       Icons.note_alt_outlined,
                       size: 14,
                       color:
-                      isToday || isHoliday
-                          ? Colors.white70
-                          : colorScheme.secondary,
+                          isToday || isHoliday
+                              ? Colors.white70
+                              : colorScheme.secondary,
                     ),
                   ),
                 Positioned(
@@ -186,9 +187,9 @@ class GridCalendarDayCard extends StatelessWidget {
                       Icons.info_outline,
                       size: 14,
                       color:
-                      isToday || isHoliday
-                          ? Colors.white70
-                          : colorScheme.primary.withOpacity(0.7),
+                          isToday || isHoliday
+                              ? Colors.white70
+                              : colorScheme.primary.withOpacity(0.7),
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -243,10 +244,11 @@ class GridCalendarDayCard extends StatelessWidget {
                 _buildDetailRow(
                   context,
                   'وضعیت',
-                  cardStatus['leaveType'] == LeaveType.work
+                  cardStatus['leaveType'] == LeaveType.work ||
+                          cardStatus['leaveType'] == LeaveType.mission
                       ? (cardStatus['isComplete']
-                      ? 'روز کاری: کامل'
-                      : 'روز کاری: ناقص')
+                          ? 'روز کاری: کامل'
+                          : 'روز کاری: ناقص')
                       : cardStatus['leaveType']?.displayName ?? 'بدون اطلاعات',
                 ),
               ],
@@ -306,9 +308,9 @@ class GridCalendarDayCard extends StatelessWidget {
   }
 
   Widget _buildHolidaySection(
-      BuildContext context,
-      Map<String, dynamic> holiday,
-      ) {
+    BuildContext context,
+    Map<String, dynamic> holiday,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final events = holiday['events'] as List<dynamic>? ?? [];
     final isHoliday = holiday['isHoliday'] == true;
@@ -339,13 +341,13 @@ class GridCalendarDayCard extends StatelessWidget {
                 fontSize: 14,
                 fontFamily: 'BNazanin',
                 color:
-                isHoliday
-                    ? colorScheme.error
-                    : isEventHoliday
-                    ? colorScheme.error
-                    : isReligious
-                    ? colorScheme.secondary
-                    : colorScheme.onSurface,
+                    isHoliday
+                        ? colorScheme.error
+                        : isEventHoliday
+                        ? colorScheme.error
+                        : isReligious
+                        ? colorScheme.secondary
+                        : colorScheme.onSurface,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,

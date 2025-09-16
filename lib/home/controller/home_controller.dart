@@ -330,8 +330,7 @@ class HomeController extends GetxController {
       return 'بدون عملکرد';
     }
 
-    if (detail.leaveType != LeaveType.work) {
-      // تغییر به enum
+    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
       return detail.leaveType?.displayName ??
           'بدون عملکرد'; // استفاده از displayName برای نمایش
     }
@@ -379,8 +378,7 @@ class HomeController extends GetxController {
       return 'بدون اطلاعات';
     }
 
-    if (detail.leaveType != LeaveType.work) {
-      // تغییر به enum
+    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
       return detail.leaveType?.displayName ??
           'بدون اطلاعات'; // استفاده از displayName
     }
@@ -460,8 +458,7 @@ class HomeController extends GetxController {
       };
     }
 
-    if (detail.leaveType != LeaveType.work) {
-      // تغییر به enum
+    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
       IconData avatarIcon;
       Color avatarColor;
       Color avatarIconColor;
@@ -483,6 +480,12 @@ class HomeController extends GetxController {
           avatarColor = colorScheme.tertiary;
           avatarIconColor = colorScheme.onTertiary;
           isComplete = true;
+          break;
+        case LeaveType.mission:
+          avatarIcon = Icons.flight_takeoff;  // یا آیکون مناسب برای ماموریت، مثل Icons.business
+          avatarColor = colorScheme.primary;  // یا secondary، بسته به theme
+          avatarIconColor = colorScheme.onPrimary;
+          isComplete = true;  // اگر مثل مرخصی باشه؛ اما چون مثل work، این case رو اصلاً نزن (با شرط if بالا)
           break;
         default:
           avatarIcon = Icons.calendar_today;

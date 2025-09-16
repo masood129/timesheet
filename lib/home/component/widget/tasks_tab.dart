@@ -19,8 +19,7 @@ class TasksTab extends StatelessWidget {
         Text('تسک‌ها'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary)),
         const SizedBox(height: 8),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work;
-          return Column(
+          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Column(
             children: List.generate(
               controller.selectedProjects.length,
                   (i) => TaskRow(
@@ -34,8 +33,7 @@ class TasksTab extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work;
-          return Align(
+          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: isEnabled ? controller.addTaskRow : null,
