@@ -4,6 +4,7 @@ enum LeaveType {
   annualLeave, // مرخصی استحقاقی
   sickLeave,   // مرخصی استعلاجی
   giftLeave,   // مرخصی هدیه
+  mission,
 }
 
 extension LeaveTypeExtension on LeaveType {
@@ -13,6 +14,7 @@ extension LeaveTypeExtension on LeaveType {
       case LeaveType.annualLeave: return 'استحقاقی';
       case LeaveType.sickLeave: return 'استعلاجی';
       case LeaveType.giftLeave: return 'هدیه';
+      case LeaveType.mission: return 'ماموریت';
     }
   }
 
@@ -23,6 +25,7 @@ extension LeaveTypeExtension on LeaveType {
       case LeaveType.annualLeave: return 'annual_leave';
       case LeaveType.sickLeave: return 'sick_leave';
       case LeaveType.giftLeave: return 'gift_leave';
+      case LeaveType.mission: return 'mission';
     }
   }
 
@@ -33,6 +36,7 @@ extension LeaveTypeExtension on LeaveType {
       case 'annual_leave': return LeaveType.annualLeave;
       case 'sick_leave': return LeaveType.sickLeave;
       case 'gift_leave': return LeaveType.giftLeave;
+      case 'mission': return LeaveType.mission;
       default: return null;
     }
   }
