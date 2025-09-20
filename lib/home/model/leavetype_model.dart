@@ -1,4 +1,4 @@
-// models/leave_type.dart (فایل جدید برای enum)
+// models/leave_type.dart
 enum LeaveType {
   work,        // روز کاری عادی
   annualLeave, // مرخصی استحقاقی
@@ -29,7 +29,7 @@ extension LeaveTypeExtension on LeaveType {
     }
   }
 
-  // Parser برای تبدیل string از backend به enum
+  // Parser برای تبدیل string از backend به enum (انگلیسی)
   static LeaveType? fromString(String? value) {
     switch (value) {
       case 'work': return LeaveType.work;
@@ -37,6 +37,18 @@ extension LeaveTypeExtension on LeaveType {
       case 'sick_leave': return LeaveType.sickLeave;
       case 'gift_leave': return LeaveType.giftLeave;
       case 'mission': return LeaveType.mission;
+      default: return null;
+    }
+  }
+
+  // جدید: Parser برای displayName (فارسی) – اگر field انگلیسی نداری
+  static LeaveType? fromDisplayName(String? value) {
+    switch (value) {
+      case 'کاری': return LeaveType.work;
+      case 'استحقاقی': return LeaveType.annualLeave;
+      case 'استعلاجی': return LeaveType.sickLeave;
+      case 'هدیه': return LeaveType.giftLeave;
+      case 'ماموریت': return LeaveType.mission;
       default: return null;
     }
   }

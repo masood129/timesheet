@@ -1,6 +1,7 @@
 // main_drawer.dart (اصلاح شده)
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timesheet/home/component/widget/user_list_view.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../manager/view/manager_dashboard.dart';
@@ -136,6 +137,27 @@ class MainDrawer extends StatelessWidget {
                     )
                     : const SizedBox.shrink(),
           ),
+          Obx(
+            () =>
+                authController.user.value != null &&
+                        [
+                          'group_manager',
+                          'general_manager',
+                        ].contains(authController.user.value!['Role'])
+                    ? ListTile(
+                      leading: Icon(Icons.people, color: colorScheme.primary),
+                      title: Text(
+                        'لیست کاربران'.tr,
+                        style: TextStyle(color: colorScheme.onSurface),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.to(() => UserListView());
+                      },
+                    )
+                    : const SizedBox.shrink(),
+          ),
+
           ListTile(
             leading: Icon(Icons.logout, color: colorScheme.primary),
             title: Text(

@@ -5,6 +5,7 @@ import 'dart:convert';
 import '../../home/model/monthly_report_model.dart';
 import '../../home/model/project_model.dart';
 import '../../home/model/daily_detail_model.dart';
+import '../../home/model/user_model.dart';
 
 class HomeApi {
   static final HomeApi _instance = HomeApi._internal();
@@ -554,5 +555,56 @@ class HomeApi {
       throw Exception('Access denied');
     }
     throw Exception('Failed to fetch drafts: ${response.statusCode}');
+  }
+
+  // Method to get subordinates
+  Future<List<UserModel>> getSubordinates() async {
+    final response = await coreAPI.get(
+      Uri.parse('$baseUrl/users/subordinates'),
+      headers: defaultHeaders,
+    );
+    if (response == null) {
+      throw Exception('Failed to fetch: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => UserModel.fromJson(e)).toList();
+    }
+    if (response.statusCode == 403) {
+      throw Exception('Access denied: Not a manager');
+    }
+    throw Exception('Failed to fetch subordinates: ${response.statusCode}');
+  }
+
+// Update api_calls.dart with full loginAs (to store all user info)
+  Future<void> loginAs(int targetUserId) async {
+    final response = await coreAPI.post(
+      Uri.parse('$baseUrl/auth/login-as'),
+      headers: defaultHeaders,
+      body: {'targetUserId': targetUserId},
+    );
+    if (response == null) {
+      throw Exception('Failed to login-as: No response from server');
+    }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final token = data['token'] as String;
+      final userId = data['userId'] as int;
+      final username = data['Username'] as String;
+      final role = data['Role'] as String;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', token);
+      await prefs.setInt('userId', userId);
+      await prefs.setString('username', username);
+      await prefs.setString('Role', role);
+      return;
+    }
+    if (response.statusCode == 403) {
+      throw Exception('Access denied: Only managers can impersonate');
+    }
+    if (response.statusCode == 404) {
+      throw Exception('User not found');
+    }
+    throw Exception('Failed to login-as: ${response.statusCode}');
   }
 }

@@ -1,3 +1,4 @@
+// Update auth_controller.dart with impersonate method
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_calls.dart';
@@ -63,6 +64,18 @@ class AuthController extends GetxController {
       Get.offAllNamed('/login');
     } catch (e) {
       Get.snackbar('خطا', 'خطای خروج: $e'.tr);
+    }
+  }
+
+  Future<void> impersonate(int targetUserId) async {
+    try {
+      await homeApi.loginAs(targetUserId);
+      // Reload user from prefs to update state
+      await loadUserFromPrefs();
+      Get.to('/home'); //TODO: moshkele dispose controller bad az initilize shodan.
+      Get.snackbar('موفقیت', 'لاگین به عنوان کاربر جدید انجام شد'.tr);
+    } catch (e) {
+      Get.snackbar('خطا', 'خطای لاگین به عنوان: $e'.tr);
     }
   }
 }

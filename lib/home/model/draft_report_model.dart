@@ -1,3 +1,5 @@
+import 'leavetype_model.dart';
+
 /// مدل ProjectHours برای نگهداری ساعت‌های صرف‌شده به تفکیک پروژه
 /// این کلاس بر اساس داده‌های API (projectHoursByProject) ساخته شده است.
 class ProjectHours {
@@ -32,7 +34,7 @@ class ProjectCarCost {
     return ProjectCarCost(
       projectId: json['ProjectID'] ?? json['projectId'],
       cost:
-          json['TotalCost'] ??
+      json['TotalCost'] ??
           json['cost'], // سازگار با API (TotalCost در query)
     );
   }
@@ -68,6 +70,7 @@ class DraftReportModel {
   final List<ProjectCarCost>? personalCarCostsByProject;
   final List<ProjectHours>?
   projectHoursByProject; // فیلد جدید: ساعت‌های به تفکیک پروژه
+  final Map<LeaveType, int>? leaveTypesCount; // فیلد به‌روزرسانی‌شده: نوع و تعداد مرخصی‌ها با استفاده از enum
 
   DraftReportModel({
     this.reportId,
@@ -91,10 +94,23 @@ class DraftReportModel {
     this.totalCommuteCost,
     this.personalCarCostsByProject,
     this.projectHoursByProject,
+    this.leaveTypesCount,
   });
 
   /// تبدیل از JSON به شیء (با پشتیبانی از فیلدهای جدید)
   factory DraftReportModel.fromJson(Map<String, dynamic> json) {
+    // پارس کردن leaveTypesCount از Map<String, int> به Map<LeaveType, int>
+    Map<LeaveType, int>? leaveTypesCount;
+    if (json['leaveTypesCount'] != null) {
+      leaveTypesCount = {};
+      (json['leaveTypesCount'] as Map<String, dynamic>).forEach((key, value) {
+        final leaveType = LeaveTypeExtension.fromString(key);
+        if (leaveType != null) {
+          leaveTypesCount![leaveType] = value as int;
+        }
+      });
+    }
+
     return DraftReportModel(
       reportId: json['ReportId'] ?? json['reportId'],
       userId: json['UserId'] ?? json['userId'],
@@ -105,17 +121,17 @@ class DraftReportModel {
       status: json['Status'] ?? json['status'],
       groupId: json['GroupId'] ?? json['groupId'],
       generalManagerStatus:
-          json['GeneralManagerStatus'] ?? json['generalManagerStatus'],
+      json['GeneralManagerStatus'] ?? json['generalManagerStatus'],
       managerComment: json['ManagerComment'] ?? json['managerComment'],
       financeComment: json['FinanceComment'] ?? json['financeComment'],
       submittedAt:
-          json['SubmittedAt'] != null
-              ? DateTime.tryParse(json['SubmittedAt'])
-              : null,
+      json['SubmittedAt'] != null
+          ? DateTime.tryParse(json['SubmittedAt'])
+          : null,
       approvedAt:
-          json['ApprovedAt'] != null
-              ? DateTime.tryParse(json['ApprovedAt'])
-              : null,
+      json['ApprovedAt'] != null
+          ? DateTime.tryParse(json['ApprovedAt'])
+          : null,
       jalaliYear: json['JalaliYear'] ?? json['jalaliYear'],
       jalaliMonth: json['JalaliMonth'] ?? json['jalaliMonth'],
       username: json['Username'] ?? json['username'],
@@ -123,22 +139,32 @@ class DraftReportModel {
       managerUsername: json['ManagerUsername'] ?? json['managerUsername'],
       totalCommuteCost: json['totalCommuteCost'],
       personalCarCostsByProject:
-          json['personalCarCostsByProject'] != null
-              ? (json['personalCarCostsByProject'] as List)
-                  .map((item) => ProjectCarCost.fromJson(item))
-                  .toList()
-              : null,
+      json['personalCarCostsByProject'] != null
+          ? (json['personalCarCostsByProject'] as List)
+          .map((item) => ProjectCarCost.fromJson(item))
+          .toList()
+          : null,
       projectHoursByProject:
-          json['projectHoursByProject'] != null
-              ? (json['projectHoursByProject'] as List)
-                  .map((item) => ProjectHours.fromJson(item))
-                  .toList()
-              : null, // پشتیبانی از فیلد جدید
+      json['projectHoursByProject'] != null
+          ? (json['projectHoursByProject'] as List)
+          .map((item) => ProjectHours.fromJson(item))
+          .toList()
+          : null, // پشتیبانی از فیلد جدید
+      leaveTypesCount: leaveTypesCount, // استفاده از مدل enum
     );
   }
 
   /// تبدیل شیء به JSON (با فیلدهای جدید)
   Map<String, dynamic> toJson() {
+    // تبدیل Map<LeaveType, int> به Map<String, int> برای API
+    Map<String, int>? leaveTypesCountJson;
+    if (leaveTypesCount != null) {
+      leaveTypesCountJson = {};
+      leaveTypesCount!.forEach((leaveType, count) {
+        leaveTypesCountJson![leaveType.apiValue] = count;
+      });
+    }
+
     return {
       'ReportId': reportId,
       'UserId': userId,
@@ -160,9 +186,10 @@ class DraftReportModel {
       'ManagerUsername': managerUsername,
       'totalCommuteCost': totalCommuteCost,
       'personalCarCostsByProject':
-          personalCarCostsByProject?.map((e) => e.toJson()).toList(),
+      personalCarCostsByProject?.map((e) => e.toJson()).toList(),
       'projectHoursByProject':
-          projectHoursByProject?.map((e) => e.toJson()).toList(), // فیلد جدید
+      projectHoursByProject?.map((e) => e.toJson()).toList(), // فیلد جدید
+      'leaveTypesCount': leaveTypesCountJson, // تبدیل به Map<String, int>
     };
   }
 }
