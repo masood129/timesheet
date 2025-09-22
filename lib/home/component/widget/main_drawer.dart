@@ -1,16 +1,14 @@
-// main_drawer.dart (اصلاح شده)
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timesheet/home/component/widget/user_list_view.dart';
-
 import '../../../core/theme/theme.dart';
 import '../../../manager/view/manager_dashboard.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
-import '../../view/monthly_details_view.dart';
+import '../../view/monthly_table_page.dart';
 import 'draft_reports_dialog.dart';
-import 'gym_cost_dialog.dart'; // import فایل جدید
-import 'monthly_report_dialog.dart'; // import دیالوگ جدید برای گزارش ماهانه
+import 'gym_cost_dialog.dart';
+import 'monthly_report_dialog.dart';
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});
@@ -71,7 +69,7 @@ class MainDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.pop(context);
-              Get.to(() => MonthlyDetailsView());
+              Get.to(() =>MonthlyTablePage());
             },
           ),
           ListTile(
