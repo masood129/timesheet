@@ -72,7 +72,7 @@ class AuthController extends GetxController {
       await homeApi.loginAs(targetUserId);
       // Reload user from prefs to update state
       await loadUserFromPrefs();
-      Get.to('/home'); //TODO: moshkele dispose controller bad az initilize shodan.
+      Get.toNamed('/home'); //TODO: moshkele dispose controller bad az initilize shodan.
       Get.snackbar('موفقیت', 'لاگین به عنوان کاربر جدید انجام شد'.tr);
     } catch (e) {
       Get.snackbar('خطا', 'خطای لاگین به عنوان: $e'.tr);
