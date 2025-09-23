@@ -1,12 +1,12 @@
 // Update auth_controller.dart with impersonate method
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/api/api_calls.dart';
+import '../../core/api/api_calls/api_calls.dart';
 
 class AuthController extends GetxController {
   var user = Rxn<Map<String, dynamic>>(); // اطلاعات کاربر (userId, Username, Role)
   var token = ''.obs; // توکن JWT
-  final HomeApi homeApi = HomeApi();
+  final ApiCalls homeApi = ApiCalls();
 
   @override
   void onInit() {

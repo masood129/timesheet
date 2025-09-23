@@ -1,15 +1,14 @@
-// Create a new file: lib/manager/view/user_list_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:timesheet/core/api/api_calls.dart'; // Adjust path if needed
-import 'package:timesheet/home/controller/auth_controller.dart'; // Adjust path if needed
-import 'package:timesheet/home/model/user_model.dart'; // Create UserModel if not exists
+import 'package:timesheet/core/api/api_calls/api_calls.dart';
+import 'package:timesheet/home/controller/auth_controller.dart';
+import 'package:timesheet/home/model/user_model.dart';
 
 class UserListView extends StatelessWidget {
   UserListView({super.key});
 
   final AuthController authController = Get.find<AuthController>();
-  final HomeApi homeApi = HomeApi();
+  final ApiCalls homeApi = ApiCalls();
 
   @override
   Widget build(BuildContext context) {

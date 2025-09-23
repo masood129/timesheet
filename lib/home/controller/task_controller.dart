@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-import 'package:timesheet/core/api/api_calls.dart';
+import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/home/model/daily_detail_model.dart';
 import 'package:timesheet/home/model/project_model.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -235,7 +235,7 @@ class TaskController extends GetxController {
 
   Future<void> fetchProjects() async {
     try {
-      final value = await HomeApi().getProjects();
+      final value = await ApiCalls().getProjects();
       projects.assignAll(value);
     } catch (e) {
       Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);
@@ -618,7 +618,7 @@ class TaskController extends GetxController {
     );
 
     try {
-      await HomeApi().saveDailyDetail(detail);
+      await ApiCalls().saveDailyDetail(detail);
       Get.back();
       Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
       Get.find<HomeController>().fetchMonthlyDetails();

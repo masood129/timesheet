@@ -1,13 +1,13 @@
 import 'package:get/get.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-import 'package:timesheet/core/api/api_calls.dart';
+import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import '../../home/controller/auth_controller.dart';
 import '../../home/model/monthly_report_model.dart';
 
 class ManagerController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
-  final HomeApi homeApi = HomeApi();
+  final ApiCalls homeApi = ApiCalls();
   var reports = <MonthlyReport>[].obs;
   var selectedYear = Jalali.now().year.obs;
   var selectedMonth = Jalali.now().month.obs;

@@ -5,7 +5,7 @@ import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
 import 'package:timesheet/home/model/draft_report_model.dart';
-import '../../core/api/api_calls.dart';
+import '../../core/api/api_calls/api_calls.dart';
 import '../component/note_dialog.dart';
 import '../model/daily_detail_model.dart';
 import '../controller/task_controller.dart';
@@ -36,7 +36,7 @@ class HomeController extends GetxController {
 
   Future<List<DraftReportModel>> fetchMyDrafts() async {
     try {
-      final reportList = await HomeApi().getMyDrafts();
+      final reportList = await ApiCalls().getMyDrafts();
       return reportList;
     } catch (e) {
       Get.snackbar('خطا', 'خطا در دریافت پیش‌نویس‌ها: $e');
@@ -47,7 +47,7 @@ class HomeController extends GetxController {
   // متد جدید برای ارسال draft به مدیر گروه
   Future<void> submitDraftToManager(int reportId) async {
     try {
-      await HomeApi().submitReportToGroupManager(reportId);
+      await ApiCalls().submitReportToGroupManager(reportId);
       // بروزرسانی لیست drafts پس از ارسال
       await fetchMyDrafts();
       await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
@@ -59,7 +59,7 @@ class HomeController extends GetxController {
   // متد جدید برای حذف draft
   Future<void> exitDraft(int reportId) async {
     try {
-      await HomeApi().exitDraft(reportId);
+      await ApiCalls().exitDraft(reportId);
       // بروزرسانی لیست drafts پس از حذف
       await fetchMyDrafts();
       await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
@@ -130,7 +130,7 @@ class HomeController extends GetxController {
 
   saveMonthlyGymCost(int year, int month, int cost, int hours) async {
     try {
-      await HomeApi().saveMonthlyGymCost(year, month, cost, hours);
+      await ApiCalls().saveMonthlyGymCost(year, month, cost, hours);
     } catch (e) {
       rethrow;
     }
@@ -252,7 +252,7 @@ class HomeController extends GetxController {
     }
 
     // Proceed if all working days are complete
-    await HomeApi().createJalaliMonthlyReport(year, month);
+    await ApiCalls().createJalaliMonthlyReport(year, month);
     await fetchMonthlyDetails(); // بروزرسانی وضعیت پس از ارسال
   }
 
@@ -275,7 +275,7 @@ class HomeController extends GetxController {
       final endDate =
           '${endGregorian.year}-${endGregorian.month.toString().padLeft(2, '0')}-${endGregorian.day.toString().padLeft(2, '0')}';
 
-      final details = await HomeApi().getDateRangeDetails(startDate, endDate);
+      final details = await ApiCalls().getDateRangeDetails(startDate, endDate);
 
       final filteredDetails =
           details.where((detail) {
@@ -287,7 +287,7 @@ class HomeController extends GetxController {
 
       dailyDetails.assignAll(filteredDetails);
 
-      final status = await HomeApi().checkMonthlyReportStatus(
+      final status = await ApiCalls().checkMonthlyReportStatus(
         currentYear.value,
         currentMonth.value,
       );

@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:timesheet/home/controller/home_controller.dart';
-import 'package:timesheet/core/api/api_calls.dart';
+import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/home/model/project_model.dart';
 import '../model/leavetype_model.dart';
 
@@ -26,7 +26,7 @@ class MonthlyDetailsController extends GetxController {
   Future<void> fetchProjects() async {
     try {
       isLoading.value = true;
-      final fetchedProjects = await HomeApi().getProjects();
+      final fetchedProjects = await ApiCalls().getProjects();
       projects.assignAll(fetchedProjects);
     } catch (e) {
       Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);

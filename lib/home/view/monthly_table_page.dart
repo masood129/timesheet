@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/model/monthly_table_model.dart';
 
-import '../../core/api/api_calls.dart';
+import '../../core/api/api_calls/api_calls.dart';
 import '../model/leavetype_model.dart'; // Import LeaveType
 
 class MonthlyTablePage extends StatefulWidget {
@@ -16,7 +16,7 @@ class MonthlyTablePage extends StatefulWidget {
 
 class _MonthlyTablePageState extends State<MonthlyTablePage> {
   late Future<List<MonthlyTableRowModel>> _dataFuture;
-  final HomeApi _homeApi = HomeApi();
+  final ApiCalls _homeApi = ApiCalls();
   late int _jalaliYear;
   late int _jalaliMonth;
   int? _userId;
