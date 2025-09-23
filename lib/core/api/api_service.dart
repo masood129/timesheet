@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart'; // برای kDebugMode
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_easyloading/flutter_easyloading.dart'; // اضافه کردن پکیج easyloading
 
 class CoreApi {
   static final CoreApi _instance = CoreApi._internal();
@@ -79,12 +80,17 @@ class CoreApi {
       Object? body,
       ) async {
     try {
+      // نمایش لودینگ قبل از درخواست
+      EasyLoading.show(status: 'در حال بارگذاری...');
+
       // اگر درخواست برای /auth/login است، نیازی به توکن نیست
       if (headers != null && headers.containsKey('skip-auth')) {
         final updatedHeaders = Map<String, String>.from(headers);
         updatedHeaders.remove('skip-auth'); // حذف هدر موقت
         if (kDebugMode) debugPrint('Skipping auth');
-        return await request(updatedHeaders, _encodeBody(body));
+        final response = await request(updatedHeaders, _encodeBody(body));
+        EasyLoading.dismiss(); // پنهان کردن لودینگ بعد از پاسخ
+        return response;
       }
 
       // افزودن هدر Authorization اگر توکن موجود باشد
@@ -108,14 +114,19 @@ class CoreApi {
           // بازنویسی هدرها با توکن جدید
           updatedHeaders['Authorization'] = 'Bearer $newToken';
           // تکرار درخواست با توکن جدید
-          return await request(updatedHeaders, encodedBody);
+          final retryResponse = await request(updatedHeaders, encodedBody);
+          EasyLoading.dismiss(); // پنهان کردن لودینگ بعد از پاسخ
+          return retryResponse;
         } else {
+          EasyLoading.dismiss(); // پنهان کردن لودینگ در صورت شکست
           throw Exception('Unauthorized: Please log in again');
         }
       }
 
+      EasyLoading.dismiss(); // پنهان کردن لودینگ بعد از پاسخ موفق
       return response;
     } catch (e) {
+      EasyLoading.dismiss(); // پنهان کردن لودینگ در صورت خطا
       if (kDebugMode) debugPrint('Interceptor error: $e');
       rethrow;
     }

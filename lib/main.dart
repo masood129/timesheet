@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,8 @@ Future<void> main() async {
   Get.put(AuthController());
 
   final authController = Get.find<AuthController>();
-  final username = Uri.base.queryParameters['id']; // 127.0.0.1:80/?id=myUserName
+  final username = Uri.base
+      .queryParameters['id']; // 127.0.0.1:80/?id=myUserName
 
   if (username != null && username.isNotEmpty) {
     final success = await authController.login(username);
@@ -59,6 +61,7 @@ class MyApp extends GetView<ThemeController> {
       ],
       supportedLocales: const [Locale('fa'), Locale('en')],
       initialRoute: initialRoute ?? '/home',
+      builder: EasyLoading.init(),
       getPages: [
         GetPage(name: '/home', page: () => CalendarView()),
         GetPage(name: '/login', page: () => LoginView()),

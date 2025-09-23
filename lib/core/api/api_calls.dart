@@ -580,7 +580,7 @@ class HomeApi {
     throw Exception('Failed to fetch subordinates: ${response.statusCode}');
   }
 
-// Update api_calls.dart with full loginAs (to store all user info)
+  // Update api_calls.dart with full loginAs (to store all user info)
   Future<void> loginAs(int targetUserId) async {
     final response = await coreAPI.post(
       Uri.parse('$baseUrl/auth/login-as'),
@@ -612,14 +612,15 @@ class HomeApi {
     throw Exception('Failed to login-as: ${response.statusCode}');
   }
 
-
   Future<List<MonthlyTableRowModel>> getUserMonthlyTableData(
-      int userId,
-      int jalaliYear,
-      int jalaliMonth,
-      ) async {
+    int userId,
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/daily-details/user/$userId/jalali/month/$jalaliYear/$jalaliMonth'),
+      Uri.parse(
+        '$baseUrl/daily-details/user/$userId/jalali/month/$jalaliYear/$jalaliMonth',
+      ),
       headers: defaultHeaders,
     );
     if (response == null) {
@@ -627,7 +628,9 @@ class HomeApi {
     }
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => MonthlyTableRowModel.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => MonthlyTableRowModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
     if (response.statusCode == 400) {
       throw Exception('Invalid input');
@@ -638,14 +641,15 @@ class HomeApi {
     throw Exception('Failed to fetch monthly data: ${response.statusCode}');
   }
 
-
   Future<String> exportUserMonthlyToExcel(
-      int userId,
-      int jalaliYear,
-      int jalaliMonth,
-      ) async {
+    int userId,
+    int jalaliYear,
+    int jalaliMonth,
+  ) async {
     final response = await coreAPI.get(
-      Uri.parse('$baseUrl/daily-details/user/$userId/jalali/month/$jalaliYear/$jalaliMonth/export-excel'),
+      Uri.parse(
+        '$baseUrl/daily-details/user/$userId/jalali/month/$jalaliYear/$jalaliMonth/export-excel',
+      ),
       headers: defaultHeaders,
     );
     if (response == null) {
@@ -658,7 +662,8 @@ class HomeApi {
       if (directory == null) {
         directory = await getApplicationDocumentsDirectory(); // Fallback
       }
-      final filePath = '${directory.path}/monthly_details_${jalaliYear}_$jalaliMonth.xlsx';
+      final filePath =
+          '${directory.path}/monthly_details_${jalaliYear}_$jalaliMonth.xlsx';
       final file = File(filePath);
       await file.writeAsBytes(bytes);
 
@@ -674,4 +679,5 @@ class HomeApi {
       throw Exception('Access denied');
     }
     throw Exception('Failed to export excel: ${response.statusCode}');
-  }}
+  }
+}
