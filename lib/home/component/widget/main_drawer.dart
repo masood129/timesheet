@@ -47,19 +47,21 @@ class MainDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.language, color: colorScheme.primary),
+            // leading: Icon(Icons.language, color: colorScheme.primary),
+            leading: Icon(Icons.language, color: Colors.grey),
             title: Text(
               Get.locale!.languageCode == 'fa' ? 'english'.tr : 'persian'.tr,
-              style: TextStyle(color: colorScheme.onSurface),
+              // style: TextStyle(color: colorScheme.onSurface),
+              style: TextStyle(color: Colors.grey),
             ),
-            onTap: () {
-              final newLocale =
-                  Get.locale!.languageCode == 'fa'
-                      ? const Locale('en')
-                      : const Locale('fa');
-              Get.updateLocale(newLocale);
-              Navigator.pop(context);
-            },
+            // onTap: () {
+            //   final newLocale =
+            //       Get.locale!.languageCode == 'fa'
+            //           ? const Locale('en')
+            //           : const Locale('fa');
+            //   Get.updateLocale(newLocale);
+            //   Navigator.pop(context);
+            // },
           ),
           ListTile(
             leading: Icon(Icons.calendar_month, color: colorScheme.primary),
@@ -69,7 +71,7 @@ class MainDrawer extends StatelessWidget {
             ),
             onTap: () {
               Navigator.pop(context);
-              Get.to(() =>MonthlyTablePage());
+              Get.to(() => MonthlyTablePage());
             },
           ),
           ListTile(
