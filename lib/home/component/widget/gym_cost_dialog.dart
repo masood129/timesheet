@@ -14,7 +14,8 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
   final costController = TextEditingController();
   final hourController = TextEditingController();
 
-  final months = List.generate(12, (index) => index + 1);
+  // تغییر: فقط ماه‌های جاری و قبلی را نمایش دهید
+  final months = List.generate(currentMonth, (index) => index + 1);
   final monthNames = [
     'فروردین',
     'اردیبهشت',
@@ -65,7 +66,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                 ),
               ),
               const SizedBox(height: 16),
-              // انتخاب ماه با نام‌های شمسی و پیش‌فرض جاری
+              // انتخاب ماه با نام‌های شمسی و پیش‌فرض جاری (فقط ماه‌های جاری و قبلی)
               DropdownButtonFormField<int>(
                 value: currentMonth,
                 decoration: InputDecoration(
@@ -74,13 +75,12 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items:
-                    months.map((month) {
-                      return DropdownMenuItem(
-                        value: month,
-                        child: Text(monthNames[month - 1]),
-                      );
-                    }).toList(),
+                items: months.map((month) {
+                  return DropdownMenuItem(
+                    value: month,
+                    child: Text(monthNames[month - 1]),
+                  );
+                }).toList(),
                 onChanged: (value) {
                   if (value != null) {
                     monthController.text = value.toString();
