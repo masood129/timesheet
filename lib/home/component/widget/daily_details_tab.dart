@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/Get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../model/leavetype_model.dart';
 import '../../controller/task_controller.dart';
-import '../../model/leavetype_model.dart';
 import 'time_picker_field.dart';
 
 class DailyDetailsTab extends StatefulWidget {

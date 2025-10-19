@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:timesheet/home/model/project_model.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../model/project_model.dart';
 import '../../controller/task_controller.dart';
 
 class CarCostRow extends StatelessWidget {

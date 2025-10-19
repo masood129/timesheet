@@ -1,5 +1,5 @@
-import 'package:timesheet/home/model/personal_car_cost_model.dart';
-import 'package:timesheet/home/model/task_model.dart';
+import 'package:timesheet/model/personal_car_cost_model.dart';
+import 'package:timesheet/model/task_model.dart';
 
 import 'leavetype_model.dart'; // import enum
 

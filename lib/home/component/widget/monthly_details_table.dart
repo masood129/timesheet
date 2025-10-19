@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-import 'package:timesheet/home/model/leavetype_model.dart';
-
+import 'package:timesheet/model/leavetype_model.dart';
+import '../../../model/daily_detail_model.dart';
+import '../../../model/project_model.dart';
 import '../../controller/home_controller.dart';
-import '../../model/daily_detail_model.dart';
-import '../../model/project_model.dart';
 
 class MonthlyDetailsTable extends StatelessWidget {
   final int daysInMonth;

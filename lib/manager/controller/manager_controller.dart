@@ -1,14 +1,16 @@
+// manager_controller.dart
 import 'package:get/get.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
+
 import '../../home/controller/auth_controller.dart';
-import '../../home/model/monthly_report_model.dart';
+import '../../../model/draft_report_model.dart'; // Use DraftReportModel
 
 class ManagerController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
   final ApiCalls homeApi = ApiCalls();
-  var reports = <MonthlyReport>[].obs;
+  var reports = <DraftReportModel>[].obs;
   var selectedYear = Jalali.now().year.obs;
   var selectedMonth = Jalali.now().month.obs;
 
@@ -41,10 +43,10 @@ class ManagerController extends GetxController {
   }
 
   Future<void> approveGroupManager(
-    int reportId,
-    String comment,
-    bool toGeneralManager,
-  ) async {
+      int reportId,
+      String comment,
+      bool toGeneralManager,
+      ) async {
     try {
       final response = await homeApi.approveReportAsGroupManager(
         reportId,

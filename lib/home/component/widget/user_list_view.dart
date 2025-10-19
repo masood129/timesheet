@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/home/controller/auth_controller.dart';
-import 'package:timesheet/home/model/user_model.dart';
+
+import '../../../model/user_model.dart';
 
 class UserListView extends StatelessWidget {
   UserListView({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-import 'package:timesheet/home/model/project_model.dart';
+import '../../../model/project_model.dart';
 import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
 

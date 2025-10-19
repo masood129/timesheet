@@ -104,7 +104,7 @@ extension HomeApiMonthlyReports on ApiCalls {
     );
   }
 
-  Future<List<MonthlyReport>> fetchMonthlyReportsForGroup(
+  Future<List<DraftReportModel>> fetchMonthlyReportsForGroup(
       int startYear,
       int startMonth,
       int endYear,
@@ -121,7 +121,7 @@ extension HomeApiMonthlyReports on ApiCalls {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((e) => MonthlyReport.fromJson(e)).toList();
+      return data.map((e) => DraftReportModel.fromJson(e)).toList();
     }
     throw Exception('Failed to fetch range reports: ${response.statusCode}');
   }

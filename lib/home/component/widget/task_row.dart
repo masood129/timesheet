@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../model/project_model.dart';
 import '../../controller/task_controller.dart';
-import '../../model/project_model.dart';
 import 'duration_field.dart';
 
 class TaskRow extends StatelessWidget {

@@ -9,8 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:timesheet/home/controller/home_controller.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
-import 'package:timesheet/home/model/project_model.dart';
-import '../model/leavetype_model.dart';
+import 'package:timesheet/model/leavetype_model.dart';
+import '../../model/project_model.dart';
 
 class MonthlyDetailsController extends GetxController {
   final HomeController homeController = Get.find<HomeController>();
