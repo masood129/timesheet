@@ -19,7 +19,7 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   late int _jalaliYear;
   late int _jalaliMonth;
   int? _userId;
-  Set<int> _uniqueProjectIds = {}; // To store unique project IDs
+  Set<int> _uniqueProjectIds = {};
 
   @override
   void initState() {
@@ -47,7 +47,6 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
       _jalaliYear,
       _jalaliMonth,
     );
-    // Extract unique project IDs
     _uniqueProjectIds = {};
     for (var row in data) {
       for (var project in row.projects) {
@@ -184,70 +183,202 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
               }
 
               final data = snapshot.data!;
-              final sortedProjectIds = _uniqueProjectIds.toList()..sort(); // Sort for consistent order
+              final sortedProjectIds = _uniqueProjectIds.toList()..sort();
 
-              // Calculate column width based on screen width
-              final numColumns = 9 + sortedProjectIds.length; // Fixed columns + project columns
-              final columnWidth = constraints.maxWidth / numColumns.clamp(1, 15); // Clamp to avoid too small
+              // Calculate column widths
+              final totalWidth = constraints.maxWidth;
+              const fixedColumnWidth = 80.0; // Fixed width for standard columns
+              final projectColumnWidth = (totalWidth - (9 * fixedColumnWidth)) / sortedProjectIds.length.clamp(1, double.infinity);
 
-              return SingleChildScrollView(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    border: TableBorder.all(color: Colors.grey.shade300, width: 1),
-                    headingRowColor: WidgetStateProperty.all(Colors.blueGrey[700]),
-                    headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    headingRowHeight: 56,
-                    dataRowMinHeight: 40,
-                    dataRowMaxHeight: 100,
-                    columnSpacing: 16,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    columns: <DataColumn>[
-                      DataColumn(label: Text('روز هفته', style: _getHeaderStyle())),
-                      DataColumn(label: Text('تاریخ', style: _getHeaderStyle())),
-                      DataColumn(label: Text('ساعت ورود', style: _getHeaderStyle())),
-                      DataColumn(label: Text('ساعت خروج', style: _getHeaderStyle())),
-                      DataColumn(label: Text('ساعت شخصی', style: _getHeaderStyle())),
-                      DataColumn(label: Text('وضعیت مرخصی', style: _getHeaderStyle())),
-                      DataColumn(label: Text('مجموع کارکرد', style: _getHeaderStyle())),
-                      DataColumn(label: Text('تاخیر ورود', style: _getHeaderStyle())),
-                      DataColumn(label: Text('توضیحات', style: _getHeaderStyle())),
-                      ...sortedProjectIds.map((id) => DataColumn(
-                        label: Text('پروژه $id', style: _getHeaderStyle()),
-                      )),
-                    ], // If sorting needed, add logic
-                    rows: data.map((row) {
-                      final leaveType = LeaveTypeExtension.fromString(row.leaveType);
-                      return DataRow(
-                        color: WidgetStateProperty.all(_getRowColor(leaveType)),
-                        cells: <DataCell>[
-                          DataCell(Text(row.dayOfWeek, style: _getCellStyle())),
-                          DataCell(Text(row.date, style: _getCellStyle())),
-                          DataCell(Text(_formatTime(row.arrivalTime), style: _getCellStyle())),
-                          DataCell(Text(_formatTime(row.leaveTime), style: _getCellStyle())),
-                          DataCell(Text(_formatMinutes(row.personalTime), style: _getCellStyle())),
-                          DataCell(Text(_translateLeaveType(row.leaveType), style: _getCellStyle())),
-                          DataCell(Text(_formatMinutes(row.totalDailyWork), style: _getCellStyle())),
-                          DataCell(Text(_formatMinutes(row.entryDelay), style: _getCellStyle())),
-                          DataCell(Text(row.description ?? '-', style: _getCellStyle())),
-                          ...sortedProjectIds.map((id) => DataCell(
-                            Text(_getProjectDuration(row.projects, id), style: _getCellStyle()),
-                          )),
+              return Column(
+                children: [
+                  // Header Table (Fixed)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: totalWidth,
+                      ),
+                      child: DataTable(
+                        border: TableBorder.all(color: Colors.grey.shade300, width: 1),
+                        headingRowColor: WidgetStateProperty.all(Colors.blueGrey[700]),
+                        headingTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        headingRowHeight: 56,
+                        columnSpacing: 16,
+                        columns: <DataColumn>[
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('روز هفته', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('تاریخ', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('ساعت ورود', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('ساعت خروج', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('ساعت شخصی', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('وضعیت مرخصی', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('مجموع کارکرد', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('تاخیر ورود', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          DataColumn(
+                            label: SizedBox(
+                              width: fixedColumnWidth,
+                              child: Text('توضیحات', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                            ),
+                          ),
+                          ...sortedProjectIds.map(
+                                (id) => DataColumn(
+                              label: SizedBox(
+                                width: projectColumnWidth,
+                                child: Text('پروژه $id', style: _getHeaderStyle(), textAlign: TextAlign.center),
+                              ),
+                            ),
+                          ),
                         ],
-                      );
-                    }).toList(),
+                        rows: const [], // Empty rows for header
+                      ),
+                    ),
                   ),
-                ),
+                  // Data Table (Scrollable)
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: totalWidth,
+                          ),
+                          child: DataTable(
+                            border: TableBorder.all(color: Colors.grey.shade300, width: 1),
+                            dataRowMinHeight: 40,
+                            dataRowMaxHeight: 100,
+                            columnSpacing: 16,
+                            columns: <DataColumn>[
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                              ...sortedProjectIds.map((_) => DataColumn(label: SizedBox(width: projectColumnWidth))),
+                            ],
+                            rows: data.map((row) {
+                              final leaveType = LeaveTypeExtension.fromString(row.leaveType);
+                              return DataRow(
+                                color: WidgetStateProperty.all(_getRowColor(leaveType)),
+                                cells: <DataCell>[
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(row.dayOfWeek, style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(row.date, style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_formatTime(row.arrivalTime), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_formatTime(row.leaveTime), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_formatMinutes(row.personalTime), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_translateLeaveType(row.leaveType), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_formatMinutes(row.totalDailyWork), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(_formatMinutes(row.entryDelay), style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: fixedColumnWidth,
+                                      child: Text(row.description ?? '-', style: _getCellStyle(), textAlign: TextAlign.center),
+                                    ),
+                                  ),
+                                  ...sortedProjectIds.map(
+                                        (id) => DataCell(
+                                      SizedBox(
+                                        width: projectColumnWidth,
+                                        child: Text(_getProjectDuration(row.projects, id), style: _getCellStyle(), textAlign: TextAlign.center),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           );
