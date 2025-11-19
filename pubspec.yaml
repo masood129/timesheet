@@ -96,6 +96,13 @@ flutter:
     - family: BNazanin
       fonts:
         - asset: assets/fonts/BNAZANIN.ttf
+    - family: Roboto  # This is the name you'll reference in code
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700  # For bold
+        - asset: assets/fonts/Roboto-Italic.ttf
+          style: italic  # For italic
   #   - family: Trajan Pro
   #     fonts:
   #       - assets: fonts/TrajanPro.ttf

@@ -139,6 +139,7 @@ extension CustomColorSchemeExtension on ColorScheme {
 
 // --- ThemeData Definitions ---
 ThemeData mainTheme = ThemeData(
+  fontFamily: 'Roboto',
   useMaterial3: true,
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
