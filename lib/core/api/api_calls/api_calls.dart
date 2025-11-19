@@ -31,7 +31,7 @@ class ApiCalls {
   late final String baseUrl;
 
   ApiCalls._internal() {
-    baseUrl = 'http://localhost:3000'; // یا از dotenv بگیرید
+    baseUrl = 'http://10.10.40.235:3000'; // یا از dotenv بگیرید
   }
 
   final coreAPI = CoreApi();

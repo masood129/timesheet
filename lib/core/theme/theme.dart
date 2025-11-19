@@ -139,7 +139,7 @@ extension CustomColorSchemeExtension on ColorScheme {
 
 // --- ThemeData Definitions ---
 ThemeData mainTheme = ThemeData(
-  fontFamily: 'Roboto',
+  fontFamily: 'BNazanin',
   useMaterial3: true,
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
@@ -240,6 +240,7 @@ ThemeData mainTheme = ThemeData(
 );
 
 ThemeData darkTheme = ThemeData(
+  fontFamily: 'BNazanin',
   useMaterial3: true,
   colorScheme: _darkColorScheme,
   brightness: Brightness.dark,

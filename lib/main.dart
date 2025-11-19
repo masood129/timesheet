@@ -21,7 +21,7 @@ Future<void> main() async {
 
   final authController = Get.find<AuthController>();
   final username = Uri.base
-      .queryParameters['id']; // 127.0.0.1:80/?id=myUserName
+      .queryParameters['id']; // 127.0.0.1:80/?id=user_engineer1
 
   if (username != null && username.isNotEmpty) {
     final success = await authController.login(username);

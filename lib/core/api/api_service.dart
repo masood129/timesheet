@@ -14,7 +14,8 @@ class CoreApi {
   CoreApi._internal();
 
   final _client = http.Client();
-  final String baseUrl = 'http://localhost:3000';
+  final String baseUrl = 'http://10.10.40.235:3000';
+  //todo : remove this base url or other base url (behtare ke az .env khonde beshe)
 
   // تابع برای دریافت توکن از SharedPreferences
   Future<String?> _getToken() async {
