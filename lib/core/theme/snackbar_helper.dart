@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -104,9 +106,9 @@ class ThemedSnackbar {
 
     final colorScheme = Theme.of(context).colorScheme;
     final surfaceTint = colorScheme.surface;
-    final glassColor = surfaceTint.withOpacity(0.82);
-    final borderColor = accent.withOpacity(0.45);
-    final accentOverlay = accent.withOpacity(0.12);
+    final glassColor = surfaceTint.withOpacity(0.22);
+    final borderColor = accent.withOpacity(0.28);
+    final accentOverlay = accent.withOpacity(0.03);
 
     Get.rawSnackbar(
       snackPosition: SnackPosition.BOTTOM,
@@ -121,83 +123,89 @@ class ThemedSnackbar {
       forwardAnimationCurve: Curves.fastOutSlowIn,
       reverseAnimationCurve: Curves.easeInCubic,
       animationDuration: const Duration(milliseconds: 260),
-      messageText: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: borderColor, width: 1.2),
-          gradient: LinearGradient(
-            colors: [
-              glassColor,
-              glassColor.withOpacity(0.94),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: accentOverlay,
+      messageText: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: borderColor, width: 0.9),
+              color: glassColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 26,
+                  offset: const Offset(0, 14),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: _defaultPadding,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: accent.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: onAccent),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontFamily: 'BNazanin',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: onAccent,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          message,
-                          style: TextStyle(
-                            fontFamily: 'BNazanin',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: onAccent.withOpacity(0.9),
-                          ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.02),
+                          accentOverlay,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: _defaultPadding,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: accent.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(icon, color: onAccent),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontFamily: 'BNazanin',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: onAccent,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              message,
+                              style: TextStyle(
+                                fontFamily: 'BNazanin',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: onAccent.withOpacity(0.9),
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
