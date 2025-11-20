@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter_easyloading/flutter_easyloading.dart'; // اضافه کردن پکیج easyloading
+import 'package:timesheet/core/config/app_env.dart';
 
 class CoreApi {
   static final CoreApi _instance = CoreApi._internal();
@@ -14,8 +15,7 @@ class CoreApi {
   CoreApi._internal();
 
   final _client = http.Client();
-  final String baseUrl = 'http://10.10.40.235:3000';
-  //todo : remove this base url or other base url (behtare ke az .env khonde beshe)
+  final String baseUrl = AppEnv.apiBaseUrl;
 
   // تابع برای دریافت توکن از SharedPreferences
   Future<String?> _getToken() async {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
+import 'package:timesheet/core/config/app_env.dart';
 import 'dart:convert';
 import '../../../model/daily_detail_model.dart';
 import '../../../model/draft_report_model.dart';
@@ -31,7 +32,7 @@ class ApiCalls {
   late final String baseUrl;
 
   ApiCalls._internal() {
-    baseUrl = 'http://10.10.40.235:3000'; // یا از dotenv بگیرید
+    baseUrl = AppEnv.apiBaseUrl;
   }
 
   final coreAPI = CoreApi();
