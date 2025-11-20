@@ -45,17 +45,26 @@ extension HomeApiTableExport on ApiCalls {
       throw Exception('Failed to export: No response from server');
     }
     if (response.statusCode == 200) {
-      // Save the file locally to Downloads
       final bytes = response.bodyBytes; // Since it's binary
+      final fileName = 'monthly_details_${jalaliYear}_$jalaliMonth.xlsx';
+
+      if (kIsWeb) {
+        final result = await triggerBrowserDownload(bytes, fileName);
+        if (result != null) {
+          return result;
+        }
+        throw Exception('Browser download failed.');
+      }
+
       Directory? directory = await downloadsDirectory;
       directory ??= await applicationDocumentsDirectory;
-      final filePath =
-          '${directory.path}/monthly_details_${jalaliYear}_$jalaliMonth.xlsx';
+      if (directory == null) {
+        throw Exception('Unable to locate a writable directory.');
+      }
+
+      final filePath = '${directory.path}/$fileName';
       final file = File(filePath);
       await file.writeAsBytes(bytes);
-
-      // Optional: Open the file if you have open_file package
-      // OpenFile.open(filePath);
 
       return filePath; // Return path for UI feedback
     }

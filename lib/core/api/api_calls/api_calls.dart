@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timesheet/core/utils/browser_download.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
 import 'dart:convert';
@@ -32,8 +34,24 @@ class ApiCalls {
 
   final coreAPI = CoreApi();
   String get baseUrl => coreAPI.baseUrl;
-  final downloadsDirectory = getDownloadsDirectory();
-  final applicationDocumentsDirectory = getApplicationDocumentsDirectory();
+
+  Future<Directory?> get downloadsDirectory async {
+    if (kIsWeb) return null;
+    try {
+      return await getDownloadsDirectory();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Directory?> get applicationDocumentsDirectory async {
+    if (kIsWeb) return null;
+    try {
+      return await getApplicationDocumentsDirectory();
+    } catch (_) {
+      return null;
+    }
+  }
   final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',
