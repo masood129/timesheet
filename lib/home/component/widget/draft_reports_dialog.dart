@@ -6,6 +6,7 @@ import 'package:shamsi_date/shamsi_date.dart';
 import '../../../model/draft_report_model.dart';
 import '../../../templates/report_details_template.dart';
 import '../../controller/home_controller.dart';
+import '../../../core/theme/snackbar_helper.dart';
 
 void showDraftReportsDialog(
     BuildContext context,
@@ -166,10 +167,9 @@ void showDraftReportsDialog(
               await homeController.submitDraftToManager(
                 selectedReportId.value!,
               );
-              Get.snackbar(
+              ThemedSnackbar.showSuccess(
                 'موفقیت',
                 'پیش‌نویس با موفقیت به مدیر گروه ارسال شد.',
-                backgroundColor: Colors.green,
               );
             },
             icon: const Icon(Icons.send),
@@ -186,10 +186,9 @@ void showDraftReportsDialog(
                 : () async {
               Get.back(); // بستن دیالوگ
               await homeController.exitDraft(selectedReportId.value!);
-              Get.snackbar(
+              ThemedSnackbar.showWarning(
                 'موفقیت',
                 'پیش‌نویس با موفقیت حذف شد.',
-                backgroundColor: Colors.orange,
               );
             },
             icon: const Icon(Icons.delete),

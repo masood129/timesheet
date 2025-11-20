@@ -5,6 +5,7 @@ import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timezone/timezone.dart' as tz;
+import '../../core/theme/snackbar_helper.dart';
 import '../../model/daily_detail_model.dart';
 import '../../model/leavetype_model.dart';
 import '../../model/personal_car_cost_model.dart';
@@ -238,7 +239,7 @@ class TaskController extends GetxController {
       final value = await ApiCalls().getProjects();
       projects.assignAll(value);
     } catch (e) {
-      Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);
+      ThemedSnackbar.showError('error'.tr, 'fetch_projects_issue_snackbar'.tr);
     }
   }
 
@@ -432,7 +433,7 @@ class TaskController extends GetxController {
 
       calculateStats();
     } catch (e) {
-      Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
+      ThemedSnackbar.showError('error'.tr, 'failed_to_fetch_details'.tr);
     }
   }
 
@@ -554,7 +555,7 @@ class TaskController extends GetxController {
     }
 
     if (hasTaskError || hasCarCostError) {
-      Get.snackbar(
+      ThemedSnackbar.showError(
         'error'.tr,
         'لطفاً برای تمام وظایف و هزینه‌های خودرو پروژه انتخاب کنید',
       );
@@ -620,10 +621,10 @@ class TaskController extends GetxController {
     try {
       await ApiCalls().saveDailyDetail(detail);
       Get.back();
-      Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
+      ThemedSnackbar.showSuccess('success'.tr, 'details_saved_snackbar'.tr);
       Get.find<HomeController>().fetchMonthlyDetails();
     } catch (e) {
-      Get.snackbar('error'.tr, 'save_details_issue_snackbar'.tr);
+      ThemedSnackbar.showError('error'.tr, 'save_details_issue_snackbar'.tr);
     }
   }
 

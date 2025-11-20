@@ -5,6 +5,7 @@ import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/core/theme/theme.dart';
 import '../../core/api/api_calls/api_calls.dart';
+import '../../core/theme/snackbar_helper.dart';
 import '../../model/daily_detail_model.dart';
 import '../../model/draft_report_model.dart';
 import '../../model/leavetype_model.dart';
@@ -39,7 +40,7 @@ class HomeController extends GetxController {
       final reportList = await ApiCalls().getMyDrafts();
       return reportList;
     } catch (e) {
-      Get.snackbar('خطا', 'خطا در دریافت پیش‌نویس‌ها: $e');
+      ThemedSnackbar.showError('خطا', 'خطا در دریافت پیش‌نویس‌ها: $e');
       return [];
     }
   }
@@ -52,7 +53,7 @@ class HomeController extends GetxController {
       await fetchMyDrafts();
       await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
     } catch (e) {
-      Get.snackbar('خطا', 'خطا در ارسال پیش‌نویس: $e');
+      ThemedSnackbar.showError('خطا', 'خطا در ارسال پیش‌نویس: $e');
     }
   }
 
@@ -64,7 +65,7 @@ class HomeController extends GetxController {
       await fetchMyDrafts();
       await fetchMonthlyDetails(); // بروزرسانی وضعیت ماه (فرض بر موجود بودن این متد)
     } catch (e) {
-      Get.snackbar('خطا', 'خطا در حذف پیش‌نویس: $e');
+      ThemedSnackbar.showError('خطا', 'خطا در حذف پیش‌نویس: $e');
     }
   }
 
@@ -173,7 +174,7 @@ class HomeController extends GetxController {
       holidays.assignAll(combinedHolidays);
     } catch (e) {
       if (Get.context != null) {
-        Get.snackbar('error'.tr, 'failed_to_load_holidays'.tr);
+        ThemedSnackbar.showError('error'.tr, 'failed_to_load_holidays'.tr);
       }
     }
   }
@@ -243,7 +244,7 @@ class HomeController extends GetxController {
         '',
       ); // Remove trailing comma
       if (Get.context != null) {
-        Get.snackbar(
+        ThemedSnackbar.showError(
           'خطا',
           '$errorMessage - ساعات پروژه و ساعات مفید مطابقت ندارند',
         );
@@ -295,7 +296,7 @@ class HomeController extends GetxController {
     } catch (e) {
       monthStatus.value = null; // In case of error, assume null
       if (Get.context != null) {
-        Get.snackbar('error'.tr, 'failed_to_fetch_details'.tr);
+        ThemedSnackbar.showError('error'.tr, 'failed_to_fetch_details'.tr);
       }
     }
   }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
+import '../../../core/theme/snackbar_helper.dart';
 
 void showGymCostDialog(BuildContext context, HomeController homeController) {
   final now = Jalali.now();
@@ -154,7 +155,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               if (monthController.text.isEmpty ||
                   costController.text.isEmpty ||
                   hourController.text.isEmpty ) {
-                Get.snackbar('خطا', 'لطفاً همه فیلدها را پر کنید'.tr);
+                ThemedSnackbar.showError('خطا', 'لطفاً همه فیلدها را پر کنید'.tr);
                 return;
               }
               try {
@@ -166,10 +167,10 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   int.parse(cleanCost),
                   int.parse(hourController.text),
                 );
-                Get.snackbar('موفقیت', 'هزینه ورزش ثبت شد'.tr);
+                ThemedSnackbar.showSuccess('موفقیت', 'هزینه ورزش ثبت شد'.tr);
                 Navigator.pop(context);
               } catch (e) {
-                Get.snackbar('خطا', 'خطا در ثبت هزینه: $e'.tr);
+                ThemedSnackbar.showError('خطا', 'خطا در ثبت هزینه: $e'.tr);
               }
             },
             child: Text('ثبت'.tr),

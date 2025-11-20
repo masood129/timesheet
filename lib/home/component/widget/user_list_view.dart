@@ -4,6 +4,7 @@ import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/home/controller/auth_controller.dart';
 
 import '../../../model/user_model.dart';
+import '../../../core/theme/snackbar_helper.dart';
 
 class UserListView extends StatelessWidget {
   UserListView({super.key});
@@ -39,7 +40,7 @@ class UserListView extends StatelessWidget {
                       try {
                         await authController.impersonate(user.userId);
                       } catch (e) {
-                        Get.snackbar('خطا', 'لاگین ناموفق: $e');
+                        ThemedSnackbar.showError('خطا', 'لاگین ناموفق: $e');
                       }
                     },
                     child: Text('لاگین به عنوان'.tr),

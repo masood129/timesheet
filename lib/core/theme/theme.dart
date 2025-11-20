@@ -237,6 +237,21 @@ ThemeData mainTheme = ThemeData(
     trackOutlineColor:
     WidgetStateProperty.resolveWith((states) => Colors.transparent),
   ),
+  snackBarTheme: SnackBarThemeData(
+    backgroundColor: _lightColorScheme.surfaceContainerHighest,
+    contentTextStyle: TextStyle(
+      fontFamily: 'BNazanin',
+      color: _lightColorScheme.onSurface,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    behavior: SnackBarBehavior.floating,
+    elevation: 4,
+    actionTextColor: _lightColorScheme.primary,
+  ),
 );
 
 ThemeData darkTheme = ThemeData(
@@ -336,5 +351,20 @@ ThemeData darkTheme = ThemeData(
     }),
     trackOutlineColor:
     WidgetStateProperty.resolveWith((states) => Colors.transparent),
+  ),
+  snackBarTheme: SnackBarThemeData(
+    backgroundColor: _darkColorScheme.surfaceContainerHighest,
+    contentTextStyle: TextStyle(
+      fontFamily: 'BNazanin',
+      color: _darkColorScheme.onSurface,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    behavior: SnackBarBehavior.floating,
+    elevation: 4,
+    actionTextColor: _darkColorScheme.primary,
   ),
 );

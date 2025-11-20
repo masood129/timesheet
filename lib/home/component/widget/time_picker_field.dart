@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/theme/snackbar_helper.dart';
 
 class TimePickerField extends StatelessWidget {
   final String labelKey;
@@ -56,7 +57,7 @@ class TimePickerField extends StatelessWidget {
               controller.text =
               '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
             } else {
-              Get.snackbar('error'.tr, 'invalid_time_format_error'.tr);
+              ThemedSnackbar.showError('error'.tr, 'invalid_time_format_error'.tr);
             }
           }
         }

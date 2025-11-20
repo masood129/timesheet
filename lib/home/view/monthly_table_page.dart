@@ -158,11 +158,17 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
                   _jalaliMonth,
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('فایل اکسل دانلود شد: $filePath')),
+                  SnackBar(
+                    content: Text('فایل اکسل دانلود شد: $filePath'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('خطا در دانلود: $e')),
+                  SnackBar(
+                    content: Text('خطا در دانلود: $e'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
                 );
               }
             },

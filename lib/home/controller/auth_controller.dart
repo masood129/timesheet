@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_calls/api_calls.dart';
+import '../../core/theme/snackbar_helper.dart';
 
 class AuthController extends GetxController {
   var user = Rxn<Map<String, dynamic>>(); // اطلاعات کاربر (userId, Username, Role)
@@ -47,11 +48,11 @@ class AuthController extends GetxController {
         this.token.value = token;
         return true;
       } else {
-        Get.snackbar('خطا', 'خطا در دریافت اطلاعات کاربر'.tr);
+        ThemedSnackbar.showError('خطا', 'خطا در دریافت اطلاعات کاربر'.tr);
         return false;
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطای ورود: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای ورود: $e'.tr);
       return false;
     }
   }
@@ -63,7 +64,7 @@ class AuthController extends GetxController {
       token.value = '';
       Get.offAllNamed('/login');
     } catch (e) {
-      Get.snackbar('خطا', 'خطای خروج: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای خروج: $e'.tr);
     }
   }
 
@@ -73,9 +74,9 @@ class AuthController extends GetxController {
       // Reload user from prefs to update state
       await loadUserFromPrefs();
       Get.toNamed('/home'); //TODO: moshkele dispose controller bad az initilize shodan.
-      Get.snackbar('موفقیت', 'لاگین به عنوان کاربر جدید انجام شد'.tr);
+      ThemedSnackbar.showSuccess('موفقیت', 'لاگین به عنوان کاربر جدید انجام شد'.tr);
     } catch (e) {
-      Get.snackbar('خطا', 'خطای لاگین به عنوان: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای لاگین به عنوان: $e'.tr);
     }
   }
 }

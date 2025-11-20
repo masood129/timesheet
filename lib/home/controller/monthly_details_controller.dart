@@ -11,6 +11,7 @@ import 'package:timesheet/home/controller/home_controller.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/model/leavetype_model.dart';
 import '../../model/project_model.dart';
+import '../../core/theme/snackbar_helper.dart';
 
 class MonthlyDetailsController extends GetxController {
   final HomeController homeController = Get.find<HomeController>();
@@ -29,7 +30,7 @@ class MonthlyDetailsController extends GetxController {
       final fetchedProjects = await ApiCalls().getProjects();
       projects.assignAll(fetchedProjects);
     } catch (e) {
-      Get.snackbar('error'.tr, 'fetch_projects_issue_snackbar'.tr);
+      ThemedSnackbar.showError('error'.tr, 'fetch_projects_issue_snackbar'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -57,7 +58,7 @@ class MonthlyDetailsController extends GetxController {
     if (!kIsWeb) {
       bool hasPermission = await _requestStoragePermission();
       if (!hasPermission) {
-        Get.snackbar('error'.tr, 'مجوز ذخیره‌سازی داده نشده است'.tr);
+        ThemedSnackbar.showError('error'.tr, 'مجوز ذخیره‌سازی داده نشده است'.tr);
         return;
       }
     }
@@ -121,16 +122,16 @@ class MonthlyDetailsController extends GetxController {
           bytes: excelData,
           mimeType: MimeType.microsoftExcel,
         );
-        Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
+        ThemedSnackbar.showSuccess('success'.tr, 'details_saved_snackbar'.tr);
       } else {
         final directory = await getTemporaryDirectory();
         final filePath = '${directory.path}/$fileName';
         final file = File(filePath);
         await file.writeAsBytes(excelData);
-        Get.snackbar('success'.tr, 'details_saved_snackbar'.tr);
+        ThemedSnackbar.showSuccess('success'.tr, 'details_saved_snackbar'.tr);
       }
     } catch (e) {
-      Get.snackbar('error'.tr, 'save_details_issue_snackbar'.tr + ': $e');
+      ThemedSnackbar.showError('error'.tr, 'save_details_issue_snackbar'.tr + ': $e');
     }
   }
 }

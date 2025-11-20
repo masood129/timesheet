@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/auth_controller.dart';
+import '../../core/theme/snackbar_helper.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -36,7 +37,7 @@ class LoginView extends StatelessWidget {
                     Get.offAllNamed('/home');
                   }
                 } else {
-                  Get.snackbar('خطا', 'لطفاً نام کاربری را وارد کنید'.tr);
+                  ThemedSnackbar.showError('خطا', 'لطفاً نام کاربری را وارد کنید'.tr);
                 }
               },
               style: ElevatedButton.styleFrom(

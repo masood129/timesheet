@@ -6,6 +6,7 @@ import 'package:timesheet/core/api/api_calls/api_calls.dart';
 
 import '../../home/controller/auth_controller.dart';
 import '../../../model/draft_report_model.dart'; // Use DraftReportModel
+import '../../../core/theme/snackbar_helper.dart';
 
 class ManagerController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
@@ -35,10 +36,10 @@ class ManagerController extends GetxController {
       if (response.isNotEmpty) {
         reports.value = response;
       } else {
-        Get.snackbar('خطا', 'خطا در دریافت گزارش‌ها: '.tr);
+        ThemedSnackbar.showError('خطا', 'خطا در دریافت گزارش‌ها: '.tr);
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
     }
   }
 
@@ -54,13 +55,13 @@ class ManagerController extends GetxController {
         toGeneralManager,
       );
       if (response.isNotEmpty) {
-        Get.snackbar('موفقیت', 'گزارش تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('موفقیت', 'گزارش تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
     }
   }
 
@@ -71,13 +72,13 @@ class ManagerController extends GetxController {
         comment,
       );
       if (response.isNotEmpty) {
-        Get.snackbar('موفقیت', 'گزارش تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('موفقیت', 'گزارش تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
     }
   }
 
@@ -85,13 +86,13 @@ class ManagerController extends GetxController {
     try {
       final response = await homeApi.approveReportAsFinance(reportId, comment);
       if (response.isNotEmpty) {
-        Get.snackbar('موفقیت', 'گزارش نهایی تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('موفقیت', 'گزارش نهایی تأیید شد'.tr);
         await fetchReports();
       } else {
-        Get.snackbar('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
       }
     } catch (e) {
-      Get.snackbar('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
     }
   }
 }
