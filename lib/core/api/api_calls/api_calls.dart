@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timesheet/core/api/api_service.dart';
-import 'package:timesheet/core/config/app_env.dart';
 import 'dart:convert';
 import '../../../model/daily_detail_model.dart';
 import '../../../model/draft_report_model.dart';
@@ -29,13 +28,10 @@ class ApiCalls {
     return _instance;
   }
 
-  late final String baseUrl;
-
-  ApiCalls._internal() {
-    baseUrl = AppEnv.apiBaseUrl;
-  }
+  ApiCalls._internal();
 
   final coreAPI = CoreApi();
+  String get baseUrl => coreAPI.baseUrl;
   final downloadsDirectory = getDownloadsDirectory();
   final applicationDocumentsDirectory = getApplicationDocumentsDirectory();
   final Map<String, String> defaultHeaders = {
