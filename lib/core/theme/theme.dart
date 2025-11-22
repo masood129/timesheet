@@ -49,8 +49,6 @@ final ColorScheme _lightColorScheme = ColorScheme.fromSeed(
   onSurfaceVariant: const Color(0xFF4A4A4A),
   outline: const Color(0xFFB0BEC5), // Blue Grey 200
   outlineVariant: const Color(0xFFCFD8DC), // Blue Grey 100
-  background: const Color(0xFFECEFF1), // Blue Grey 50 - رنگ پس‌زمینه اصلی اسکیم
-  onBackground: const Color(0xFF1A1A1A),
 );
 
 // --- Dark Theme ---
@@ -80,8 +78,6 @@ final ColorScheme _darkColorScheme = ColorScheme.fromSeed(
   onSurfaceVariant: const Color(0xFFA0A0A0),
   outline: const Color(0xFF546E7A), // Blue Grey 500
   outlineVariant: const Color(0xFF455A64), // Blue Grey 600
-  background: const Color(0xFF121212), // پس‌زمینه اصلی اسکیم برای تم تیره
-  onBackground: const Color(0xFFE0E0E0),
 );
 
 // --- Custom Colors Extension ---
@@ -144,7 +140,7 @@ ThemeData mainTheme = ThemeData(
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
   disabledColor: _applyOpacity(_lightColorScheme.outline, 0.7),
-  scaffoldBackgroundColor: _lightColorScheme.background,
+  scaffoldBackgroundColor: const Color(0xFFECEFF1), // Blue Grey 50
   appBarTheme: AppBarTheme(
     backgroundColor: _lightColorScheme.primary,
     foregroundColor: _lightColorScheme.onPrimary,
@@ -260,7 +256,7 @@ ThemeData darkTheme = ThemeData(
   colorScheme: _darkColorScheme,
   brightness: Brightness.dark,
   disabledColor: _applyOpacity(_darkColorScheme.outline, 0.7),
-  scaffoldBackgroundColor: _darkColorScheme.background,
+  scaffoldBackgroundColor: const Color(0xFF121212),
   appBarTheme: AppBarTheme(
     backgroundColor: _darkColorScheme.surface,
     foregroundColor: _darkColorScheme.onSurface,
