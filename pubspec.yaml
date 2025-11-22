@@ -104,6 +104,13 @@ flutter:
           weight: 700  # For bold
         - asset: assets/fonts/Roboto-Italic.ttf
           style: italic  # For italic
+    - family: Ubuntu
+      fonts:
+        - asset: assets/fonts/Ubuntu-Regular.ttf
+        - asset: assets/fonts/Ubuntu-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Ubuntu-Italic.ttf
+          style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - assets: fonts/TrajanPro.ttf
