@@ -1,4 +1,3 @@
-// manager_dashboard.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -17,15 +16,13 @@ class ManagerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('manager_dashboard'.tr),
-      ),
+      appBar: AppBar(title: Text('manager_dashboard'.tr)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Obx(
-                  () => DropdownButtonFormField<int>(
+              () => DropdownButtonFormField<int>(
                 value: reportController.selectedYear.value,
                 decoration: InputDecoration(
                   labelText: 'year'.tr,
@@ -34,21 +31,21 @@ class ManagerDashboard extends StatelessWidget {
                   ),
                 ),
                 items:
-                List.generate(5, (index) => Jalali.now().year - 2 + index)
-                    .map(
-                      (year) => DropdownMenuItem(
-                    value: year,
-                    child: Text(year.toString()),
-                  ),
-                )
-                    .toList(),
+                    List.generate(5, (index) => Jalali.now().year - 2 + index)
+                        .map(
+                          (year) => DropdownMenuItem(
+                            value: year,
+                            child: Text(year.toString()),
+                          ),
+                        )
+                        .toList(),
                 onChanged:
                     (value) => reportController.selectedYear.value = value!,
               ),
             ),
             const SizedBox(height: 16),
             Obx(
-                  () => DropdownButtonFormField<int>(
+              () => DropdownButtonFormField<int>(
                 value: reportController.selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
@@ -56,14 +53,15 @@ class ManagerDashboard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                items: List.generate(12, (index) => index + 1)
-                    .map(
-                      (month) => DropdownMenuItem(
-                    value: month,
-                    child: Text(Jalali(2023, month).formatter.mN),
-                  ),
-                )
-                    .toList(),
+                items:
+                    List.generate(12, (index) => index + 1)
+                        .map(
+                          (month) => DropdownMenuItem(
+                            value: month,
+                            child: Text(Jalali(2023, month).formatter.mN),
+                          ),
+                        )
+                        .toList(),
                 onChanged:
                     (value) => reportController.selectedMonth.value = value!,
               ),
@@ -76,7 +74,7 @@ class ManagerDashboard extends StatelessWidget {
             const SizedBox(height: 16),
             Expanded(
               child: Obx(
-                    () => ListView.builder(
+                () => ListView.builder(
                   itemCount: reportController.reports.length,
                   itemBuilder: (context, index) {
                     final report = reportController.reports[index];
@@ -99,26 +97,28 @@ class ManagerDashboard extends StatelessWidget {
                         onTap: () {
                           showDialog(
                             context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(
-                                  'جزئیات گزارش ${report.username ?? ''}'),
-                              content: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                height:
-                                MediaQuery.of(context).size.height * 0.6,
-                                child: SingleChildScrollView(
-                                  child: ReportDetailsCard(
-                                    report: report,
+                            builder:
+                                (context) => AlertDialog(
+                                  title: Text(
+                                    '${'report_details_title'.tr} ${report.username ?? ''}',
                                   ),
+                                  content: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    height:
+                                        MediaQuery.of(context).size.height *
+                                        0.6,
+                                    child: SingleChildScrollView(
+                                      child: ReportDetailsCard(report: report),
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('close'.tr),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text('بستن'.tr),
-                                ),
-                              ],
-                            ),
                           );
                         },
                       ),
@@ -156,16 +156,17 @@ class ManagerDashboard extends StatelessWidget {
             }
           }
         },
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 'to_general',
-            child: Text('submit_to_general_manager'.tr),
-          ),
-          PopupMenuItem(
-            value: 'to_finance',
-            child: Text('submit_to_finance'.tr),
-          ),
-        ],
+        itemBuilder:
+            (context) => [
+              PopupMenuItem(
+                value: 'to_general',
+                child: Text('submit_to_general_manager'.tr),
+              ),
+              PopupMenuItem(
+                value: 'to_finance',
+                child: Text('submit_to_finance'.tr),
+              ),
+            ],
       );
     } else if (role == 'general_manager' &&
         status == 'submitted_to_general_manager') {
@@ -199,23 +200,24 @@ class ManagerDashboard extends StatelessWidget {
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('enter_comment'.tr),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(labelText: 'comment'.tr),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('cancel'.tr),
+      builder:
+          (context) => AlertDialog(
+            title: Text('enter_comment'.tr),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(labelText: 'comment'.tr),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('cancel'.tr),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, controller.text),
+                child: Text('submit'.tr),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text('submit'.tr),
-          ),
-        ],
-      ),
     );
   }
 }

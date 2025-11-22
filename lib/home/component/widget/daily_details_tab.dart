@@ -51,7 +51,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
     return ListView(
       children: [
         Text(
-          'جزئیات روز'.tr,
+          'day_details'.tr,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -139,7 +139,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
         Obx(
           () => DropdownButtonFormField<LeaveType>(
             value: widget.controller.leaveType.value,
-            hint: Text('وضعیت روز'.tr, style: TextStyle(color: disabledColor)),
+            hint: Text('leave_type'.tr, style: TextStyle(color: disabledColor)),
             decoration: AppStyles.inputDecoration(
               context,
               'leave_type',
@@ -184,7 +184,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
             children: [
               Expanded(
                 child: Tooltip(
-                  message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                  message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
                   child: TextField(
                     controller: widget.controller.goCostController,
                     keyboardType: TextInputType.number,
@@ -206,7 +206,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
               const SizedBox(width: 10),
               Expanded(
                 child: Tooltip(
-                  message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                  message: isEnabled ? '' : 'disabled_for_non_working_leave'.tr,
                   child: TextField(
                     controller: widget.controller.returnCostController,
                     keyboardType: TextInputType.number,

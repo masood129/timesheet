@@ -35,19 +35,22 @@ class FailLogin extends StatelessWidget {
                       size: 64,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "ورود ناموفق!",
-                      style: TextStyle(
+                    Text(
+                      'login_failed'.tr,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      "پارامتر ورود معتبر پیدا نشد.\nلطفاً دوباره تلاش کنید.",
+                    Text(
+                      'login_failed_message'.tr,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
@@ -55,7 +58,7 @@ class FailLogin extends StatelessWidget {
                         Get.offAllNamed('/login');
                       },
                       icon: const Icon(Icons.refresh),
-                      label: const Text("تلاش مجدد"),
+                      label: Text('retry'.tr),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         shape: RoundedRectangleBorder(

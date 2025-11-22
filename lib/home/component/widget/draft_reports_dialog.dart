@@ -1,4 +1,3 @@
-// draft_reports_dialog.dart (بدون تغییر)
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -9,9 +8,9 @@ import '../../controller/home_controller.dart';
 import '../../../core/theme/snackbar_helper.dart';
 
 void showDraftReportsDialog(
-    BuildContext context,
-    HomeController homeController,
-    ) {
+  BuildContext context,
+  HomeController homeController,
+) {
   final currentYear = Jalali.now().year;
 
   // محاسبه maxHeight و maxWidth خارج از Obx برای جلوگیری از مشکلات timing در layout
@@ -65,7 +64,7 @@ void showDraftReportsDialog(
     if (availableMonths.isNotEmpty) {
       selectedMonth.value = availableMonths.first;
       final draft = allDrafts.firstWhereOrNull(
-            (draft) => draft.jalaliMonth == selectedMonth.value,
+        (draft) => draft.jalaliMonth == selectedMonth.value,
       );
       if (draft != null) {
         selectedReportId.value = draft.reportId;
@@ -86,18 +85,18 @@ void showDraftReportsDialog(
         children: [
           Icon(Icons.description, color: Colors.blue),
           const SizedBox(width: 8),
-          Text('مدیریت پیش‌نویس گزارش ماهانه'.tr, textAlign: TextAlign.center),
+          Text('manage_monthly_report_draft'.tr, textAlign: TextAlign.center),
         ],
       ),
       content: Obx(() {
         if (availableMonths.isEmpty) {
-          return const Card(
+          return Card(
             color: Colors.orange,
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Text(
-                'هیچ پیش‌نویسی یافت نشد.',
-                style: TextStyle(color: Colors.white),
+                'no_drafts_found'.tr,
+                style: const TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -121,12 +120,12 @@ void showDraftReportsDialog(
                     selectedMonth,
                     availableMonths,
                     monthNames,
-                        (newMonth) {
+                    (newMonth) {
                       if (newMonth != null) {
                         selectedMonth.value = newMonth;
                         // به‌روزرسانی reportId و جزئیات بر اساس ماه انتخاب‌شده با استفاده از allDrafts
                         final draft = allDrafts.firstWhereOrNull(
-                              (draft) => draft.jalaliMonth == newMonth,
+                          (draft) => draft.jalaliMonth == newMonth,
                         );
                         if (draft != null) {
                           selectedReportId.value = draft.reportId;
@@ -154,45 +153,45 @@ void showDraftReportsDialog(
         // دکمه لغو (رنگی قرمز برای برجستگی)
         TextButton(
           onPressed: () => Get.back(),
-          child: Text('لغو'.tr, style: const TextStyle(color: Colors.red)),
+          child: Text('cancel'.tr, style: const TextStyle(color: Colors.red)),
         ),
         // دکمه ارسال به مدیر (غیرفعال اگر انتخابی نباشد)
         Obx(
-              () => ElevatedButton.icon(
+          () => ElevatedButton.icon(
             onPressed:
-            availableMonths.isEmpty || selectedReportId.value == null
-                ? null
-                : () async {
-              Get.back(); // بستن دیالوگ
-              await homeController.submitDraftToManager(
-                selectedReportId.value!,
-              );
-              ThemedSnackbar.showSuccess(
-                'موفقیت',
-                'پیش‌نویس با موفقیت به مدیر گروه ارسال شد.',
-              );
-            },
+                availableMonths.isEmpty || selectedReportId.value == null
+                    ? null
+                    : () async {
+                      Get.back(); // بستن دیالوگ
+                      await homeController.submitDraftToManager(
+                        selectedReportId.value!,
+                      );
+                      ThemedSnackbar.showSuccess(
+                        'success'.tr,
+                        'draft_submitted_success'.tr,
+                      );
+                    },
             icon: const Icon(Icons.send),
-            label: Text('ارسال به مدیر گروه'.tr),
+            label: Text('submit_to_group_manager'.tr),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
           ),
         ),
         // دکمه حذف پیش‌نویس (غیرفعال اگر انتخابی نباشد)
         Obx(
-              () => ElevatedButton.icon(
+          () => ElevatedButton.icon(
             onPressed:
-            availableMonths.isEmpty || selectedReportId.value == null
-                ? null
-                : () async {
-              Get.back(); // بستن دیالوگ
-              await homeController.exitDraft(selectedReportId.value!);
-              ThemedSnackbar.showWarning(
-                'موفقیت',
-                'پیش‌نویس با موفقیت حذف شد.',
-              );
-            },
+                availableMonths.isEmpty || selectedReportId.value == null
+                    ? null
+                    : () async {
+                      Get.back(); // بستن دیالوگ
+                      await homeController.exitDraft(selectedReportId.value!);
+                      ThemedSnackbar.showWarning(
+                        'success'.tr,
+                        'draft_deleted_success'.tr,
+                      );
+                    },
             icon: const Icon(Icons.delete),
-            label: Text('حذف پیش‌نویس'.tr),
+            label: Text('delete_draft'.tr),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
           ),
         ),
@@ -211,9 +210,9 @@ Widget _buildYearCard(int currentYear) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'سال',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          Text(
+            'year'.tr,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -234,11 +233,11 @@ Widget _buildYearCard(int currentYear) {
 
 /// دراپ‌داون انتخاب ماه با استایل زیبا
 Widget _buildMonthDropdown(
-    Rx<int?> selectedMonth,
-    RxList<int> availableMonths,
-    List<String> monthNames,
-    Function(int?) onChanged,
-    ) {
+  Rx<int?> selectedMonth,
+  RxList<int> availableMonths,
+  List<String> monthNames,
+  Function(int?) onChanged,
+) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -247,7 +246,7 @@ Widget _buildMonthDropdown(
       child: DropdownButtonFormField<int>(
         value: selectedMonth.value,
         decoration: InputDecoration(
-          labelText: 'انتخاب ماه',
+          labelText: 'select_month'.tr,
           labelStyle: const TextStyle(fontWeight: FontWeight.w500),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -262,12 +261,13 @@ Widget _buildMonthDropdown(
             borderSide: const BorderSide(color: Colors.blue, width: 2),
           ),
         ),
-        items: availableMonths.map((month) {
-          return DropdownMenuItem(
-            value: month,
-            child: Text(monthNames[month - 1]),
-          );
-        }).toList(),
+        items:
+            availableMonths.map((month) {
+              return DropdownMenuItem(
+                value: month,
+                child: Text(monthNames[month - 1]),
+              );
+            }).toList(),
         onChanged: onChanged,
       ),
     ),

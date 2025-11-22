@@ -1,13 +1,12 @@
-// report_details_template.dart (بدون تغییر)
 import 'package:flutter/material.dart';
-import 'package:shamsi_date/shamsi_date.dart';
+import 'package:get/get.dart';
 
 import '../../../model/draft_report_model.dart';
 import '../../../model/leavetype_model.dart';
 
 // تابع کمکی برای فرمت کردن دقیقه به HH:MM
 String formatMinutesToHHMM(int? minutes) {
-  if (minutes == null || minutes < 0) return 'نامشخص';
+  if (minutes == null || minutes < 0) return 'unknown'.tr;
   int hours = minutes ~/ 60;
   int mins = minutes % 60;
   return '${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}';
@@ -15,28 +14,28 @@ String formatMinutesToHHMM(int? minutes) {
 
 // تابع کمکی برای فرمت کردن هزینه به صورت سه‌تایی با کاما
 String formatCurrency(int? amount) {
-  if (amount == null || amount < 0) return 'نامشخص';
+  if (amount == null || amount < 0) return 'unknown'.tr;
   return amount.toString().replaceAllMapped(
     RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (Match m) => '${m[1]},',
+    (Match m) => '${m[1]},',
   );
 }
 
 class ReportDetailsCard extends StatelessWidget {
   final DraftReportModel report;
   final List<String> monthNames = [
-    'فروردین',
-    'اردیبهشت',
-    'خرداد',
-    'تیر',
-    'مرداد',
-    'شهریور',
-    'مهر',
-    'آبان',
-    'آذر',
-    'دی',
-    'بهمن',
-    'اسفند',
+    'month_1'.tr,
+    'month_2'.tr,
+    'month_3'.tr,
+    'month_4'.tr,
+    'month_5'.tr,
+    'month_6'.tr,
+    'month_7'.tr,
+    'month_8'.tr,
+    'month_9'.tr,
+    'month_10'.tr,
+    'month_11'.tr,
+    'month_12'.tr,
   ];
 
   ReportDetailsCard({super.key, required this.report});
@@ -55,9 +54,12 @@ class ReportDetailsCard extends StatelessWidget {
               children: [
                 const Icon(Icons.info_outline, color: Colors.blue),
                 const SizedBox(width: 8),
-                const Text(
-                  'جزئیات گزارش',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                Text(
+                  'report_details_title'.tr,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ],
             ),
@@ -65,27 +67,30 @@ class ReportDetailsCard extends StatelessWidget {
             const Divider(color: Colors.grey),
             const SizedBox(height: 8),
             // ردیف‌های ساده جزئیات
-            _buildDetailRow('سال', '${report.jalaliYear ?? 'نامشخص'}'),
-            _buildDetailRow('ماه', monthNames[(report.jalaliMonth ?? 1) - 1]),
+            _buildDetailRow('year'.tr, '${report.jalaliYear ?? 'unknown'.tr}'),
             _buildDetailRow(
-              'جمع ساعت کاری کل',
+              'month'.tr,
+              monthNames[(report.jalaliMonth ?? 1) - 1],
+            ),
+            _buildDetailRow(
+              'total_working_hours'.tr,
               formatMinutesToHHMM(report.totalHours),
             ),
             _buildDetailRow(
-              'هزینه باشگاه',
-              '${formatCurrency(report.gymCost)} تومان',
+              'gym_cost'.tr,
+              '${formatCurrency(report.gymCost)} ${'toman'.tr}', // Assuming 'toman' key exists or just hardcode if not
             ),
             _buildDetailRow(
-              'هزینه رفت و آمد به شرکت',
-              '${formatCurrency(report.totalCommuteCost)} تومان',
+              'commute_cost'.tr,
+              '${formatCurrency(report.totalCommuteCost)} ${'toman'.tr}',
             ),
             _buildDetailRow(
-              'گروه مربوطه',
-              '${report.groupName ?? report.groupId?.toString() ?? 'نامشخص'}',
+              'group'.tr,
+              '${report.groupName ?? report.groupId?.toString() ?? 'unknown'.tr}',
             ),
             _buildDetailRow(
-              'سرگروه مربوطه',
-              '${report.managerUsername ?? 'نامشخص'}',
+              'manager'.tr,
+              '${report.managerUsername ?? 'unknown'.tr}',
             ),
             const SizedBox(height: 16),
             // بخش لیست ساعت‌های پروژه
@@ -139,15 +144,15 @@ class ReportDetailsCard extends StatelessWidget {
           children: [
             const Icon(Icons.access_time, color: Colors.green, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'ساعت صرف‌شده به تفکیک هر پروژه',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            Text(
+              'project_hours_breakdown'.tr,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
           ],
         ),
         const SizedBox(height: 8),
         if (hours.isEmpty)
-          _buildDetailRow('ساعت صرف‌شده به تفکیک هر پروژه', 'هیچ ساعتی ثبت نشده')
+          _buildDetailRow('project_hours_breakdown'.tr, 'no_hours_recorded'.tr)
         else
           Container(
             height: 120,
@@ -161,11 +166,14 @@ class ReportDetailsCard extends StatelessWidget {
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final hour = hours[index];
-                final projectId = hour.projectId?.toString() ?? 'نامشخص';
+                final projectId = hour.projectId?.toString() ?? 'unknown'.tr;
                 final totalHours = formatMinutesToHHMM(hour.totalHours);
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text('پروژه $projectId'), Text('$totalHours')],
+                  children: [
+                    Text('${'project'.tr} $projectId'),
+                    Text(totalHours),
+                  ],
                 );
               },
             ),
@@ -183,17 +191,17 @@ class ReportDetailsCard extends StatelessWidget {
           children: [
             const Icon(Icons.local_gas_station, color: Colors.orange, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'هزینه ماشین شخصی به تفکیک هر پروژه',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            Text(
+              'personal_car_cost_breakdown'.tr,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
           ],
         ),
         const SizedBox(height: 8),
         if (costs.isEmpty)
           _buildDetailRow(
-            'هزینه ماشین شخصی به تفکیک هر پروژه',
-            'هیچ هزینه‌ای ثبت نشده',
+            'personal_car_cost_breakdown'.tr,
+            'no_cost_recorded'.tr,
           )
         else
           Container(
@@ -208,11 +216,14 @@ class ReportDetailsCard extends StatelessWidget {
               separatorBuilder: (context, index) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final cost = costs[index];
-                final projectId = cost.projectId?.toString() ?? 'نامشخص';
+                final projectId = cost.projectId?.toString() ?? 'unknown'.tr;
                 final costAmount = formatCurrency(cost.cost);
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text('پروژه $projectId'), Text('$costAmount تومان')],
+                  children: [
+                    Text('${'project'.tr} $projectId'),
+                    Text('$costAmount ${'toman'.tr}'),
+                  ],
                 );
               },
             ),
@@ -231,15 +242,15 @@ class ReportDetailsCard extends StatelessWidget {
           children: [
             const Icon(Icons.event_busy, color: Colors.purple, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'نوع و تعداد مرخصی‌ها',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            Text(
+              'leave_types_count'.tr,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
             ),
           ],
         ),
         const SizedBox(height: 8),
         if (leaveEntries.isEmpty)
-          _buildDetailRow('نوع و تعداد مرخصی‌ها', 'هیچ مرخصی‌ای ثبت نشده')
+          _buildDetailRow('leave_types_count'.tr, 'no_leave_recorded'.tr)
         else
           Container(
             height: 120,
@@ -257,7 +268,7 @@ class ReportDetailsCard extends StatelessWidget {
                 final count = entry.value.toString();
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text(leaveType), Text('$count روز')],
+                  children: [Text(leaveType), Text('$count ${'day'.tr}')],
                 );
               },
             ),

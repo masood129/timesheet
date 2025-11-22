@@ -37,15 +37,23 @@ class LoginView extends StatelessWidget {
                     Get.offAllNamed('/home');
                   }
                 } else {
-                  ThemedSnackbar.showError('خطا', 'لطفاً نام کاربری را وارد کنید'.tr);
+                  ThemedSnackbar.showError('error'.tr, 'enter_username'.tr);
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 24,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              child: Text('login'.tr, style: TextStyle(color: colorScheme.onPrimary)),
+              child: Text(
+                'login'.tr,
+                style: TextStyle(color: colorScheme.onPrimary),
+              ),
             ),
           ],
         ),

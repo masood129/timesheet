@@ -77,7 +77,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.fitness_center, color: colorScheme.primary),
             title: Text(
-              'هزینه ورزش ماهیانه'.tr,
+              'monthly_gym_cost'.tr,
               style: TextStyle(color: colorScheme.onSurface),
             ),
             onTap: () {
@@ -89,7 +89,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.send_to_mobile, color: colorScheme.primary),
             title: Text(
-              'ذخیره پیش نویس ساعات ماهانه',
+              'save_monthly_hours_draft'.tr,
               style: TextStyle(color: colorScheme.onSurface),
             ),
             onTap: () {
@@ -104,7 +104,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.drafts, color: colorScheme.primary),
             title: Text(
-              'مدیریت پیش‌نویس‌ها'.tr,
+              'manage_drafts'.tr,
               style: TextStyle(color: colorScheme.onSurface),
             ),
             onTap: () {
@@ -147,7 +147,7 @@ class MainDrawer extends StatelessWidget {
                     ? ListTile(
                       leading: Icon(Icons.people, color: colorScheme.primary),
                       title: Text(
-                        'لیست کاربران'.tr,
+                        'user_list'.tr,
                         style: TextStyle(color: colorScheme.onSurface),
                       ),
                       onTap: () {

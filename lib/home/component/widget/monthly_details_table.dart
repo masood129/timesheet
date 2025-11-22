@@ -29,13 +29,20 @@ class MonthlyDetailsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final projectList =
-    projects.isEmpty ? ['no_project'.tr] : projects.map((p) => p.projectName).toList();
+        projects.isEmpty
+            ? ['no_project'.tr]
+            : projects.map((p) => p.projectName).toList();
     final homeController = Get.find<HomeController>();
 
     // Calculate column widths dynamically
     final totalWidth = MediaQuery.of(context).size.width;
     const fixedColumnWidth = 80.0; // Fixed width for standard columns
-    final projectColumnWidth = (totalWidth - (5 * fixedColumnWidth)) / projectList.length.clamp(1, double.infinity); // Dynamic width for project columns
+    final projectColumnWidth =
+        (totalWidth - (5 * fixedColumnWidth)) /
+        projectList.length.clamp(
+          1,
+          double.infinity,
+        ); // Dynamic width for project columns
 
     return Container(
       margin: const EdgeInsets.all(8.0),
@@ -57,9 +64,7 @@ class MonthlyDetailsTable extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const AlwaysScrollableScrollPhysics(),
             child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minWidth: totalWidth,
-              ),
+              constraints: BoxConstraints(minWidth: totalWidth),
               child: DataTable(
                 columnSpacing: 10,
                 headingRowHeight: 40,
@@ -94,7 +99,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     label: SizedBox(
                       width: fixedColumnWidth,
                       child: Text(
-                        'تاریخ'.tr,
+                        'date'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -108,7 +113,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     label: SizedBox(
                       width: fixedColumnWidth,
                       child: Text(
-                        'نوع مرخصی'.tr,
+                        'leave_type'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -122,7 +127,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     label: SizedBox(
                       width: fixedColumnWidth,
                       child: Text(
-                        'زمان ورود'.tr,
+                        'arrival_time'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -136,7 +141,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     label: SizedBox(
                       width: fixedColumnWidth,
                       child: Text(
-                        'زمان خروج'.tr,
+                        'leave_time'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -150,7 +155,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     label: SizedBox(
                       width: fixedColumnWidth,
                       child: Text(
-                        'زمان شخصی'.tr,
+                        'personal_time'.tr,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -161,7 +166,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                     ),
                   ),
                   ...projectList.map(
-                        (project) => DataColumn(
+                    (project) => DataColumn(
                       label: SizedBox(
                         width: projectColumnWidth,
                         child: Container(
@@ -202,9 +207,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: totalWidth,
-                  ),
+                  constraints: BoxConstraints(minWidth: totalWidth),
                   child: DataTable(
                     columnSpacing: 10,
                     dataRowHeight: 40,
@@ -228,23 +231,13 @@ class MonthlyDetailsTable extends StatelessWidget {
                       color: colorScheme.onSurface,
                     ),
                     columns: [
-                      DataColumn(
-                        label: SizedBox(width: fixedColumnWidth),
-                      ),
-                      DataColumn(
-                        label: SizedBox(width: fixedColumnWidth),
-                      ),
-                      DataColumn(
-                        label: SizedBox(width: fixedColumnWidth),
-                      ),
-                      DataColumn(
-                        label: SizedBox(width: fixedColumnWidth),
-                      ),
-                      DataColumn(
-                        label: SizedBox(width: fixedColumnWidth),
-                      ),
+                      DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                      DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                      DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                      DataColumn(label: SizedBox(width: fixedColumnWidth)),
+                      DataColumn(label: SizedBox(width: fixedColumnWidth)),
                       ...projectList.map(
-                            (_) => DataColumn(
+                        (_) => DataColumn(
                           label: SizedBox(width: projectColumnWidth),
                         ),
                       ),
@@ -260,7 +253,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                       final formattedDate =
                           '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
                       final detail = dailyDetails.firstWhereOrNull(
-                            (d) => d.date == formattedDate,
+                        (d) => d.date == formattedDate,
                       );
 
                       final projectDurations = List<String>.filled(
@@ -271,7 +264,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                       if (detail != null) {
                         for (var task in detail.tasks) {
                           final projectIndex = projects.indexWhere(
-                                (p) => p.id == task.projectId,
+                            (p) => p.id == task.projectId,
                           );
                           if (projectIndex != -1) {
                             projectDurations[projectIndex] = _formatDuration(
@@ -343,7 +336,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                             ),
                           ),
                           ...projectDurations.map(
-                                (duration) => DataCell(
+                            (duration) => DataCell(
                               SizedBox(
                                 width: projectColumnWidth,
                                 child: Text(

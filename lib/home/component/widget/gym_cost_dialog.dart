@@ -18,18 +18,18 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
   // تغییر: فقط ماه‌های جاری و قبلی را نمایش دهید
   final months = List.generate(currentMonth, (index) => index + 1);
   final monthNames = [
-    'فروردین',
-    'اردیبهشت',
-    'خرداد',
-    'تیر',
-    'مرداد',
-    'شهریور',
-    'مهر',
-    'آبان',
-    'آذر',
-    'دی',
-    'بهمن',
-    'اسفند',
+    'month_1'.tr,
+    'month_2'.tr,
+    'month_3'.tr,
+    'month_4'.tr,
+    'month_5'.tr,
+    'month_6'.tr,
+    'month_7'.tr,
+    'month_8'.tr,
+    'month_9'.tr,
+    'month_10'.tr,
+    'month_11'.tr,
+    'month_12'.tr,
   ];
 
   final numberFormatter = NumberFormat(
@@ -40,7 +40,10 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('ثبت هزینه ورزش ماهیانه'.tr, textAlign: TextAlign.center),
+        title: Text(
+          'register_monthly_gym_cost'.tr,
+          textAlign: TextAlign.center,
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -55,7 +58,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'سال'.tr,
+                        'year'.tr,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -71,17 +74,18 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               DropdownButtonFormField<int>(
                 value: currentMonth,
                 decoration: InputDecoration(
-                  labelText: 'ماه'.tr,
+                  labelText: 'month'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: months.map((month) {
-                  return DropdownMenuItem(
-                    value: month,
-                    child: Text(monthNames[month - 1]),
-                  );
-                }).toList(),
+                items:
+                    months.map((month) {
+                      return DropdownMenuItem(
+                        value: month,
+                        child: Text(monthNames[month - 1]),
+                      );
+                    }).toList(),
                 onChanged: (value) {
                   if (value != null) {
                     monthController.text = value.toString();
@@ -92,11 +96,11 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               TextField(
                 controller: costController,
                 decoration: InputDecoration(
-                  labelText: 'هزینه (تومان)'.tr,
+                  labelText: 'cost_toman'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  hintText: 'حداکثر هزینه ورزش 800 هزارتومان',
+                  hintText: 'gym_cost_hint'.tr,
                   suffixIcon: Icon(Icons.money),
                 ),
                 keyboardType: TextInputType.number,
@@ -132,7 +136,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               TextField(
                 controller: hourController,
                 decoration: InputDecoration(
-                  labelText: 'ساعت'.tr,
+                  labelText: 'hour'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -148,14 +152,14 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('لغو'.tr, style: TextStyle(color: Colors.red)),
+            child: Text('cancel'.tr, style: TextStyle(color: Colors.red)),
           ),
           ElevatedButton(
             onPressed: () async {
               if (monthController.text.isEmpty ||
                   costController.text.isEmpty ||
-                  hourController.text.isEmpty ) {
-                ThemedSnackbar.showError('خطا', 'لطفاً همه فیلدها را پر کنید'.tr);
+                  hourController.text.isEmpty) {
+                ThemedSnackbar.showError('error'.tr, 'fill_all_fields'.tr);
                 return;
               }
               try {
@@ -167,13 +171,16 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   int.parse(cleanCost),
                   int.parse(hourController.text),
                 );
-                ThemedSnackbar.showSuccess('موفقیت', 'هزینه ورزش ثبت شد'.tr);
+                ThemedSnackbar.showSuccess('success'.tr, 'gym_cost_saved'.tr);
                 Navigator.pop(context);
               } catch (e) {
-                ThemedSnackbar.showError('خطا', 'خطا در ثبت هزینه: $e'.tr);
+                ThemedSnackbar.showError(
+                  'error'.tr,
+                  '${'save_cost_error'.tr}: $e',
+                );
               }
             },
-            child: Text('ثبت'.tr),
+            child: Text('submit'.tr),
           ),
         ],
       );

@@ -5,9 +5,9 @@ import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
 
 void showMonthlyReportDialog(
-    BuildContext context,
-    HomeController homeController,
-    ) {
+  BuildContext context,
+  HomeController homeController,
+) {
   final currentYear = Jalali.now().year;
   final currentMonth = Jalali.now().month;
 
@@ -33,7 +33,7 @@ void showMonthlyReportDialog(
 
   Get.dialog(
     AlertDialog(
-      title: Text('پیش نویس گزارش ماهانه'.tr, textAlign: TextAlign.center),
+      title: Text('monthly_report_draft'.tr, textAlign: TextAlign.center),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -62,7 +62,7 @@ void showMonthlyReportDialog(
             const SizedBox(height: 16),
             // انتخاب ماه با نام‌های شمسی و محدود به ماه جاری
             Obx(
-                  () => DropdownButtonFormField<int>(
+              () => DropdownButtonFormField<int>(
                 value: selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'ماه'.tr,
@@ -70,12 +70,13 @@ void showMonthlyReportDialog(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: months.map((month) {
-                  return DropdownMenuItem(
-                    value: month,
-                    child: Text(monthNames[month - 1]),
-                  );
-                }).toList(),
+                items:
+                    months.map((month) {
+                      return DropdownMenuItem(
+                        value: month,
+                        child: Text(monthNames[month - 1]),
+                      );
+                    }).toList(),
                 onChanged: (newMonth) {
                   if (newMonth != null) {
                     selectedMonth.value = newMonth;
@@ -100,7 +101,7 @@ void showMonthlyReportDialog(
               selectedMonth.value,
             );
           },
-          child: Text('بله، ارسال کن'.tr),
+          child: Text('yes_submit'.tr),
         ),
       ],
     ),

@@ -36,18 +36,18 @@ class ManagerController extends GetxController {
       if (response.isNotEmpty) {
         reports.value = response;
       } else {
-        ThemedSnackbar.showError('خطا', 'خطا در دریافت گزارش‌ها: '.tr);
+        ThemedSnackbar.showError('error'.tr, '${'fetch_reports_error'.tr}: ');
       }
     } catch (e) {
-      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('error'.tr, '${'server_error'.tr}: $e');
     }
   }
 
   Future<void> approveGroupManager(
-      int reportId,
-      String comment,
-      bool toGeneralManager,
-      ) async {
+    int reportId,
+    String comment,
+    bool toGeneralManager,
+  ) async {
     try {
       final response = await homeApi.approveReportAsGroupManager(
         reportId,
@@ -55,13 +55,13 @@ class ManagerController extends GetxController {
         toGeneralManager,
       );
       if (response.isNotEmpty) {
-        ThemedSnackbar.showSuccess('موفقیت', 'گزارش تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('success'.tr, 'report_approved'.tr);
         await fetchReports();
       } else {
-        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('error'.tr, '${'approve_report_error'.tr}: ');
       }
     } catch (e) {
-      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('error'.tr, '${'server_error'.tr}: $e');
     }
   }
 
@@ -72,13 +72,13 @@ class ManagerController extends GetxController {
         comment,
       );
       if (response.isNotEmpty) {
-        ThemedSnackbar.showSuccess('موفقیت', 'گزارش تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('success'.tr, 'report_approved'.tr);
         await fetchReports();
       } else {
-        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('error'.tr, '${'approve_report_error'.tr}: ');
       }
     } catch (e) {
-      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('error'.tr, '${'server_error'.tr}: $e');
     }
   }
 
@@ -86,13 +86,13 @@ class ManagerController extends GetxController {
     try {
       final response = await homeApi.approveReportAsFinance(reportId, comment);
       if (response.isNotEmpty) {
-        ThemedSnackbar.showSuccess('موفقیت', 'گزارش نهایی تأیید شد'.tr);
+        ThemedSnackbar.showSuccess('success'.tr, 'final_report_approved'.tr);
         await fetchReports();
       } else {
-        ThemedSnackbar.showError('خطا', 'خطا در تأیید گزارش: '.tr);
+        ThemedSnackbar.showError('error'.tr, '${'approve_report_error'.tr}: ');
       }
     } catch (e) {
-      ThemedSnackbar.showError('خطا', 'خطای سرور: $e'.tr);
+      ThemedSnackbar.showError('error'.tr, '${'server_error'.tr}: $e');
     }
   }
 }

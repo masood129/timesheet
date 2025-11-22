@@ -16,13 +16,23 @@ class TasksTab extends StatelessWidget {
 
     return ListView(
       children: [
-        Text('تسک‌ها'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary)),
+        Text(
+          'task'.tr,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: colorScheme.primary,
+          ),
+        ),
         const SizedBox(height: 8),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Column(
+          final isEnabled =
+              controller.leaveType.value == LeaveType.work ||
+              controller.leaveType.value == LeaveType.mission;
+          return Column(
             children: List.generate(
               controller.selectedProjects.length,
-                  (i) => TaskRow(
+              (i) => TaskRow(
                 index: i,
                 controller: controller,
                 isEnabled: isEnabled,
@@ -33,12 +43,23 @@ class TasksTab extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Align(
+          final isEnabled =
+              controller.leaveType.value == LeaveType.work ||
+              controller.leaveType.value == LeaveType.mission;
+          return Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: isEnabled ? controller.addTaskRow : null,
-              icon: Icon(Icons.add, color: isEnabled ? colorScheme.primary : disabledColor),
-              label: Text('اضافه کردن وظیفه'.tr, style: TextStyle(color: isEnabled ? colorScheme.primary : disabledColor)),
+              icon: Icon(
+                Icons.add,
+                color: isEnabled ? colorScheme.primary : disabledColor,
+              ),
+              label: Text(
+                'add_task_button_label'.tr,
+                style: TextStyle(
+                  color: isEnabled ? colorScheme.primary : disabledColor,
+                ),
+              ),
             ),
           );
         }),

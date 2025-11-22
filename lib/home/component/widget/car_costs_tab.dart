@@ -16,13 +16,23 @@ class CarCostsTab extends StatelessWidget {
 
     return ListView(
       children: [
-        Text('هزینه‌های ماشین شخصی'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary)),
+        Text(
+          'personal_car_costs'.tr,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: colorScheme.primary,
+          ),
+        ),
         const SizedBox(height: 8),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Column(
+          final isEnabled =
+              controller.leaveType.value == LeaveType.work ||
+              controller.leaveType.value == LeaveType.mission;
+          return Column(
             children: List.generate(
               controller.selectedCarCostProjects.length,
-                  (i) => CarCostRow(
+              (i) => CarCostRow(
                 index: i,
                 controller: controller,
                 isEnabled: isEnabled,
@@ -33,12 +43,23 @@ class CarCostsTab extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isEnabled = controller.leaveType.value == LeaveType.work || controller.leaveType.value == LeaveType.mission;          return Align(
+          final isEnabled =
+              controller.leaveType.value == LeaveType.work ||
+              controller.leaveType.value == LeaveType.mission;
+          return Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: isEnabled ? controller.addCarCostRow : null,
-              icon: Icon(Icons.add, color: isEnabled ? colorScheme.primary : disabledColor),
-              label: Text('اضافه کردن هزینه ماشین'.tr, style: TextStyle(color: isEnabled ? colorScheme.primary : disabledColor)),
+              icon: Icon(
+                Icons.add,
+                color: isEnabled ? colorScheme.primary : disabledColor,
+              ),
+              label: Text(
+                'add_car_cost'.tr,
+                style: TextStyle(
+                  color: isEnabled ? colorScheme.primary : disabledColor,
+                ),
+              ),
             ),
           );
         }),

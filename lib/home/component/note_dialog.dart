@@ -53,9 +53,9 @@ class NoteDialog extends StatelessWidget {
                       unselectedLabelColor: Theme.of(context).disabledColor,
                       indicatorColor: colorScheme.primary,
                       tabs: [
-                        Tab(text: 'جزئیات روز'.tr),
-                        Tab(text: 'تسک‌ها'.tr),
-                        Tab(text: 'هزینه‌های ماشین شخصی'.tr),
+                        Tab(text: 'day_details'.tr),
+                        Tab(text: 'task'.tr),
+                        Tab(text: 'personal_car_costs'.tr),
                       ],
                     ),
                     Expanded(
@@ -85,7 +85,7 @@ class NoteDialog extends StatelessWidget {
                       size: 24,
                     ),
                     label: Text(
-                      'ذخیره'.tr,
+                      'save'.tr,
                       style: TextStyle(
                         color: colorScheme.onPrimary,
                         fontSize: 16,
