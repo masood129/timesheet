@@ -12,6 +12,7 @@ import '../../../model/monthly_report_model.dart';
 import '../../../model/monthly_table_model.dart';
 import '../../../model/project_model.dart';
 import '../../../model/user_model.dart';
+import '../../../data/models/month_period_model.dart';
 
 part 'api_call_auth.dart';
 part 'api_call_gym_cost.dart';
@@ -22,6 +23,7 @@ part 'api_call_monthly_reports.dart';
 part 'api_call_drafts.dart';
 part 'api_call_users.dart';
 part 'api_call_table_export.dart';
+part 'api_call_month_periods.dart';
 
 class ApiCalls {
   static final ApiCalls _instance = ApiCalls._internal();
@@ -52,6 +54,7 @@ class ApiCalls {
       return null;
     }
   }
+
   final Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'accept': 'application/json',

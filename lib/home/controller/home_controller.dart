@@ -9,6 +9,7 @@ import '../../core/theme/snackbar_helper.dart';
 import '../../model/daily_detail_model.dart';
 import '../../model/draft_report_model.dart';
 import '../../model/leavetype_model.dart';
+import '../../data/models/month_period_model.dart';
 import '../component/note_dialog.dart';
 import '../controller/task_controller.dart';
 
@@ -26,8 +27,15 @@ class HomeController extends GetxController {
   List<DraftReportModel> drafts =
       <DraftReportModel>[].obs; // لیست drafts (json objects)
 
-  int get daysInMonth =>
-      calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+  // Month period settings
+  MonthPeriodModel? currentMonthPeriod;
+
+  int get daysInMonth {
+    if (currentMonthPeriod != null) {
+      return currentMonthPeriod!.calculateDaysInPeriod(currentYear.value);
+    }
+    return calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+  }
 
   @override
   void onInit() {
@@ -141,11 +149,26 @@ class HomeController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await loadHolidays();
+        await _fetchCurrentMonthPeriod();
         await fetchMonthlyDetails();
       } finally {
         FlutterNativeSplash.remove();
       }
     });
+  }
+
+  /// دریافت بازه ماه جاری
+  Future<void> _fetchCurrentMonthPeriod() async {
+    try {
+      currentMonthPeriod = await ApiCalls().getMonthPeriod(
+        currentYear.value,
+        currentMonth.value,
+      );
+      update();
+    } catch (e) {
+      // در صورت خطا، از مقدار پیش‌فرض استفاده می‌شود
+      currentMonthPeriod = null;
+    }
   }
 
   Future<void> loadHolidays() async {
@@ -200,6 +223,7 @@ class HomeController extends GetxController {
     } else {
       currentMonth.value += 1;
     }
+    _fetchCurrentMonthPeriod();
     fetchMonthlyDetails();
   }
 
@@ -210,6 +234,7 @@ class HomeController extends GetxController {
     } else {
       currentMonth.value -= 1;
     }
+    _fetchCurrentMonthPeriod();
     fetchMonthlyDetails();
   }
 
@@ -331,7 +356,9 @@ class HomeController extends GetxController {
       return 'بدون عملکرد';
     }
 
-    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
+    if (detail.leaveType != LeaveType.work &&
+        detail.leaveType != LeaveType.mission) {
+      // تغییر به enum
       return detail.leaveType?.displayName ??
           'بدون عملکرد'; // استفاده از displayName برای نمایش
     }
@@ -379,7 +406,9 @@ class HomeController extends GetxController {
       return 'بدون اطلاعات';
     }
 
-    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
+    if (detail.leaveType != LeaveType.work &&
+        detail.leaveType != LeaveType.mission) {
+      // تغییر به enum
       return detail.leaveType?.displayName ??
           'بدون اطلاعات'; // استفاده از displayName
     }
@@ -459,7 +488,9 @@ class HomeController extends GetxController {
       };
     }
 
-    if (detail.leaveType != LeaveType.work && detail.leaveType != LeaveType.mission) {      // تغییر به enum
+    if (detail.leaveType != LeaveType.work &&
+        detail.leaveType != LeaveType.mission) {
+      // تغییر به enum
       IconData avatarIcon;
       Color avatarColor;
       Color avatarIconColor;
@@ -483,10 +514,13 @@ class HomeController extends GetxController {
           isComplete = true;
           break;
         case LeaveType.mission:
-          avatarIcon = Icons.flight_takeoff;  // یا آیکون مناسب برای ماموریت، مثل Icons.business
-          avatarColor = colorScheme.primary;  // یا secondary، بسته به theme
+          avatarIcon =
+              Icons
+                  .flight_takeoff; // یا آیکون مناسب برای ماموریت، مثل Icons.business
+          avatarColor = colorScheme.primary; // یا secondary، بسته به theme
           avatarIconColor = colorScheme.onPrimary;
-          isComplete = true;  // اگر مثل مرخصی باشه؛ اما چون مثل work، این case رو اصلاً نزن (با شرط if بالا)
+          isComplete =
+              true; // اگر مثل مرخصی باشه؛ اما چون مثل work، این case رو اصلاً نزن (با شرط if بالا)
           break;
         default:
           avatarIcon = Icons.calendar_today;
