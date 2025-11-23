@@ -16,6 +16,7 @@ class _CalculationSummaryState extends State<CalculationSummary>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _iconTurns;
+  // ignore: unused_field
   bool _isExpanded = false;
 
   @override
