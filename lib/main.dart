@@ -1,31 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get/get.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'core/theme/theme.dart';
-import 'home/controller/auth_controller.dart';
-import 'home/view/fail_login.dart';
-import 'home/view/home.dart';
-import 'home/view/login_view.dart';
-import 'l10n/massage.dart';
-
-Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  tz.initializeTimeZones();
-  await _loadEnv();
-
-  Get.put(ThemeController());
-  Get.put(AuthController());
-
-  final authController = Get.find<AuthController>();
-  final username = Uri.base
-      .queryParameters['id']; // 127.0.0.1:80/?id=user_engineer1
-
   if (username != null && username.isNotEmpty) {
     final success = await authController.login(username);
     if (success) {

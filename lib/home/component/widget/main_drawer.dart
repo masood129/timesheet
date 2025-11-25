@@ -6,6 +6,7 @@ import '../../../manager/view/manager_dashboard.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
 import '../../view/monthly_table_page.dart';
+import '../../view/logs_viewer_page.dart';
 import 'draft_reports_dialog.dart';
 import 'gym_cost_dialog.dart';
 import 'monthly_report_dialog.dart';
@@ -158,6 +159,18 @@ class MainDrawer extends StatelessWidget {
                     : const SizedBox.shrink(),
           ),
 
+          const Divider(),
+          ListTile(
+            leading: Icon(Icons.description, color: colorScheme.primary),
+            title: Text(
+              'logs'.tr,
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => const LogsViewerPage());
+            },
+          ),
           ListTile(
             leading: Icon(Icons.logout, color: colorScheme.primary),
             title: Text(
