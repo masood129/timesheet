@@ -7,6 +7,7 @@ import '../../controller/auth_controller.dart';
 import '../../controller/home_controller.dart';
 import '../../view/monthly_table_page.dart';
 import '../../view/logs_viewer_page.dart';
+import '../../view/project_access_page.dart';
 import 'draft_reports_dialog.dart';
 import 'gym_cost_dialog.dart';
 import 'monthly_report_dialog.dart';
@@ -73,6 +74,17 @@ class MainDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Get.to(() => MonthlyTablePage());
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.assignment, color: colorScheme.primary),
+            title: Text(
+              'تنظیمات دسترسی پروژه‌ها',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => const ProjectAccessPage());
             },
           ),
           ListTile(
