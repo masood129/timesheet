@@ -50,6 +50,35 @@ class HomeController extends GetxController {
     );
   }
 
+  /// بررسی اینکه آیا بازه ماه جاری سفارشی (ویرایش شده) است یا نه
+  bool get isCurrentMonthPeriodCustom {
+    if (currentMonthPeriod == null) {
+      return false;
+    }
+    
+    final period = currentMonthPeriod!;
+    final periodMonth = period.month;
+    final periodYear = period.year;
+    
+    // محاسبه آخرین روز ماه
+    final lastDayOfMonth = calendarModel.getDaysInMonth(periodYear, periodMonth);
+    
+    // بازه سفارشی است اگر:
+    // 1. روز شروع 1 نباشد
+    // 2. ماه شروع با ماه بازه متفاوت باشد
+    // 3. روز پایان آخرین روز ماه نباشد
+    // 4. ماه پایان با ماه بازه متفاوت باشد
+    // 5. سال شروع یا پایان با سال بازه متفاوت باشد
+    final isCustom = period.startDay != 1 ||
+        period.startMonth != periodMonth ||
+        period.startYear != periodYear ||
+        period.endDay != lastDayOfMonth ||
+        period.endMonth != periodMonth ||
+        period.endYear != periodYear;
+    
+    return isCustom;
+  }
+
   @override
   void onInit() {
     super.onInit();
