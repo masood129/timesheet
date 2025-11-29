@@ -1,4 +1,3 @@
-// custom_calendar.dart (بروزرسانی شده)
 import 'package:flutter/material.dart';
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
@@ -7,141 +6,151 @@ import '../../controller/home_controller.dart';
 import 'grid_calendar_day_card.dart';
 
 class CustomCalendarWidget extends StatelessWidget {
-  final HomeController homeController = Get.find<HomeController>();
-
-  CustomCalendarWidget({super.key});
+  const CustomCalendarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final days = homeController.daysInCurrentMonth;
+    return GetBuilder<HomeController>(
+      builder: (homeController) {
+        final colorScheme = Theme.of(context).colorScheme;
+        final days = homeController.daysInCurrentMonth;
 
-    if (days.isEmpty) {
-      return Center(
-        child: Text(
-          'روزی برای نمایش وجود ندارد',
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'BNazanin',
-            color: colorScheme.onSurface,
-          ),
-        ),
-      );
-    }
+        if (days.isEmpty) {
+          return Center(
+            child: Text(
+              'روزی برای نمایش وجود ندارد',
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'BNazanin',
+                color: colorScheme.onSurface,
+              ),
+            ),
+          );
+        }
 
-    // محاسبه اولین روز هفته برای تنظیم offset در grid
-    final firstDay = days.first;
-    // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
-    final firstWeekday = firstDay.weekDay;
+        // محاسبه اولین روز هفته برای تنظیم offset در grid
+        final firstDay = days.first;
+        // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
+        final firstWeekday = firstDay.weekDay;
 
-    // تعداد slot های خالی قبل از اولین روز
-    // weekday - 1 چون grid از index 0 شروع می‌شود
-    final emptySlotsBefore = firstWeekday - 1;
+        // تعداد slot های خالی قبل از اولین روز
+        // weekday - 1 چون grid از index 0 شروع می‌شود
+        final emptySlotsBefore = firstWeekday - 1;
 
-    // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
-    final totalSlots = days.length + emptySlotsBefore;
-    // تکمیل آخرین ردیف grid
-    final adjustedSlots =
-        (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
+        // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
+        final totalSlots = days.length + emptySlotsBefore;
+        // تکمیل آخرین ردیف grid
+        final adjustedSlots =
+            (totalSlots % 7 == 0)
+                ? totalSlots
+                : totalSlots + (7 - totalSlots % 7);
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:
-                [
-                  'شنبه', // index 0, weekday 1
-                  'یک‌شنبه', // index 1, weekday 2
-                  'دوشنبه', // index 2, weekday 3
-                  'سه‌شنبه', // index 3, weekday 4
-                  'چهارشنبه', // index 4, weekday 5
-                  'پنج‌شنبه', // index 5, weekday 6
-                  'جمعه', // index 6, weekday 7
-                ].asMap().entries.map((entry) {
-                  return Expanded(
-                    child: Text(
-                      entry.value,
-                      textAlign: TextAlign.center,
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 4.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children:
+                    [
+                      'شنبه', // index 0, weekday 1
+                      'یک‌شنبه', // index 1, weekday 2
+                      'دوشنبه', // index 2, weekday 3
+                      'سه‌شنبه', // index 3, weekday 4
+                      'چهارشنبه', // index 4, weekday 5
+                      'پنج‌شنبه', // index 5, weekday 6
+                      'جمعه', // index 6, weekday 7
+                    ].asMap().entries.map((entry) {
+                      return Expanded(
+                        child: Text(
+                          entry.value,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'BNazanin',
+                            color:
+                                entry.key == 6
+                                    ? colorScheme.error
+                                    : colorScheme.onSurface,
+                            fontSize: 12,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+            ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
+                  childAspectRatio: 0.9,
+                ),
+                itemCount: adjustedSlots,
+                itemBuilder: (context, index) {
+                  // اگر در محدوده slot های خالی قبل از اولین روز باشیم
+                  if (index < emptySlotsBefore) {
+                    return Container();
+                  }
+
+                  // محاسبه index روز در لیست days
+                  final dayIndex = index - emptySlotsBefore;
+
+                  // اگر index از تعداد روزها بیشتر باشد، slot خالی
+                  if (dayIndex >= days.length) {
+                    return Container();
+                  }
+
+                  // نمایش روز
+                  return GridCalendarDayCard(date: days[dayIndex]);
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  _showDayDetailsDialog(context, Jalali.now());
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  elevation: 4,
+                  shadowColor: colorScheme.primary.withOpacity(0.3),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.info_outline, color: colorScheme.onPrimary),
+                    const SizedBox(width: 8),
+                    Text(
+                      'جزئیات روز',
                       style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'BNazanin',
-                        color:
-                            entry.key == 6
-                                ? colorScheme.error
-                                : colorScheme.onSurface,
-                        fontSize: 12,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
-                  );
-                }).toList(),
-          ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(8.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              crossAxisSpacing: 4.0,
-              mainAxisSpacing: 4.0,
-              childAspectRatio: 0.9,
-            ),
-            itemCount: adjustedSlots,
-            itemBuilder: (context, index) {
-              // اگر در محدوده slot های خالی قبل از اولین روز باشیم
-              if (index < emptySlotsBefore) {
-                return Container();
-              }
-
-              // محاسبه index روز در لیست days
-              final dayIndex = index - emptySlotsBefore;
-
-              // اگر index از تعداد روزها بیشتر باشد، slot خالی
-              if (dayIndex >= days.length) {
-                return Container();
-              }
-
-              // نمایش روز
-              return GridCalendarDayCard(date: days[dayIndex]);
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: () {
-              _showDayDetailsDialog(context, Jalali.now());
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              elevation: 4,
-              shadowColor: colorScheme.primary.withOpacity(0.3),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.info_outline, color: colorScheme.onPrimary),
-                const SizedBox(width: 8),
-                Text(
-                  'جزئیات روز',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'BNazanin',
-                    color: colorScheme.onPrimary,
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 

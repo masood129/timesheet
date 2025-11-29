@@ -219,11 +219,18 @@ class HomeController extends GetxController {
 
   /// دریافت بازه ماه جاری و ماه قبل
   Future<void> _fetchCurrentMonthPeriod() async {
+    print(
+      '📅 [PERIOD] Fetching period for ${currentYear.value}/${currentMonth.value}',
+    );
     try {
       currentMonthPeriod = await ApiCalls().getMonthPeriod(
         currentYear.value,
         currentMonth.value,
       );
+      print(
+        '✅ [PERIOD] Current: ${currentMonthPeriod!.startYear}/${currentMonthPeriod!.startMonth}/${currentMonthPeriod!.startDay} to ${currentMonthPeriod!.endYear}/${currentMonthPeriod!.endMonth}/${currentMonthPeriod!.endDay}',
+      );
+      print('📊 [PERIOD] Is custom: $isCurrentMonthPeriodCustom');
 
       // دریافت بازه ماه قبل
       int prevYear = currentYear.value;
@@ -238,15 +245,19 @@ class HomeController extends GetxController {
           prevYear,
           prevMonth,
         );
+        print('✅ [PERIOD] Previous month period also fetched');
       } catch (e) {
         previousMonthPeriod = null;
+        print('⚠️ [PERIOD] Previous month period not found');
       }
 
       update();
     } catch (e) {
+      print('❌ [PERIOD] Error fetching period: $e');
       // در صورت خطا، از مقدار پیش‌فرض استفاده می‌شود
       currentMonthPeriod = null;
       previousMonthPeriod = null;
+      update();
     }
   }
 
