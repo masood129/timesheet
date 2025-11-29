@@ -113,8 +113,6 @@ class GridCalendarDayCard extends StatelessWidget {
                         color:
                             isToday || isHoliday
                                 ? Colors.white
-                                : isFromOtherMonth
-                                ? colorScheme.primary.withOpacity(0.7)
                                 : isFriday
                                 ? colorScheme.error
                                 : colorScheme.onSurface,
@@ -122,24 +120,20 @@ class GridCalendarDayCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      isFromOtherMonth
-                          ? '${date.formatter.wN}\n${date.formatter.mN}'
-                          : date.formatter.wN,
+                      date.formatter.wN,
                       style: TextStyle(
-                        fontSize: isFromOtherMonth ? 10 : 12,
+                        fontSize: 12,
                         fontFamily: 'BNazanin',
                         color:
                             isToday || isHoliday
                                 ? Colors.white70
-                                : isFromOtherMonth
-                                ? colorScheme.onSurface.withOpacity(0.5)
                                 : isFriday
                                 ? colorScheme.error.withOpacity(0.7)
                                 : colorScheme.onSurface.withOpacity(0.7),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
-                      maxLines: isFromOtherMonth ? 2 : 1,
+                      maxLines: 1,
                     ),
                     const SizedBox(height: 4),
                     Text(
