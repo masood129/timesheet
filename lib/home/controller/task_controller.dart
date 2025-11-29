@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/Get.dart';
@@ -16,9 +17,9 @@ import 'home_controller.dart';
 class ThousandSeparatorInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue;
     }
@@ -155,7 +156,7 @@ class TaskController extends GetxController {
       await loadDailyDetail(date, Get.find<HomeController>().dailyDetails);
       // Check if a task with the same projectId already exists
       int existingIndex = selectedProjects.indexWhere(
-            (p) => p.value?.id == selectedTimerProject.value!.id,
+        (p) => p.value?.id == selectedTimerProject.value!.id,
       );
       if (existingIndex != -1) {
         // Update existing task duration
@@ -213,7 +214,7 @@ class TaskController extends GetxController {
         final minutes = (duration % 3600) ~/ 60;
         final seconds = duration % 60;
         timerDuration.value =
-        '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
       });
     }
 
@@ -229,7 +230,7 @@ class TaskController extends GetxController {
         final minutes = (duration % 3600) ~/ 60;
         final seconds = duration % 60;
         personalTimerDuration.value =
-        '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+            '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
       });
     }
   }
@@ -239,7 +240,16 @@ class TaskController extends GetxController {
       final value = await ApiCalls().getProjects();
       projects.assignAll(value);
     } catch (e) {
-      ThemedSnackbar.showError('error'.tr, 'fetch_projects_issue_snackbar'.tr);
+      if (kDebugMode) {
+        print('Error fetching projects: $e');
+      }
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
+      ThemedSnackbar.showError(
+        'error'.tr,
+        errorMessage.isNotEmpty
+            ? errorMessage
+            : 'fetch_projects_issue_snackbar'.tr,
+      );
     }
   }
 
@@ -331,9 +341,9 @@ class TaskController extends GetxController {
   }
 
   Future<void> loadDailyDetail(
-      Jalali date,
-      List<DailyDetail> dailyDetails,
-      ) async {
+    Jalali date,
+    List<DailyDetail> dailyDetails,
+  ) async {
     currentDate = date;
     try {
       final gregorianDate = date.toGregorian();
@@ -341,7 +351,7 @@ class TaskController extends GetxController {
           '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
 
       final detail = dailyDetails.firstWhereOrNull(
-            (d) => d.date == formattedDate,
+        (d) => d.date == formattedDate,
       );
 
       currentDetail.value = detail;
@@ -376,22 +386,22 @@ class TaskController extends GetxController {
       personalTimeController.text = _minutesToHHMM(detail?.personalTime);
       descriptionController.text = detail?.description ?? '';
       goCostController.text =
-      detail?.goCost != null
-          ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!)
-          : '';
+          detail?.goCost != null
+              ? ThousandSeparatorInputFormatter()._formatNumber(detail!.goCost!)
+              : '';
       returnCostController.text =
-      detail?.returnCost != null
-          ? ThousandSeparatorInputFormatter()._formatNumber(
-        detail!.returnCost!,
-      )
-          : '';
+          detail?.returnCost != null
+              ? ThousandSeparatorInputFormatter()._formatNumber(
+                detail!.returnCost!,
+              )
+              : '';
       leaveType.value =
           LeaveTypeExtension.fromString(detail?.leaveType?.apiValue) ??
-              LeaveType.work;
+          LeaveType.work;
 
       for (final task in detail?.tasks ?? []) {
         final project = projects.firstWhereOrNull(
-              (p) => p.id == task.projectId,
+          (p) => p.id == task.projectId,
         );
         selectedProjects.add(Rx<Project?>(project));
         durationControllers.add(
@@ -405,7 +415,7 @@ class TaskController extends GetxController {
 
       for (final cost in detail?.personalCarCosts ?? []) {
         final project = projects.firstWhereOrNull(
-              (p) => p.id == cost.projectId,
+          (p) => p.id == cost.projectId,
         );
         selectedCarCostProjects.add(Rx<Project?>(project));
         carKmControllers.add(
@@ -646,9 +656,9 @@ class TaskController extends GetxController {
     final leave = parseTime(leaveTimeController.text);
     final personal = _hhmmToMinutes(personalTimeController.text) ?? 0;
     final totalTaskMinutes = durationControllers.fold<int>(0, (
-        sum,
-        controller,
-        ) {
+      sum,
+      controller,
+    ) {
       final minutes = _hhmmToMinutes(controller.text);
       return sum + (minutes ?? 0);
     });
@@ -682,9 +692,9 @@ class TaskController extends GetxController {
     }
 
     final totalCarCosts = carKmControllers.asMap().entries.fold<int>(0, (
-        sum,
-        entry,
-        ) {
+      sum,
+      entry,
+    ) {
       final i = entry.key;
       final controller = entry.value;
       if (i < carKmControllers.length && i < carCostControllers.length) {
@@ -696,9 +706,9 @@ class TaskController extends GetxController {
     });
 
     for (
-    int i = 0;
-    i < carKmControllers.length && i < carCostControllers.length;
-    i++
+      int i = 0;
+      i < carKmControllers.length && i < carCostControllers.length;
+      i++
     ) {
       final kilometers =
           int.tryParse(carKmControllers[i].text.replaceAll(',', '')) ?? 0;
@@ -736,9 +746,9 @@ class TaskController extends GetxController {
       );
     }
     for (
-    int i = 0;
-    i < carKmControllers.length && i < selectedCarCostProjects.length;
-    i++
+      int i = 0;
+      i < carKmControllers.length && i < selectedCarCostProjects.length;
+      i++
     ) {
       if (selectedCarCostProjects[i].value != null) {
         final kilometers =
@@ -757,15 +767,15 @@ class TaskController extends GetxController {
       final effective = presence.inMinutes - personal;
 
       summaryReport.value =
-      '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
       presenceDuration.value =
-      '${'live_calc_presence_duration_prefix'.tr}${presence.inHours}${'live_calc_hours_and_suffix'.tr}${presence.inMinutes % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_presence_duration_prefix'.tr}${presence.inHours}${'live_calc_hours_and_suffix'.tr}${presence.inMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       effectiveWork.value =
-      '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
       taskTotalTime.value =
-      '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       totalCost.value =
-      '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
+          '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
     } else {
       summaryReport.value = '';
       presenceDuration.value = '';

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:excel/excel.dart';
@@ -30,7 +30,11 @@ class MonthlyDetailsController extends GetxController {
       final fetchedProjects = await ApiCalls().getProjects();
       projects.assignAll(fetchedProjects);
     } catch (e) {
-      ThemedSnackbar.showError('error'.tr, 'fetch_projects_issue_snackbar'.tr);
+      if (kDebugMode) {
+        print('Error fetching projects: $e');
+      }
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
+      ThemedSnackbar.showError('error'.tr, errorMessage.isNotEmpty ? errorMessage : 'fetch_projects_issue_snackbar'.tr);
     } finally {
       isLoading.value = false;
     }

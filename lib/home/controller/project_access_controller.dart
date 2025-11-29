@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:timesheet/core/api/api_calls/api_calls.dart';
 import 'package:timesheet/model/project_access_model.dart';
+import 'package:timesheet/home/controller/task_controller.dart';
+import 'package:timesheet/home/controller/monthly_details_controller.dart';
 
 class ProjectAccessController extends GetxController {
   final RxList<ProjectAccess> projects = <ProjectAccess>[].obs;
@@ -51,6 +53,32 @@ class ProjectAccessController extends GetxController {
       projects[projectIndex] = oldProject.copyWith(
         hasAccess: result['hasAccess'],
       );
+
+      // Refresh TaskController projects list if it exists
+      try {
+        if (Get.isRegistered<TaskController>()) {
+          final taskController = Get.find<TaskController>();
+          await taskController.fetchProjects();
+        }
+      } catch (e) {
+        // TaskController might not be initialized, ignore the error
+        if (Get.isLogEnable) {
+          print('TaskController not available: $e');
+        }
+      }
+
+      // Refresh MonthlyDetailsController projects list if it exists
+      try {
+        if (Get.isRegistered<MonthlyDetailsController>()) {
+          final monthlyController = Get.find<MonthlyDetailsController>();
+          await monthlyController.fetchProjects();
+        }
+      } catch (e) {
+        // MonthlyDetailsController might not be initialized, ignore the error
+        if (Get.isLogEnable) {
+          print('MonthlyDetailsController not available: $e');
+        }
+      }
 
       // Show success message
       Get.snackbar(
