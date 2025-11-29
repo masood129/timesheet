@@ -27,7 +27,9 @@ class GridCalendarDayCard extends StatelessWidget {
       final cardStatus = homeController.getCardStatus(date, context);
       final effectiveWork = homeController.calculateEffectiveWork(date);
       final note = homeController.getNoteForDate(date);
-      final isFromOtherMonth = homeController.isDayFromOtherMonth(date);
+      // Calendar now only shows period days, so all days are "current month"
+      final isFromOtherMonth = false;
+      final isEditedPeriod = homeController.isCurrentMonthPeriodCustom;
 
       return GestureDetector(
         onTap: () {
@@ -71,19 +73,30 @@ class GridCalendarDayCard extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
+                      : isEditedPeriod && !isFromOtherMonth
+                      ? LinearGradient(
+                        colors: [
+                          Colors.purple[100]!.withOpacity(0.3),
+                          Colors.teal[50]!.withOpacity(0.2),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
                       : null,
-              color: isToday || isHoliday 
-                  ? null 
-                  : isFromOtherMonth 
-                  ? colorScheme.surfaceContainerHighest.withOpacity(0.7)
-                  : colorScheme.surface,
-              border: isFromOtherMonth && !isToday && !isHoliday
-                  ? Border.all(
-                      color: colorScheme.primary.withOpacity(0.3),
-                      width: 1.5,
-                      style: BorderStyle.solid,
-                    )
-                  : null,
+              color:
+                  isToday || isHoliday
+                      ? null
+                      : isEditedPeriod && !isFromOtherMonth
+                      ? null // Use gradient instead
+                      : colorScheme.surface,
+              border:
+                  isEditedPeriod && !isToday && !isHoliday
+                      ? Border.all(
+                        color: Colors.purple.withOpacity(0.4),
+                        width: 1.5,
+                        style: BorderStyle.solid,
+                      )
+                      : null,
             ),
             padding: const EdgeInsets.all(6.0),
             child: Stack(
@@ -109,7 +122,7 @@ class GridCalendarDayCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      isFromOtherMonth 
+                      isFromOtherMonth
                           ? '${date.formatter.wN}\n${date.formatter.mN}'
                           : date.formatter.wN,
                       style: TextStyle(

@@ -15,7 +15,7 @@ class CustomCalendarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final days = homeController.daysInCurrentMonth;
-    
+
     if (days.isEmpty) {
       return Center(
         child: Text(
@@ -28,21 +28,19 @@ class CustomCalendarWidget extends StatelessWidget {
         ),
       );
     }
-    
-    // استفاده از اولین روز در لیست برای محاسبه weekday
-    // این می‌تواند روز ماه قبل، ماه جاری یا ماه بعد باشد
+
+    // محاسبه اولین روز هفته برای تنظیم offset در grid
     final firstDay = days.first;
-    // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, 3=دوشنبه, 4=سه‌شنبه, 5=چهارشنبه, 6=پنج‌شنبه, 7=جمعه
+    // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
     final firstWeekday = firstDay.weekDay;
-    final daysInMonth = days.length;
-    
-    // محاسبه تعداد slot های خالی قبل از اولین روز
-    // ستون‌های grid: 0=شنبه, 1=یک‌شنبه, 2=دوشنبه, 3=سه‌شنبه, 4=چهارشنبه, 5=پنج‌شنبه, 6=جمعه
-    // weekday: 1=شنبه → ستون 0 → offset = 0 = weekday - 1
-    // weekday: 2=یک‌شنبه → ستون 1 → offset = 1 = weekday - 1
-    // پس: emptySlotsBefore = firstWeekday - 1
+
+    // تعداد slot های خالی قبل از اولین روز
+    // weekday - 1 چون grid از index 0 شروع می‌شود
     final emptySlotsBefore = firstWeekday - 1;
-    final totalSlots = daysInMonth + emptySlotsBefore;
+
+    // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
+    final totalSlots = days.length + emptySlotsBefore;
+    // تکمیل آخرین ردیف grid
     final adjustedSlots =
         (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
 
@@ -54,13 +52,13 @@ class CustomCalendarWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children:
                 [
-                  'شنبه',      // index 0, weekday 1
-                  'یک‌شنبه',    // index 1, weekday 2
-                  'دوشنبه',    // index 2, weekday 3
-                  'سه‌شنبه',    // index 3, weekday 4
-                  'چهارشنبه',  // index 4, weekday 5
-                  'پنج‌شنبه',  // index 5, weekday 6
-                  'جمعه',      // index 6, weekday 7
+                  'شنبه', // index 0, weekday 1
+                  'یک‌شنبه', // index 1, weekday 2
+                  'دوشنبه', // index 2, weekday 3
+                  'سه‌شنبه', // index 3, weekday 4
+                  'چهارشنبه', // index 4, weekday 5
+                  'پنج‌شنبه', // index 5, weekday 6
+                  'جمعه', // index 6, weekday 7
                 ].asMap().entries.map((entry) {
                   return Expanded(
                     child: Text(
@@ -95,15 +93,15 @@ class CustomCalendarWidget extends StatelessWidget {
               if (index < emptySlotsBefore) {
                 return Container();
               }
-              
+
               // محاسبه index روز در لیست days
               final dayIndex = index - emptySlotsBefore;
-              
+
               // اگر index از تعداد روزها بیشتر باشد، slot خالی
-              if (dayIndex >= daysInMonth) {
+              if (dayIndex >= days.length) {
                 return Container();
               }
-              
+
               // نمایش روز
               return GridCalendarDayCard(date: days[dayIndex]);
             },
