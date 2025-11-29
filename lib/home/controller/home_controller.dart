@@ -37,6 +37,19 @@ class HomeController extends GetxController {
     return calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
   }
 
+  /// دریافت لیست روزهای ماه جاری (بر اساس بازه ادمین یا ماه عادی)
+  List<Jalali> get daysInCurrentMonth {
+    if (currentMonthPeriod != null) {
+      return currentMonthPeriod!.getDaysInPeriod();
+    }
+    // حالت پیش‌فرض: تمام روزهای ماه
+    final daysCount = calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+    return List.generate(
+      daysCount,
+      (index) => Jalali(currentYear.value, currentMonth.value, index + 1),
+    );
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -250,8 +263,13 @@ class HomeController extends GetxController {
     bool hasIncompleteDays = false;
     String errorMessage = 'روزهای ناقص: ';
 
-    for (int day = 1; day <= daysInMonth; day++) {
-      final date = Jalali(year, month, day);
+    final daysList = currentMonthPeriod?.getDaysInPeriod() ?? 
+        List.generate(
+          calendarModel.getDaysInMonth(year, month),
+          (index) => Jalali(year, month, index + 1),
+        );
+    
+    for (final date in daysList) {
       final status = getCardStatus(
         date,
         Get.context!,
@@ -284,16 +302,28 @@ class HomeController extends GetxController {
 
   Future<void> fetchMonthlyDetails() async {
     try {
-      final jalaliDate = Jalali(currentYear.value, currentMonth.value, 1);
-      final daysInMonth =
-          Jalali(currentYear.value, currentMonth.value).monthLength;
+      Jalali startJalali, endJalali;
+      
+      if (currentMonthPeriod != null) {
+        // استفاده از بازه تعریف شده
+        final days = currentMonthPeriod!.getDaysInPeriod();
+        if (days.isNotEmpty) {
+          startJalali = days.first;
+          endJalali = days.last;
+        } else {
+          // fallback به حالت پیش‌فرض
+          startJalali = Jalali(currentYear.value, currentMonth.value, 1);
+          final daysInMonth = Jalali(currentYear.value, currentMonth.value).monthLength;
+          endJalali = Jalali(currentYear.value, currentMonth.value, daysInMonth);
+        }
+      } else {
+        // حالت پیش‌فرض
+        startJalali = Jalali(currentYear.value, currentMonth.value, 1);
+        final daysInMonth = Jalali(currentYear.value, currentMonth.value).monthLength;
+        endJalali = Jalali(currentYear.value, currentMonth.value, daysInMonth);
+      }
 
-      final startGregorian = jalaliDate.toGregorian();
-      final endJalali = Jalali(
-        currentYear.value,
-        currentMonth.value,
-        daysInMonth,
-      );
+      final startGregorian = startJalali.toGregorian();
       final endGregorian = endJalali.toGregorian();
 
       final startDate =
@@ -303,13 +333,23 @@ class HomeController extends GetxController {
 
       final details = await ApiCalls().getDateRangeDetails(startDate, endDate);
 
-      final filteredDetails =
-          details.where((detail) {
-            final date = DateTime.parse(detail.date);
-            final jalali = Jalali.fromDateTime(date);
-            return jalali.year == currentYear.value &&
-                jalali.month == currentMonth.value;
-          }).toList();
+      // فیلتر کردن بر اساس روزهای بازه
+      final periodDays = currentMonthPeriod?.getDaysInPeriod() ?? [];
+      final filteredDetails = details.where((detail) {
+        final date = DateTime.parse(detail.date);
+        final jalali = Jalali.fromDateTime(date);
+        // بررسی اینکه آیا این تاریخ در لیست روزهای بازه است
+        if (periodDays.isNotEmpty) {
+          return periodDays.any((day) => 
+            day.year == jalali.year && 
+            day.month == jalali.month && 
+            day.day == jalali.day
+          );
+        }
+        // fallback به فیلتر قدیمی
+        return jalali.year == currentYear.value &&
+            jalali.month == currentMonth.value;
+      }).toList();
 
       dailyDetails.assignAll(filteredDetails);
 

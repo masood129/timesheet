@@ -14,17 +14,17 @@ class CustomCalendarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final year = homeController.currentYear.value;
-    final month = homeController.currentMonth.value;
-    final daysInMonth = homeController.daysInMonth;
-
-    final firstDayOfMonth = Jalali(year, month, 1);
-    final firstWeekday = firstDayOfMonth.weekDay;
-
-    final days = List.generate(
-      daysInMonth,
-      (index) => Jalali(year, month, index + 1),
-    );
+    final days = homeController.daysInCurrentMonth;
+    
+    // پیدا کردن اولین روز برای محاسبه weekday
+    Jalali firstDay;
+    if (days.isNotEmpty) {
+      firstDay = days.first;
+    } else {
+      firstDay = Jalali(homeController.currentYear.value, homeController.currentMonth.value, 1);
+    }
+    final firstWeekday = firstDay.weekDay;
+    final daysInMonth = days.length;
     final totalSlots = daysInMonth + (firstWeekday - 1);
     final adjustedSlots =
         (totalSlots % 7 == 0) ? totalSlots : totalSlots + (7 - totalSlots % 7);
