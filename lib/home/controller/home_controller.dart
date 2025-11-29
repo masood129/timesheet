@@ -110,13 +110,34 @@ class HomeController extends GetxController {
       }
     }
     
-    // مرتب‌سازی هر بخش
-    prevMonthDays.sort((a, b) => a.day.compareTo(b.day));
-    currentMonthDays.sort((a, b) => a.day.compareTo(b.day));
-    nextMonthDays.sort((a, b) => a.day.compareTo(b.day));
+    // مرتب‌سازی هر بخش بر اساس تاریخ کامل
+    prevMonthDays.sort((a, b) {
+      if (a.year != b.year) return a.year.compareTo(b.year);
+      if (a.month != b.month) return a.month.compareTo(b.month);
+      return a.day.compareTo(b.day);
+    });
+    currentMonthDays.sort((a, b) {
+      if (a.year != b.year) return a.year.compareTo(b.year);
+      if (a.month != b.month) return a.month.compareTo(b.month);
+      return a.day.compareTo(b.day);
+    });
+    nextMonthDays.sort((a, b) {
+      if (a.year != b.year) return a.year.compareTo(b.year);
+      if (a.month != b.month) return a.month.compareTo(b.month);
+      return a.day.compareTo(b.day);
+    });
     
     // ترکیب: ابتدا ماه قبل، سپس ماه جاری، سپس ماه بعد
-    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+    final allDays = [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+    
+    // مرتب‌سازی نهایی بر اساس تاریخ کامل برای اطمینان
+    allDays.sort((a, b) {
+      if (a.year != b.year) return a.year.compareTo(b.year);
+      if (a.month != b.month) return a.month.compareTo(b.month);
+      return a.day.compareTo(b.day);
+    });
+    
+    return allDays;
   }
   
   /// بررسی اینکه آیا یک روز از ماه دیگر است (نه ماه جاری)
