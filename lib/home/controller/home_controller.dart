@@ -29,6 +29,7 @@ class HomeController extends GetxController {
 
   // Month period settings
   MonthPeriodModel? currentMonthPeriod;
+  MonthPeriodModel? previousMonthPeriod;
 
   int get daysInMonth {
     if (currentMonthPeriod != null) {
@@ -38,16 +39,89 @@ class HomeController extends GetxController {
   }
 
   /// دریافت لیست روزهای ماه جاری (بر اساس بازه ادمین یا ماه عادی)
+  /// شامل روزهای باقیمانده از ماه قبل در ابتدای لیست و روزهای ماه بعد در انتهای لیست
   List<Jalali> get daysInCurrentMonth {
-    if (currentMonthPeriod != null) {
-      return currentMonthPeriod!.getDaysInPeriod();
+    List<Jalali> prevMonthDays = []; // روزهای ماه قبل
+    List<Jalali> currentMonthDays = []; // روزهای ماه جاری
+    List<Jalali> nextMonthDays = []; // روزهای ماه بعد
+    
+    // محاسبه ماه قبل و بعد
+    int prevYear = currentYear.value;
+    int prevMonth = currentMonth.value - 1;
+    if (prevMonth < 1) {
+      prevMonth = 12;
+      prevYear = currentYear.value - 1;
     }
-    // حالت پیش‌فرض: تمام روزهای ماه
-    final daysCount = calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
-    return List.generate(
-      daysCount,
-      (index) => Jalali(currentYear.value, currentMonth.value, index + 1),
-    );
+    
+    int nextYear = currentYear.value;
+    int nextMonth = currentMonth.value + 1;
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear = currentYear.value + 1;
+    }
+    
+    // اگر بازه ماه جاری وجود دارد
+    if (currentMonthPeriod != null) {
+      final currentPeriodDays = currentMonthPeriod!.getDaysInPeriod();
+      
+      for (final day in currentPeriodDays) {
+        if (day.year == prevYear && day.month == prevMonth) {
+          // روز از ماه قبل
+          if (!prevMonthDays.any((d) => d.year == day.year && d.month == day.month && d.day == day.day)) {
+            prevMonthDays.add(day);
+          }
+        } else if (day.year == currentYear.value && day.month == currentMonth.value) {
+          // روز از ماه جاری
+          if (!currentMonthDays.any((d) => d.year == day.year && d.month == day.month && d.day == day.day)) {
+            currentMonthDays.add(day);
+          }
+        } else if (day.year == nextYear && day.month == nextMonth) {
+          // روز از ماه بعد
+          if (!nextMonthDays.any((d) => d.year == day.year && d.month == day.month && d.day == day.day)) {
+            nextMonthDays.add(day);
+          }
+        }
+      }
+    }
+    
+    // اگر روز ماه جاری وجود ندارد، روزهای پیش‌فرض را اضافه کن
+    if (currentMonthDays.isEmpty) {
+      final daysCount = calendarModel.getDaysInMonth(currentYear.value, currentMonth.value);
+      currentMonthDays = List.generate(
+        daysCount,
+        (index) => Jalali(currentYear.value, currentMonth.value, index + 1),
+      );
+    }
+    
+    // اگر بازه ماه قبل وجود دارد و روزهای باقیمانده دارد
+    if (previousMonthPeriod != null) {
+      final prevPeriod = previousMonthPeriod!;
+      // اگر بازه ماه قبل به ماه جاری ادامه پیدا نمی‌کند
+      if (prevPeriod.endMonth == prevPeriod.month && prevPeriod.endYear == prevPeriod.year) {
+        final lastDayOfPrevMonth = calendarModel.getDaysInMonth(prevYear, prevMonth);
+        // روزهای باقیمانده ماه قبل که در بازه نیستند
+        for (int day = prevPeriod.endDay + 1; day <= lastDayOfPrevMonth; day++) {
+          final date = Jalali(prevYear, prevMonth, day);
+          // اگر قبلاً اضافه نشده باشد
+          if (!prevMonthDays.any((d) => d.year == date.year && d.month == date.month && d.day == date.day)) {
+            prevMonthDays.add(date);
+          }
+        }
+      }
+    }
+    
+    // مرتب‌سازی هر بخش
+    prevMonthDays.sort((a, b) => a.day.compareTo(b.day));
+    currentMonthDays.sort((a, b) => a.day.compareTo(b.day));
+    nextMonthDays.sort((a, b) => a.day.compareTo(b.day));
+    
+    // ترکیب: ابتدا ماه قبل، سپس ماه جاری، سپس ماه بعد
+    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+  }
+  
+  /// بررسی اینکه آیا یک روز از ماه دیگر است (نه ماه جاری)
+  bool isDayFromOtherMonth(Jalali date) {
+    return date.year != currentYear.value || date.month != currentMonth.value;
   }
 
   /// بررسی اینکه آیا بازه ماه جاری سفارشی (ویرایش شده) است یا نه
@@ -199,17 +273,33 @@ class HomeController extends GetxController {
     });
   }
 
-  /// دریافت بازه ماه جاری
+  /// دریافت بازه ماه جاری و ماه قبل
   Future<void> _fetchCurrentMonthPeriod() async {
     try {
       currentMonthPeriod = await ApiCalls().getMonthPeriod(
         currentYear.value,
         currentMonth.value,
       );
+      
+      // دریافت بازه ماه قبل
+      int prevYear = currentYear.value;
+      int prevMonth = currentMonth.value - 1;
+      if (prevMonth < 1) {
+        prevMonth = 12;
+        prevYear = currentYear.value - 1;
+      }
+      
+      try {
+        previousMonthPeriod = await ApiCalls().getMonthPeriod(prevYear, prevMonth);
+      } catch (e) {
+        previousMonthPeriod = null;
+      }
+      
       update();
     } catch (e) {
       // در صورت خطا، از مقدار پیش‌فرض استفاده می‌شود
       currentMonthPeriod = null;
+      previousMonthPeriod = null;
     }
   }
 

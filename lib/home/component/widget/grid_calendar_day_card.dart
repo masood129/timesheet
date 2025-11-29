@@ -27,6 +27,7 @@ class GridCalendarDayCard extends StatelessWidget {
       final cardStatus = homeController.getCardStatus(date, context);
       final effectiveWork = homeController.calculateEffectiveWork(date);
       final note = homeController.getNoteForDate(date);
+      final isFromOtherMonth = homeController.isDayFromOtherMonth(date);
 
       return GestureDetector(
         onTap: () {
@@ -71,7 +72,18 @@ class GridCalendarDayCard extends StatelessWidget {
                         end: Alignment.bottomRight,
                       )
                       : null,
-              color: isToday || isHoliday ? null : colorScheme.surface,
+              color: isToday || isHoliday 
+                  ? null 
+                  : isFromOtherMonth 
+                  ? colorScheme.surfaceContainerHighest.withOpacity(0.7)
+                  : colorScheme.surface,
+              border: isFromOtherMonth && !isToday && !isHoliday
+                  ? Border.all(
+                      color: colorScheme.primary.withOpacity(0.3),
+                      width: 1.5,
+                      style: BorderStyle.solid,
+                    )
+                  : null,
             ),
             padding: const EdgeInsets.all(6.0),
             child: Stack(
@@ -88,6 +100,8 @@ class GridCalendarDayCard extends StatelessWidget {
                         color:
                             isToday || isHoliday
                                 ? Colors.white
+                                : isFromOtherMonth
+                                ? colorScheme.primary.withOpacity(0.7)
                                 : isFriday
                                 ? colorScheme.error
                                 : colorScheme.onSurface,
@@ -95,19 +109,24 @@ class GridCalendarDayCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      date.formatter.wN,
+                      isFromOtherMonth 
+                          ? '${date.formatter.wN}\n${date.formatter.mN}'
+                          : date.formatter.wN,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isFromOtherMonth ? 10 : 12,
                         fontFamily: 'BNazanin',
                         color:
                             isToday || isHoliday
                                 ? Colors.white70
+                                : isFromOtherMonth
+                                ? colorScheme.onSurface.withOpacity(0.5)
                                 : isFriday
                                 ? colorScheme.error.withOpacity(0.7)
                                 : colorScheme.onSurface.withOpacity(0.7),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
+                      maxLines: isFromOtherMonth ? 2 : 1,
                     ),
                     const SizedBox(height: 4),
                     Text(

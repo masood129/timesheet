@@ -36,6 +36,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     final isHoliday = holiday != null && holiday['isHoliday'] == true;
     final cardStatus = homeController.getCardStatus(widget.date, context);
     final effectiveWork = homeController.calculateEffectiveWork(widget.date);
+    final isFromOtherMonth = homeController.isDayFromOtherMonth(widget.date);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
@@ -76,8 +77,16 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                       ),
                     )
                     : BoxDecoration(
-                      color: colorScheme.surface,
+                      color: isFromOtherMonth 
+                          ? colorScheme.surfaceContainerHighest.withOpacity(0.7)
+                          : colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
+                      border: isFromOtherMonth && !isToday && !isHoliday
+                          ? Border.all(
+                              color: colorScheme.primary.withOpacity(0.3),
+                              width: 1.5,
+                            )
+                          : null,
                     ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,12 +124,14 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     ),
                   ),
                   title: Text(
-                    '${widget.date.formatter.wN} ${widget.date.day}',
+                    '${widget.date.formatter.wN} ${widget.date.day}${isFromOtherMonth ? ' (${widget.date.formatter.mN})' : ''}',
                     style: TextStyle(
                       fontSize: 14,
                       color:
                           isToday || isHoliday
                               ? Colors.white
+                              : isFromOtherMonth
+                              ? colorScheme.primary.withOpacity(0.7)
                               : isFriday
                               ? colorScheme.error
                               : null,

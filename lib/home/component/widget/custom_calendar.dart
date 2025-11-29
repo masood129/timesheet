@@ -16,13 +16,22 @@ class CustomCalendarWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final days = homeController.daysInCurrentMonth;
     
-    // پیدا کردن اولین روز برای محاسبه weekday
-    Jalali firstDay;
-    if (days.isNotEmpty) {
-      firstDay = days.first;
-    } else {
-      firstDay = Jalali(homeController.currentYear.value, homeController.currentMonth.value, 1);
+    if (days.isEmpty) {
+      return Center(
+        child: Text(
+          'روزی برای نمایش وجود ندارد',
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: 'BNazanin',
+            color: colorScheme.onSurface,
+          ),
+        ),
+      );
     }
+    
+    // استفاده از اولین روز در لیست برای محاسبه weekday
+    // این می‌تواند روز ماه قبل، ماه جاری یا ماه بعد باشد
+    final firstDay = days.first;
     final firstWeekday = firstDay.weekDay;
     final daysInMonth = days.length;
     final totalSlots = daysInMonth + (firstWeekday - 1);
