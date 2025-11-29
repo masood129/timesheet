@@ -42,7 +42,7 @@ class CarCostRow extends StatelessWidget {
                   message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
                   child: Obx(
                         () => DropdownButtonFormField<Project>(
-                      value: controller.selectedCarCostProjects[index].value,
+                      initialValue: controller.selectedCarCostProjects[index].value,
                       hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: disabledColor)),
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
                         errorText: controller.carCostProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,

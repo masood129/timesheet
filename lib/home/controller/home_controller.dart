@@ -147,6 +147,8 @@ class HomeController extends GetxController {
     final taskController = Get.find<TaskController>();
     await taskController.loadDailyDetail(date, dailyDetails);
 
+    if (!context.mounted) return;
+    
     showModalBottomSheet(
       useSafeArea: true,
       enableDrag: false,

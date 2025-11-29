@@ -23,7 +23,7 @@ class ManagerDashboard extends StatelessWidget {
           children: [
             Obx(
               () => DropdownButtonFormField<int>(
-                value: reportController.selectedYear.value,
+                initialValue: reportController.selectedYear.value,
                 decoration: InputDecoration(
                   labelText: 'year'.tr,
                   border: OutlineInputBorder(
@@ -46,7 +46,7 @@ class ManagerDashboard extends StatelessWidget {
             const SizedBox(height: 16),
             Obx(
               () => DropdownButtonFormField<int>(
-                value: reportController.selectedMonth.value,
+                initialValue: reportController.selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
                   border: OutlineInputBorder(

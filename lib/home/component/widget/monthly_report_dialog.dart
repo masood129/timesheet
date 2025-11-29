@@ -63,7 +63,7 @@ void showMonthlyReportDialog(
             // انتخاب ماه با نام‌های شمسی و محدود به ماه جاری
             Obx(
               () => DropdownButtonFormField<int>(
-                value: selectedMonth.value,
+                initialValue: selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'ماه'.tr,
                   border: OutlineInputBorder(

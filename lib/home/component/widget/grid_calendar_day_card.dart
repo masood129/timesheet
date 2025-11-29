@@ -44,10 +44,10 @@ class GridCalendarDayCard extends StatelessWidget {
                   : 2,
           shadowColor:
               isToday
-                  ? Colors.blue.withOpacity(0.4)
+                  ? Colors.blue.withValues(alpha: 0.4)
                   : isHoliday
-                  ? Colors.red.withOpacity(0.3)
-                  : colorScheme.shadow.withOpacity(0.2),
+                  ? Colors.red.withValues(alpha: 0.3)
+                  : colorScheme.shadow.withValues(alpha: 0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
             side:
@@ -76,8 +76,8 @@ class GridCalendarDayCard extends StatelessWidget {
                       : isEditedPeriod && !isFromOtherMonth
                       ? LinearGradient(
                         colors: [
-                          Colors.purple[100]!.withOpacity(0.3),
-                          Colors.teal[50]!.withOpacity(0.2),
+                          Colors.purple[100]!.withValues(alpha: 0.3),
+                          Colors.teal[50]!.withValues(alpha: 0.2),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -92,7 +92,7 @@ class GridCalendarDayCard extends StatelessWidget {
               border:
                   isEditedPeriod && !isToday && !isHoliday
                       ? Border.all(
-                        color: Colors.purple.withOpacity(0.4),
+                        color: Colors.purple.withValues(alpha: 0.4),
                         width: 1.5,
                         style: BorderStyle.solid,
                       )
@@ -128,8 +128,8 @@ class GridCalendarDayCard extends StatelessWidget {
                             isToday || isHoliday
                                 ? Colors.white70
                                 : isFriday
-                                ? colorScheme.error.withOpacity(0.7)
-                                : colorScheme.onSurface.withOpacity(0.7),
+                                ? colorScheme.error.withValues(alpha: 0.7)
+                                : colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -148,7 +148,7 @@ class GridCalendarDayCard extends StatelessWidget {
                         color:
                             isToday || isHoliday
                                 ? Colors.white70
-                                : colorScheme.onSurface.withOpacity(0.6),
+                                : colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
@@ -215,7 +215,7 @@ class GridCalendarDayCard extends StatelessWidget {
                       color:
                           isToday || isHoliday
                               ? Colors.white70
-                              : colorScheme.primary.withOpacity(0.7),
+                              : colorScheme.primary.withValues(alpha: 0.7),
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

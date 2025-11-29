@@ -29,7 +29,7 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField(
-                  value: taskController.selectedTimerProject.value,
+                  initialValue: taskController.selectedTimerProject.value,
                   hint: Text(
                     'select_project'.tr,
                     style: TextStyle(color: colorScheme.onSurface),

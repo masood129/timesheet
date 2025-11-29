@@ -35,7 +35,7 @@ class TaskRow extends StatelessWidget {
                   message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
                   child: Obx(
                         () => DropdownButtonFormField<Project>(
-                      value: controller.selectedProjects[index].value,
+                      initialValue: controller.selectedProjects[index].value,
                       hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: disabledColor)),
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
                         errorText: controller.taskProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,

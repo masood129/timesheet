@@ -51,7 +51,7 @@ class MonthlyDetailsTable extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.onSurface.withOpacity(0.1),
+            color: colorScheme.onSurface.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -71,24 +71,24 @@ class MonthlyDetailsTable extends StatelessWidget {
                 dividerThickness: 1,
                 border: TableBorder(
                   horizontalInside: BorderSide(
-                    color: colorScheme.onSurface.withOpacity(0.2),
+                    color: colorScheme.onSurface.withValues(alpha: 0.2),
                     width: 1,
                   ),
                   verticalInside: BorderSide(
-                    color: colorScheme.onSurface.withOpacity(0.2),
+                    color: colorScheme.onSurface.withValues(alpha: 0.2),
                     width: 1,
                   ),
                   top: BorderSide(
-                    color: colorScheme.onSurface.withOpacity(0.3),
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                     width: 1,
                   ),
                   bottom: BorderSide(
-                    color: colorScheme.onSurface.withOpacity(0.3),
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
                 headingRowColor: WidgetStateProperty.all(
-                  colorScheme.primaryContainer.withOpacity(0.8),
+                  colorScheme.primaryContainer.withValues(alpha: 0.8),
                 ),
                 dataTextStyle: TextStyle(
                   fontSize: 11,
@@ -210,19 +210,20 @@ class MonthlyDetailsTable extends StatelessWidget {
                   constraints: BoxConstraints(minWidth: totalWidth),
                   child: DataTable(
                     columnSpacing: 10,
-                    dataRowHeight: 40,
+                    dataRowMinHeight: 40,
+                    dataRowMaxHeight: 40,
                     dividerThickness: 1,
                     border: TableBorder(
                       horizontalInside: BorderSide(
-                        color: colorScheme.onSurface.withOpacity(0.2),
+                        color: colorScheme.onSurface.withValues(alpha: 0.2),
                         width: 1,
                       ),
                       verticalInside: BorderSide(
-                        color: colorScheme.onSurface.withOpacity(0.2),
+                        color: colorScheme.onSurface.withValues(alpha: 0.2),
                         width: 1,
                       ),
                       bottom: BorderSide(
-                        color: colorScheme.onSurface.withOpacity(0.3),
+                        color: colorScheme.onSurface.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -278,7 +279,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                         color: WidgetStateProperty.all(
                           index % 2 == 0
                               ? colorScheme.surface
-                              : colorScheme.surfaceVariant.withOpacity(0.5),
+                              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                         ),
                         cells: [
                           DataCell(
@@ -300,7 +301,7 @@ class MonthlyDetailsTable extends StatelessWidget {
                               child: Text(
                                 detail?.leaveType?.displayName ?? '',
                                 style: TextStyle(
-                                  color: colorScheme.onSurface.withOpacity(0.7),
+                                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                                 textAlign: TextAlign.center,
                               ),

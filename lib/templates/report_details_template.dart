@@ -86,11 +86,11 @@ class ReportDetailsCard extends StatelessWidget {
             ),
             _buildDetailRow(
               'group'.tr,
-              '${report.groupName ?? report.groupId?.toString() ?? 'unknown'.tr}',
+              report.groupName ?? report.groupId?.toString() ?? 'unknown'.tr,
             ),
             _buildDetailRow(
               'manager'.tr,
-              '${report.managerUsername ?? 'unknown'.tr}',
+              report.managerUsername ?? 'unknown'.tr,
             ),
             const SizedBox(height: 16),
             // بخش لیست ساعت‌های پروژه
@@ -113,7 +113,7 @@ class ReportDetailsCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: 140,
             child: Text(
               '$label:',
@@ -124,7 +124,7 @@ class ReportDetailsCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.05),
+                color: Colors.grey.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(value, style: const TextStyle(fontSize: 14)),
@@ -157,7 +157,7 @@ class ReportDetailsCard extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.05),
+              color: Colors.green.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.separated(
@@ -207,7 +207,7 @@ class ReportDetailsCard extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.05),
+              color: Colors.orange.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.separated(
@@ -255,7 +255,7 @@ class ReportDetailsCard extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.05),
+              color: Colors.purple.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.separated(

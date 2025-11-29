@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:timesheet/home/controller/project_access_controller.dart';
 
 class ProjectAccessPage extends StatelessWidget {
-  const ProjectAccessPage({Key? key}) : super(key: key);
+  const ProjectAccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +110,7 @@ class ProjectAccessPage extends StatelessWidget {
                       onChanged: (value) {
                         controller.toggleProjectAccess(project.id);
                       },
-                      activeColor: Colors.green,
+                      activeThumbColor: Colors.green,
                     ),
                   ),
                 );

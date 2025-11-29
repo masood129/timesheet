@@ -138,7 +138,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
         const SizedBox(height: 10),
         Obx(
           () => DropdownButtonFormField<LeaveType>(
-            value: widget.controller.leaveType.value,
+            initialValue: widget.controller.leaveType.value,
             hint: Text('leave_type'.tr, style: TextStyle(color: disabledColor)),
             decoration: AppStyles.inputDecoration(
               context,

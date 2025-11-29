@@ -133,8 +133,9 @@ class TaskController extends GetxController {
   }
 
   void startTimer() {
-    if (selectedTimerProject.value == null || isPersonalTimerRunning.value)
+    if (selectedTimerProject.value == null || isPersonalTimerRunning.value) {
       return;
+    }
     isTimerRunning.value = true;
     timerStartTime = DateTime.now();
     _updateTimerDuration();

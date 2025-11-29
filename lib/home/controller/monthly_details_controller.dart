@@ -135,7 +135,7 @@ class MonthlyDetailsController extends GetxController {
         ThemedSnackbar.showSuccess('success'.tr, 'details_saved_snackbar'.tr);
       }
     } catch (e) {
-      ThemedSnackbar.showError('error'.tr, 'save_details_issue_snackbar'.tr + ': $e');
+      ThemedSnackbar.showError('error'.tr, '${'save_details_issue_snackbar'.tr}: $e');
     }
   }
 }

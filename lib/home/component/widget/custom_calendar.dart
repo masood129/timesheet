@@ -128,7 +128,7 @@ class CustomCalendarWidget extends StatelessWidget {
                     vertical: 12,
                   ),
                   elevation: 4,
-                  shadowColor: colorScheme.primary.withOpacity(0.3),
+                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

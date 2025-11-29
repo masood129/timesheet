@@ -72,7 +72,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               const SizedBox(height: 16),
               // انتخاب ماه با نام‌های شمسی و پیش‌فرض جاری (فقط ماه‌های جاری و قبلی)
               DropdownButtonFormField<int>(
-                value: currentMonth,
+                initialValue: currentMonth,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
                   border: OutlineInputBorder(
@@ -172,7 +172,9 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   int.parse(hourController.text),
                 );
                 ThemedSnackbar.showSuccess('success'.tr, 'gym_cost_saved'.tr);
-                Navigator.pop(context);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
               } catch (e) {
                 ThemedSnackbar.showError(
                   'error'.tr,

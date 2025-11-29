@@ -46,7 +46,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         },
         child: Card(
           elevation: isToday ? 8 : 4,
-          shadowColor: isToday ? Colors.blue.withOpacity(0.3) : null,
+          shadowColor: isToday ? Colors.blue.withValues(alpha: 0.3) : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side:
@@ -78,12 +78,12 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     )
                     : BoxDecoration(
                       color: isFromOtherMonth 
-                          ? colorScheme.surfaceContainerHighest.withOpacity(0.7)
+                          ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.7)
                           : colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: isFromOtherMonth && !isToday && !isHoliday
                           ? Border.all(
-                              color: colorScheme.primary.withOpacity(0.3),
+                              color: colorScheme.primary.withValues(alpha: 0.3),
                               width: 1.5,
                             )
                           : null,
@@ -131,7 +131,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                           isToday || isHoliday
                               ? Colors.white
                               : isFromOtherMonth
-                              ? colorScheme.primary.withOpacity(0.7)
+                              ? colorScheme.primary.withValues(alpha: 0.7)
                               : isFriday
                               ? colorScheme.error
                               : null,
@@ -149,7 +149,7 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                       color:
                           isToday || isHoliday
                               ? Colors.white70
-                              : colorScheme.onSurface.withOpacity(0.7),
+                              : colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),

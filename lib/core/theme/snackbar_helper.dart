@@ -106,9 +106,9 @@ class ThemedSnackbar {
 
     final colorScheme = Theme.of(context).colorScheme;
     final surfaceTint = colorScheme.surface;
-    final glassColor = surfaceTint.withOpacity(0.22);
-    final borderColor = accent.withOpacity(0.28);
-    final accentOverlay = accent.withOpacity(0.03);
+    final glassColor = surfaceTint.withValues(alpha: 0.22);
+    final borderColor = accent.withValues(alpha: 0.28);
+    final accentOverlay = accent.withValues(alpha: 0.03);
 
     Get.rawSnackbar(
       snackPosition: SnackPosition.BOTTOM,
@@ -134,7 +134,7 @@ class ThemedSnackbar {
               color: glassColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
+                  color: Colors.black.withValues(alpha: 0.18),
                   blurRadius: 26,
                   offset: const Offset(0, 14),
                 ),
@@ -148,7 +148,7 @@ class ThemedSnackbar {
                       borderRadius: BorderRadius.circular(18),
                       gradient: LinearGradient(
                         colors: [
-                          Colors.white.withOpacity(0.02),
+                          Colors.white.withValues(alpha: 0.02),
                           accentOverlay,
                         ],
                         begin: Alignment.topLeft,
@@ -166,7 +166,7 @@ class ThemedSnackbar {
                         width: 38,
                         height: 38,
                         decoration: BoxDecoration(
-                          color: accent.withOpacity(0.18),
+                          color: accent.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(icon, color: onAccent),
@@ -192,7 +192,7 @@ class ThemedSnackbar {
                                 fontFamily: 'BNazanin',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: onAccent.withOpacity(0.9),
+                                color: onAccent.withValues(alpha: 0.9),
                               ),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,

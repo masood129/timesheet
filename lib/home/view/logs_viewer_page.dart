@@ -158,7 +158,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                   // Category filter
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedCategory,
+                      initialValue: _selectedCategory,
                       decoration: const InputDecoration(
                         labelText: 'دسته‌بندی',
                         border: OutlineInputBorder(),
@@ -181,7 +181,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                   // Level filter
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedLevel,
+                      initialValue: _selectedLevel,
                       decoration: const InputDecoration(
                         labelText: 'سطح',
                         border: OutlineInputBorder(),
@@ -210,7 +210,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
             // Log count
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: colorScheme.surfaceVariant,
+              color: colorScheme.surfaceContainerHighest,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -323,7 +323,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                                 decoration: BoxDecoration(
                                   color: _getLevelColor(
                                     log.level,
-                                  ).withOpacity(0.1),
+                                  ).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
                                     color: _getLevelColor(log.level),
