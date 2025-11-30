@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/utils/app_logger.dart';
 import '../../core/widgets/searchable_dropdown.dart';
 import '../../model/app_log_entry.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class LogsViewerPage extends StatefulWidget {
   const LogsViewerPage({super.key});
@@ -23,6 +24,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
   @override
   void initState() {
     super.initState();
+    PageTitleManager.setTitle('لاگ‌ها');
     _loadLogs();
   }
 

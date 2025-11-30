@@ -7,6 +7,7 @@ import '../../home/controller/auth_controller.dart';
 import '../../templates/report_details_template.dart';
 import '../../../model/draft_report_model.dart'; // Use DraftReportModel
 import '../../core/widgets/searchable_dropdown.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class ManagerDashboard extends StatelessWidget {
   ManagerDashboard({super.key});
@@ -16,6 +17,11 @@ class ManagerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('داشبورد مدیر');
+    });
+    
     return Scaffold(
       appBar: AppBar(title: Text('manager_dashboard'.tr)),
       body: Padding(

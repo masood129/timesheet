@@ -5,6 +5,7 @@ import 'package:shamsi_date/shamsi_date.dart';
 import '../../core/api/api_calls/api_calls.dart';
 import '../../model/leavetype_model.dart';
 import '../../model/monthly_table_model.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class MonthlyTablePage extends StatefulWidget {
   const MonthlyTablePage({super.key});
@@ -24,6 +25,7 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   @override
   void initState() {
     super.initState();
+    PageTitleManager.setTitle('جدول ماهانه');
     final now = Jalali.now();
     _jalaliYear = now.year;
     _jalaliMonth = now.month;

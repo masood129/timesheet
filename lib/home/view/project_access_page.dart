@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timesheet/home/controller/project_access_controller.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class ProjectAccessPage extends StatelessWidget {
   const ProjectAccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('دسترسی پروژه‌ها');
+    });
+    
     final controller = Get.put(ProjectAccessController());
 
     return Directionality(

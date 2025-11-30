@@ -5,6 +5,7 @@ import 'package:timesheet/home/controller/auth_controller.dart';
 
 import '../../../model/user_model.dart';
 import '../../../core/theme/snackbar_helper.dart';
+import '../../../core/utils/page_title_manager.dart';
 
 class UserListView extends StatelessWidget {
   UserListView({super.key});
@@ -14,6 +15,11 @@ class UserListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('لیست کاربران');
+    });
+    
     return Scaffold(
       appBar: AppBar(title: Text('لیست کاربران زیرمجموعه'.tr)),
       body: FutureBuilder<List<UserModel>>(

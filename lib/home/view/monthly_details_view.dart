@@ -4,6 +4,7 @@ import 'package:shamsi_date/shamsi_date.dart';
 import 'package:timesheet/home/controller/home_controller.dart';
 import 'package:timesheet/home/controller/monthly_details_controller.dart';
 import '../component/widget/monthly_details_table.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class MonthlyDetailsView extends StatelessWidget {
   MonthlyDetailsView({super.key});
@@ -13,6 +14,11 @@ class MonthlyDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('جزئیات ماهانه');
+    });
+    
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class FailLogin extends StatelessWidget {
   const FailLogin({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('خطا در ورود');
+    });
+    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(

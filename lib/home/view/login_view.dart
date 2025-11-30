@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/auth_controller.dart';
 import '../../core/theme/snackbar_helper.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -11,6 +12,11 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('ورود');
+    });
+    
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text('login'.tr)),

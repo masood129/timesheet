@@ -8,6 +8,7 @@ import '../component/widget/main_drawer.dart';
 import '../component/widget/timer_dialog.dart';
 import '../controller/home_controller.dart';
 import '../controller/task_controller.dart';
+import '../../core/utils/page_title_manager.dart';
 
 class CalendarView extends StatelessWidget {
   CalendarView({super.key});
@@ -24,6 +25,10 @@ class CalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set page title when building the widget
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PageTitleManager.setTitle('تقویم');
+    });
     return Scaffold(
       appBar: CalendarAppBar(),
       drawer: MainDrawer(),
