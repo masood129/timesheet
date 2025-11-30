@@ -194,7 +194,7 @@ class TimerDialog extends StatelessWidget {
                             onPressed: () async {
                               await taskController.stopTimer(today);
                               await taskController.saveDailyDetail();
-                              Navigator.pop(context);
+                              // Don't call Navigator.pop here, saveDailyDetail already calls Get.back()
                             },
                             icon: Icon(
                               Icons.stop,
@@ -273,7 +273,7 @@ class TimerDialog extends StatelessWidget {
                             onPressed: () async {
                               await taskController.stopPersonalTimer(today);
                               await taskController.saveDailyDetail();
-                              Navigator.pop(context);
+                              // Don't call Navigator.pop here, saveDailyDetail already calls Get.back()
                             },
                             icon: Icon(
                               Icons.stop,
