@@ -132,10 +132,18 @@ class TaskController extends GetxController {
     selectedCarCostProjects.listen((_) => calculateStats());
   }
 
-  void startTimer() {
+  Future<void> startTimer() async {
     if (selectedTimerProject.value == null || isPersonalTimerRunning.value) {
       return;
     }
+    // Save the new project before stopping the old timer
+    final newProject = selectedTimerProject.value;
+    // Auto-stop previous timer if running
+    if (isTimerRunning.value) {
+      await stopTimer(Jalali.now());
+    }
+    // Restore the new project after stopping
+    selectedTimerProject.value = newProject;
     isTimerRunning.value = true;
     timerStartTime = DateTime.now();
     _updateTimerDuration();
@@ -155,28 +163,12 @@ class TaskController extends GetxController {
     if (duration > 0) {
       currentDate = date;
       await loadDailyDetail(date, Get.find<HomeController>().dailyDetails);
-      // Check if a task with the same projectId already exists
-      int existingIndex = selectedProjects.indexWhere(
-        (p) => p.value?.id == selectedTimerProject.value!.id,
-      );
-      if (existingIndex != -1) {
-        // Update existing task duration
-        final existingDuration =
-            _hhmmToMinutes(durationControllers[existingIndex].text) ?? 0;
-        durationControllers[existingIndex].text = _minutesToHHMM(
-          existingDuration + duration,
-        );
-        if (descriptionControllers[existingIndex].text.isEmpty) {
-          descriptionControllers[existingIndex].text = 'اضافه‌شده توسط تایمر';
-        }
-      } else {
-        // Add new task
-        addTaskRow();
-        final index = selectedProjects.length - 1;
-        selectedProjects[index].value = selectedTimerProject.value;
-        durationControllers[index].text = _minutesToHHMM(duration);
-        descriptionControllers[index].text = 'اضافه‌شده توسط تایمر';
-      }
+      // Always add as new task - never merge with existing ones
+      addTaskRow();
+      final index = selectedProjects.length - 1;
+      selectedProjects[index].value = selectedTimerProject.value;
+      durationControllers[index].text = _minutesToHHMM(duration);
+      descriptionControllers[index].text = 'اضافه‌شده توسط تایمر';
       calculateStats();
     }
     timerStartTime = null;

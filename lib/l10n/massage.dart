@@ -195,6 +195,7 @@ class Messages extends Translations {
           'پارامتر ورود معتبر پیدا نشد.\nلطفاً دوباره تلاش کنید.',
       'retry': 'تلاش مجدد',
       'logs': 'لاگ‌ها',
+      'timer': 'تایمر',
     },
     'en': {
       "failed_to_load_holidays": "Failed to load holiday data",
@@ -388,6 +389,7 @@ class Messages extends Translations {
           'No valid login parameter found.\nPlease try again.',
       'retry': 'Retry',
       'logs': 'Logs',
+      'timer': 'Timer',
     },
   };
 }

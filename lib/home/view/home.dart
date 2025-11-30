@@ -5,6 +5,7 @@ import '../component/widget/calendar_day_card.dart';
 import '../component/widget/custom_calendar.dart';
 import '../component/widget/weekly_calendar.dart';
 import '../component/widget/main_drawer.dart';
+import '../component/widget/timer_dialog.dart';
 import '../controller/home_controller.dart';
 import '../controller/task_controller.dart';
 
@@ -13,6 +14,13 @@ class CalendarView extends StatelessWidget {
 
   final HomeController homeController = Get.put(HomeController());
   final TaskController taskController = Get.put(TaskController());
+
+  void _openTimerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const TimerDialog(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +51,41 @@ class CalendarView extends StatelessWidget {
             return const CustomCalendarWidget();
           }
         });
+      }),
+      floatingActionButton: Obx(() {
+        final isProjectTimerRunning = taskController.isTimerRunning.value;
+        final isPersonalTimerRunning = taskController.isPersonalTimerRunning.value;
+        final projectDuration = taskController.timerDuration.value;
+        final personalDuration = taskController.personalTimerDuration.value;
+        final colorScheme = Theme.of(context).colorScheme;
+        
+        return FloatingActionButton.extended(
+          onPressed: () => _openTimerDialog(context),
+          icon: Icon(
+            isProjectTimerRunning || isPersonalTimerRunning 
+                ? Icons.timer 
+                : Icons.timer_outlined,
+            color: Colors.white,
+          ),
+          label: Text(
+            isProjectTimerRunning 
+                ? projectDuration
+                : isPersonalTimerRunning
+                    ? personalDuration
+                    : 'timer'.tr,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          backgroundColor: isProjectTimerRunning
+              ? colorScheme.primary
+              : isPersonalTimerRunning
+                  ? colorScheme.secondary
+                  : colorScheme.primary,
+          elevation: 4,
+        );
       }),
     );
   }
