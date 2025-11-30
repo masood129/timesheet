@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter_easyloading/flutter_easyloading.dart'; // اضافه کردن پکیج easyloading
 import 'package:timesheet/core/config/app_env.dart';
+import 'package:timesheet/core/utils/api_logger.dart';
 
 class CoreApi {
   static final CoreApi _instance = CoreApi._internal();
@@ -79,6 +80,9 @@ class CoreApi {
       Future<http.Response> Function(Map<String, String>, String?) request,
       Map<String, String>? headers,
       Object? body,
+      String method,
+      String url,
+      int startTime,
       ) async {
     try {
       // نمایش لودینگ قبل از درخواست
@@ -88,7 +92,6 @@ class CoreApi {
       if (headers != null && headers.containsKey('skip-auth')) {
         final updatedHeaders = Map<String, String>.from(headers);
         updatedHeaders.remove('skip-auth'); // حذف هدر موقت
-        if (kDebugMode) debugPrint('Skipping auth');
         final response = await request(updatedHeaders, _encodeBody(body));
         EasyLoading.dismiss(); // پنهان کردن لودینگ بعد از پاسخ
         return response;
@@ -109,7 +112,6 @@ class CoreApi {
 
       // مدیریت خطای 401
       if (response.statusCode == 401) {
-        if (kDebugMode) debugPrint('Unauthorized: Attempting to refresh token');
         final newToken = await _refreshToken();
         if (newToken != null) {
           // بازنویسی هدرها با توکن جدید
@@ -120,29 +122,74 @@ class CoreApi {
           return retryResponse;
         } else {
           EasyLoading.dismiss(); // پنهان کردن لودینگ در صورت شکست
+          final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+          ApiLogger.logError(
+            method: method,
+            url: url,
+            statusCode: 401,
+            errorMessage: 'Unauthorized: Please log in again',
+            responseBody: response.body,
+            durationMs: duration,
+          );
           throw Exception('Unauthorized: Please log in again');
         }
+      }
+
+      // Log errors for non-2xx responses
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+        ApiLogger.logError(
+          method: method,
+          url: url,
+          statusCode: response.statusCode,
+          errorMessage: 'HTTP ${response.statusCode}',
+          responseBody: response.body,
+          durationMs: duration,
+        );
       }
 
       EasyLoading.dismiss(); // پنهان کردن لودینگ بعد از پاسخ موفق
       return response;
     } catch (e) {
       EasyLoading.dismiss(); // پنهان کردن لودینگ در صورت خطا
-      if (kDebugMode) debugPrint('Interceptor error: $e');
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      ApiLogger.logError(
+        method: method,
+        url: url,
+        statusCode: 0,
+        errorMessage: e.toString(),
+        durationMs: duration,
+      );
       rethrow;
     }
   }
 
   Future<http.Response?> get(Uri url, {Map<String, String>? headers}) async {
+    final startTime = DateTime.now().millisecondsSinceEpoch;
+    
     return _interceptRequest((updatedHeaders, encodedBody) async {
-      if (kDebugMode) {
-        debugPrint('GET => $url');
-        debugPrint('Headers: $updatedHeaders');
-      }
+      ApiLogger.logRequest(
+        method: 'GET',
+        url: url.toString(),
+        headers: updatedHeaders,
+        body: null,
+      );
+      
       final response = await _client.get(url, headers: updatedHeaders);
-      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        ApiLogger.logResponse(
+          method: 'GET',
+          url: url.toString(),
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: duration,
+        );
+      }
+      
       return response;
-    }, headers, null); // بدون body
+    }, headers, null, 'GET', url.toString(), startTime);
   }
 
   Future<http.Response?> post(
@@ -150,20 +197,36 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
+    final startTime = DateTime.now().millisecondsSinceEpoch;
+    
     return _interceptRequest((updatedHeaders, encodedBody) async {
-      if (kDebugMode) {
-        debugPrint('POST => $url');
-        debugPrint('Headers: $updatedHeaders');
-        debugPrint('Body: $encodedBody');
-      }
+      ApiLogger.logRequest(
+        method: 'POST',
+        url: url.toString(),
+        headers: updatedHeaders,
+        body: encodedBody,
+      );
+      
       final response = await _client.post(
         url,
         headers: updatedHeaders,
         body: encodedBody,
       );
-      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
+      
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        ApiLogger.logResponse(
+          method: 'POST',
+          url: url.toString(),
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: duration,
+        );
+      }
+      
       return response;
-    }, headers, body);
+    }, headers, body, 'POST', url.toString(), startTime);
   }
 
   Future<http.Response?> delete(
@@ -171,20 +234,36 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
+    final startTime = DateTime.now().millisecondsSinceEpoch;
+    
     return _interceptRequest((updatedHeaders, encodedBody) async {
-      if (kDebugMode) {
-        debugPrint('DELETE => $url');
-        debugPrint('Headers: $updatedHeaders');
-        debugPrint('Body: $encodedBody');
-      }
+      ApiLogger.logRequest(
+        method: 'DELETE',
+        url: url.toString(),
+        headers: updatedHeaders,
+        body: encodedBody,
+      );
+      
       final response = await _client.delete(
         url,
         headers: updatedHeaders,
         body: encodedBody,
       );
-      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
+      
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        ApiLogger.logResponse(
+          method: 'DELETE',
+          url: url.toString(),
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: duration,
+        );
+      }
+      
       return response;
-    }, headers, body);
+    }, headers, body, 'DELETE', url.toString(), startTime);
   }
 
   Future<http.Response?> put(
@@ -192,20 +271,36 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
+    final startTime = DateTime.now().millisecondsSinceEpoch;
+    
     return _interceptRequest((updatedHeaders, encodedBody) async {
-      if (kDebugMode) {
-        debugPrint('PUT => $url');
-        debugPrint('Headers: $updatedHeaders');
-        debugPrint('Body: $encodedBody');
-      }
+      ApiLogger.logRequest(
+        method: 'PUT',
+        url: url.toString(),
+        headers: updatedHeaders,
+        body: encodedBody,
+      );
+      
       final response = await _client.put(
         url,
         headers: updatedHeaders,
         body: encodedBody,
       );
-      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
+      
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        ApiLogger.logResponse(
+          method: 'PUT',
+          url: url.toString(),
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: duration,
+        );
+      }
+      
       return response;
-    }, headers, body);
+    }, headers, body, 'PUT', url.toString(), startTime);
   }
 
   Future<http.Response?> patch(
@@ -213,19 +308,35 @@ class CoreApi {
         Map<String, String>? headers,
         Object? body,
       }) async {
+    final startTime = DateTime.now().millisecondsSinceEpoch;
+    
     return _interceptRequest((updatedHeaders, encodedBody) async {
-      if (kDebugMode) {
-        debugPrint('PATCH => $url');
-        debugPrint('Headers: $updatedHeaders');
-        debugPrint('Body: $encodedBody');
-      }
+      ApiLogger.logRequest(
+        method: 'PATCH',
+        url: url.toString(),
+        headers: updatedHeaders,
+        body: encodedBody,
+      );
+      
       final response = await _client.patch(
         url,
         headers: updatedHeaders,
         body: encodedBody,
       );
-      if (kDebugMode) debugPrint('Response [${response.statusCode}]: ${response.body}');
+      
+      final duration = DateTime.now().millisecondsSinceEpoch - startTime;
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        ApiLogger.logResponse(
+          method: 'PATCH',
+          url: url.toString(),
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: duration,
+        );
+      }
+      
       return response;
-    }, headers, body);
+    }, headers, body, 'PATCH', url.toString(), startTime);
   }
 }
