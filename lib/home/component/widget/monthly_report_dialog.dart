@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 import '../../controller/home_controller.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 
 void showMonthlyReportDialog(
   BuildContext context,
@@ -62,14 +63,15 @@ void showMonthlyReportDialog(
             const SizedBox(height: 16),
             // انتخاب ماه با نام‌های شمسی و محدود به ماه جاری
             Obx(
-              () => DropdownButtonFormField<int>(
-                initialValue: selectedMonth.value,
+              () => SearchableDropdown<int>(
+                value: selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'ماه'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                searchHint: 'جستجوی ماه...',
                 items:
                     months.map((month) {
                       return DropdownMenuItem(

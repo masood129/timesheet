@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 import '../../../model/project_model.dart';
 import '../../controller/task_controller.dart';
 
@@ -41,7 +42,26 @@ class CarCostRow extends StatelessWidget {
                 child: Tooltip(
                   message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
                   child: Obx(
-                        () => DropdownButtonFormField<Project>(
+                        () => isEnabled ? SearchableDropdown<Project>(
+                      value: controller.selectedCarCostProjects[index].value,
+                      decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
+                        errorText: controller.carCostProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,
+                        errorBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.error, width: 1.5), borderRadius: BorderRadius.circular(12)),
+                        focusedErrorBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.error, width: 1.5), borderRadius: BorderRadius.circular(12)),
+                      ),
+                      searchHint: 'جستجوی پروژه...'.tr,
+                      items: controller.projects.map<DropdownMenuItem<Project>>((project) {
+                        return DropdownMenuItem<Project>(
+                          value: project,
+                          child: Text(project.projectName, style: TextStyle(color: colorScheme.onSurface, overflow: TextOverflow.ellipsis)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        controller.selectedCarCostProjects[index].value = val;
+                        controller.carCostProjectErrors[index].value = false;
+                        controller.calculateStats();
+                      },
+                    ) : DropdownButtonFormField<Project>(
                       initialValue: controller.selectedCarCostProjects[index].value,
                       hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: disabledColor)),
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
@@ -52,16 +72,12 @@ class CarCostRow extends StatelessWidget {
                       items: controller.projects.map<DropdownMenuItem<Project>>((project) {
                         return DropdownMenuItem<Project>(
                           value: project,
-                          enabled: isEnabled,
-                          child: Text(project.projectName, style: TextStyle(color: isEnabled ? colorScheme.onSurface : disabledColor, overflow: TextOverflow.ellipsis)),
+                          enabled: false,
+                          child: Text(project.projectName, style: TextStyle(color: disabledColor, overflow: TextOverflow.ellipsis)),
                         );
                       }).toList(),
                       isDense: true,
-                      onChanged: isEnabled ? (val) {
-                        controller.selectedCarCostProjects[index].value = val;
-                        controller.carCostProjectErrors[index].value = false;
-                        controller.calculateStats();
-                      } : null,
+                      onChanged: null,
                     ),
                   ),
                 ),

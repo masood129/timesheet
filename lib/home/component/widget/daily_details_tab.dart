@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/Get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 import '../../../model/leavetype_model.dart';
 import '../../controller/task_controller.dart';
 import 'time_picker_field.dart';
@@ -46,7 +47,6 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final disabledColor = Theme.of(context).disabledColor;
 
     return ListView(
       children: [
@@ -137,15 +137,15 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
         }),
         const SizedBox(height: 10),
         Obx(
-          () => DropdownButtonFormField<LeaveType>(
-            initialValue: widget.controller.leaveType.value,
-            hint: Text('leave_type'.tr, style: TextStyle(color: disabledColor)),
+          () => SearchableDropdown<LeaveType>(
+            value: widget.controller.leaveType.value,
             decoration: AppStyles.inputDecoration(
               context,
               'leave_type',
               Icons.leave_bags_at_home,
               true,
             ),
+            searchHint: 'جستجوی نوع مرخصی...',
             items:
                 LeaveType.values
                     .map(

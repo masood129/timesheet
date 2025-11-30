@@ -6,6 +6,7 @@ import 'package:timesheet/manager/controller/manager_controller.dart';
 import '../../home/controller/auth_controller.dart';
 import '../../templates/report_details_template.dart';
 import '../../../model/draft_report_model.dart'; // Use DraftReportModel
+import '../../core/widgets/searchable_dropdown.dart';
 
 class ManagerDashboard extends StatelessWidget {
   ManagerDashboard({super.key});
@@ -22,14 +23,15 @@ class ManagerDashboard extends StatelessWidget {
         child: Column(
           children: [
             Obx(
-              () => DropdownButtonFormField<int>(
-                initialValue: reportController.selectedYear.value,
+              () => SearchableDropdown<int>(
+                value: reportController.selectedYear.value,
                 decoration: InputDecoration(
                   labelText: 'year'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                searchHint: 'جستجوی سال...',
                 items:
                     List.generate(5, (index) => Jalali.now().year - 2 + index)
                         .map(
@@ -45,14 +47,15 @@ class ManagerDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Obx(
-              () => DropdownButtonFormField<int>(
-                initialValue: reportController.selectedMonth.value,
+              () => SearchableDropdown<int>(
+                value: reportController.selectedMonth.value,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                searchHint: 'جستجوی ماه...',
                 items:
                     List.generate(12, (index) => index + 1)
                         .map(

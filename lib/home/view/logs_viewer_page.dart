@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/utils/app_logger.dart';
+import '../../core/widgets/searchable_dropdown.dart';
 import '../../model/app_log_entry.dart';
 
 class LogsViewerPage extends StatefulWidget {
@@ -157,8 +158,8 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                 children: [
                   // Category filter
                   Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _selectedCategory,
+                    child: SearchableDropdown<String>(
+                      value: _selectedCategory,
                       decoration: const InputDecoration(
                         labelText: 'دسته‌بندی',
                         border: OutlineInputBorder(),
@@ -167,6 +168,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                           vertical: 8,
                         ),
                       ),
+                      searchHint: 'جستجوی دسته‌بندی...',
                       items:
                           _categories.map((category) {
                             return DropdownMenuItem(
@@ -180,8 +182,8 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                   const SizedBox(width: 16),
                   // Level filter
                   Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _selectedLevel,
+                    child: SearchableDropdown<String>(
+                      value: _selectedLevel,
                       decoration: const InputDecoration(
                         labelText: 'سطح',
                         border: OutlineInputBorder(),
@@ -190,6 +192,7 @@ class _LogsViewerPageState extends State<LogsViewerPage> {
                           vertical: 8,
                         ),
                       ),
+                      searchHint: 'جستجوی سطح...',
                       items: const [
                         DropdownMenuItem(value: 'all', child: Text('همه')),
                         DropdownMenuItem(value: 'error', child: Text('خطا')),

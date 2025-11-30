@@ -6,6 +6,7 @@ import '../../../model/draft_report_model.dart';
 import '../../../templates/report_details_template.dart';
 import '../../controller/home_controller.dart';
 import '../../../core/theme/snackbar_helper.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 
 void showDraftReportsDialog(
   BuildContext context,
@@ -243,8 +244,8 @@ Widget _buildMonthDropdown(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
       padding: const EdgeInsets.all(12.0),
-      child: DropdownButtonFormField<int>(
-        initialValue: selectedMonth.value,
+      child: SearchableDropdown<int>(
+        value: selectedMonth.value,
         decoration: InputDecoration(
           labelText: 'select_month'.tr,
           labelStyle: const TextStyle(fontWeight: FontWeight.w500),
@@ -261,6 +262,7 @@ Widget _buildMonthDropdown(
             borderSide: const BorderSide(color: Colors.blue, width: 2),
           ),
         ),
+        searchHint: 'جستجوی ماه...',
         items:
             availableMonths.map((month) {
               return DropdownMenuItem(

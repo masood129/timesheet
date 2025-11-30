@@ -5,6 +5,7 @@ import '../../../model/project_model.dart';
 import '../../controller/home_controller.dart';
 import '../../controller/task_controller.dart';
 import '../../controller/auth_controller.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 
 class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
   CalendarAppBar({super.key});
@@ -28,34 +29,51 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             () => Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                DropdownButtonFormField(
-                  initialValue: taskController.selectedTimerProject.value,
-                  hint: Text(
-                    'select_project'.tr,
-                    style: TextStyle(color: colorScheme.onSurface),
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'projects'.tr,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  items:
-                      taskController.projects
-                          .map(
-                            (project) => DropdownMenuItem(
-                              value: project,
-                              child: Text(project.projectName),
-                            ),
-                          )
-                          .toList(),
-                  onChanged:
-                      taskController.isPersonalTimerRunning.value
-                          ? null
-                          : (value) =>
-                              taskController.selectedTimerProject.value =
-                                  value as Project?,
-                ),
+                taskController.isPersonalTimerRunning.value
+                    ? DropdownButtonFormField(
+                        initialValue: taskController.selectedTimerProject.value,
+                        hint: Text(
+                          'select_project'.tr,
+                          style: TextStyle(color: colorScheme.onSurface),
+                        ),
+                        decoration: InputDecoration(
+                          labelText: 'projects'.tr,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items:
+                            taskController.projects
+                                .map(
+                                  (project) => DropdownMenuItem(
+                                    value: project,
+                                    child: Text(project.projectName),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: null,
+                      )
+                    : SearchableDropdown<Project>(
+                        value: taskController.selectedTimerProject.value,
+                        decoration: InputDecoration(
+                          labelText: 'projects'.tr,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        searchHint: 'جستجوی پروژه...',
+                        items:
+                            taskController.projects
+                                .map(
+                                  (project) => DropdownMenuItem(
+                                    value: project,
+                                    child: Text(project.projectName),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (value) =>
+                            taskController.selectedTimerProject.value = value,
+                      ),
                 const SizedBox(height: 16),
                 Text(
                   taskController.isTimerRunning.value

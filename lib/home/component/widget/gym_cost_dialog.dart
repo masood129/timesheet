@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../controller/home_controller.dart';
 import '../../../core/theme/snackbar_helper.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 
 void showGymCostDialog(BuildContext context, HomeController homeController) {
   final now = Jalali.now();
@@ -71,14 +72,15 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               ),
               const SizedBox(height: 16),
               // انتخاب ماه با نام‌های شمسی و پیش‌فرض جاری (فقط ماه‌های جاری و قبلی)
-              DropdownButtonFormField<int>(
-                initialValue: currentMonth,
+              SearchableDropdown<int>(
+                value: currentMonth,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                searchHint: 'جستجوی ماه...',
                 items:
                     months.map((month) {
                       return DropdownMenuItem(

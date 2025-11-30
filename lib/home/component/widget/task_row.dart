@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/widgets/searchable_dropdown.dart';
 import '../../../model/project_model.dart';
 import '../../controller/task_controller.dart';
 import 'duration_field.dart';
@@ -34,7 +35,26 @@ class TaskRow extends StatelessWidget {
                 child: Tooltip(
                   message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
                   child: Obx(
-                        () => DropdownButtonFormField<Project>(
+                        () => isEnabled ? SearchableDropdown<Project>(
+                      value: controller.selectedProjects[index].value,
+                      decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
+                        errorText: controller.taskProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,
+                        errorBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.error, width: 1.5), borderRadius: BorderRadius.circular(12)),
+                        focusedErrorBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.error, width: 1.5), borderRadius: BorderRadius.circular(12)),
+                      ),
+                      searchHint: 'جستجوی پروژه...'.tr,
+                      items: controller.projects.map<DropdownMenuItem<Project>>((project) {
+                        return DropdownMenuItem<Project>(
+                          value: project,
+                          child: Text(project.projectName, style: TextStyle(color: colorScheme.onSurface)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        controller.selectedProjects[index].value = val;
+                        controller.taskProjectErrors[index].value = false;
+                        controller.calculateStats();
+                      },
+                    ) : DropdownButtonFormField<Project>(
                       initialValue: controller.selectedProjects[index].value,
                       hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: disabledColor)),
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
@@ -45,15 +65,11 @@ class TaskRow extends StatelessWidget {
                       items: controller.projects.map<DropdownMenuItem<Project>>((project) {
                         return DropdownMenuItem<Project>(
                           value: project,
-                          enabled: isEnabled,
-                          child: Text(project.projectName, style: TextStyle(color: isEnabled ? colorScheme.onSurface : disabledColor)),
+                          enabled: false,
+                          child: Text(project.projectName, style: TextStyle(color: disabledColor)),
                         );
                       }).toList(),
-                      onChanged: isEnabled ? (val) {
-                        controller.selectedProjects[index].value = val;
-                        controller.taskProjectErrors[index].value = false;
-                        controller.calculateStats();
-                      } : null,
+                      onChanged: null,
                     ),
                   ),
                 ),
