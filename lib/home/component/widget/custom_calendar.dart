@@ -99,7 +99,7 @@ class CustomCalendarWidget extends StatelessWidget {
                   crossAxisCount: 7,
                   crossAxisSpacing: 4.0,
                   mainAxisSpacing: 4.0,
-                  childAspectRatio: 1.4, // مستطیل افقی برای وب
+                  childAspectRatio: 0.85, // مستطیل عمودی مناسب برای وب
                 ),
                 itemCount: adjustedSlots,
                 itemBuilder: (context, index) {
