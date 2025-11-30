@@ -204,12 +204,6 @@
         "additional_description": "31 March",
         "isHoliday": false,
         "isReligious": false
-      },
-      {
-        "description": "برج ایفل در پاریس بطور رسمی گشایش یافت.",
-        "additional_description": "31 March",
-        "isHoliday": false,
-        "isReligious": false
       }
     ]
   },
@@ -469,12 +463,6 @@
         "isReligious": false
       },
       {
-        "description": "روز بزرگداشت عطار نیشابوری",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "شهادت امام جعفر صادق علیه السلام",
         "additional_description": "٢٥ شوال",
         "isHoliday": true,
@@ -485,12 +473,6 @@
         "additional_description": "14 April",
         "isHoliday": false,
         "isReligious": false
-      },
-      {
-        "description": "شهادت امام جعفر صادق علیه السلام",
-        "additional_description": "٢٥ شوال",
-        "isHoliday": true,
-        "isReligious": true
       },
       {
         "description": "درگذشت جرج فردریک هندل آهنگساز آلمانی",
@@ -871,12 +853,6 @@
       },
       {
         "description": "زادروز آلفرد کاستلر فیزیکدان فرانسوی، برندهٔ جایزه نوبل فیزیک سال ۱۹۶۶",
-        "additional_description": "3 May",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز جرج پاجت تامسون فیزیک‌دان انگلیسی، برندهٔ جایزه نوبل سال ۱۹۳۷",
         "additional_description": "3 May",
         "isHoliday": false,
         "isReligious": false
@@ -1274,12 +1250,6 @@
         "additional_description": "26 May",
         "isHoliday": false,
         "isReligious": false
-      },
-      {
-        "description": "درگذشت هوشنگ سیحون معمار، طراح، نقاش و مجسمه‌ساز ایرانی",
-        "additional_description": "26 May",
-        "isHoliday": false,
-        "isReligious": false
       }
     ]
   },
@@ -1432,25 +1402,7 @@
         "isReligious": true
       },
       {
-        "description": "ولادت امام علی النقی الهادی علیه السلام",
-        "additional_description": "١٥ ذوالحجه",
-        "isHoliday": false,
-        "isReligious": true
-      },
-      {
         "description": "زادروز توماس هاردی، رمان‌نویس و شاعر انگلیسی",
-        "additional_description": "2 June",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز توماس هاردی، رمان‌نویس و شاعر انگلیسی",
-        "additional_description": "2 June",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز مارکی دو ساد نویسنده و فیلسوف فرانسوی",
         "additional_description": "2 June",
         "isHoliday": false,
         "isReligious": false
@@ -1744,12 +1696,6 @@
         "isReligious": false
       },
       {
-        "description": "زادروز توران میرهادی استاد ادبیات کودک، نویسنده و کارشناس آموزش و پرورش و شخصیت برجسته فرهنگی",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "روز جهانی پدر",
         "additional_description": "16 June",
         "isHoliday": false,
@@ -1852,24 +1798,6 @@
         "isReligious": false
       },
       {
-        "description": "شهادت دکتر مصطفی چمران",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "شهادت دکتر مصطفی چمران",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "شهادت دکتر مصطفی چمران",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "سالروز زلزله رودبار و منجیل [1369خورشیدی]",
         "additional_description": "",
         "isHoliday": false,
@@ -1905,12 +1833,6 @@
     "date": "1405/04/02",
     "isHoliday": false,
     "events": [
-      {
-        "description": "زادروز آلن تورینگ، ریاضی‌دان، منطق‌دان، و رمزنگار بریتانیایی، دانشمند علوم رایانه",
-        "additional_description": "23 June",
-        "isHoliday": false,
-        "isReligious": false
-      },
       {
         "description": "زادروز آلن تورینگ، ریاضی‌دان، منطق‌دان، و رمزنگار بریتانیایی، دانشمند علوم رایانه",
         "additional_description": "23 June",
@@ -2176,18 +2098,6 @@
         "isReligious": false
       },
       {
-        "description": "روز قلم",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت آلبرشت کوسل زیست‌شناس آلمانی، برندهٔ جایزه نوبل فیزیولوژی و پزشکی سال ۱۹۱۰",
-        "additional_description": "5 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "درگذشت آلبرشت کوسل زیست‌شناس آلمانی، برندهٔ جایزه نوبل فیزیولوژی و پزشکی سال ۱۹۱۰",
         "additional_description": "5 July",
         "isHoliday": false,
@@ -2326,24 +2236,6 @@
         "isReligious": false
       },
       {
-        "description": "زادروز ملاله یوسف‌زی، فعال حقوق بشر و حقوق کودکان و عضو کمپین تحصیل دختران اهل پاکستان، برندهٔ جایزه صلح نوبل",
-        "additional_description": "12 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت مریم میرزاخانی، ریاضیدان ایرانی و اولین زن برنده مدال فیلدز",
-        "additional_description": "12 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت مریم میرزاخانی، ریاضیدان ایرانی و اولین زن برنده مدال فیلدز",
-        "additional_description": "12 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "درگذشت مریم میرزاخانی، ریاضیدان ایرانی و اولین زن برنده مدال فیلدز",
         "additional_description": "12 July",
         "isHoliday": false,
@@ -2357,18 +2249,6 @@
     "events": [
       {
         "description": "زادروز عباس زریاب خویی، مترجم، تاریخ‌دان و کتاب‌شناس ایرانی",
-        "additional_description": "13 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز عباس زریاب خویی، مترجم، تاریخ‌دان و کتاب‌شناس ایرانی",
-        "additional_description": "13 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت مهدی حمیدی شیرازی، ادیب، شاعر، مترجم و منتقد ایرانی",
         "additional_description": "13 July",
         "isHoliday": false,
         "isReligious": false
@@ -2409,12 +2289,6 @@
     "date": "1405/04/24",
     "isHoliday": false,
     "events": [
-      {
-        "description": "درگذشت آنتون چخوف، داستان‌نویس و نمایش‌نامه‌نویس برجستهٔ روس",
-        "additional_description": "15 July",
-        "isHoliday": false,
-        "isReligious": false
-      },
       {
         "description": "درگذشت آنتون چخوف، داستان‌نویس و نمایش‌نامه‌نویس برجستهٔ روس",
         "additional_description": "15 July",
@@ -2739,18 +2613,6 @@
         "isReligious": false
       },
       {
-        "description": "درگذشت الکساندر گراهام بل دانشمند بریتانیایی، مخترع تلفن",
-        "additional_description": "2 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت ریموند کِلِوی کاروِر جونیور نویسندهٔ داستان‌های کوتاه و شاعر آمریکایی",
-        "additional_description": "2 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "درگذشت ریموند کِلِوی کاروِر جونیور نویسندهٔ داستان‌های کوتاه و شاعر آمریکایی",
         "additional_description": "2 August",
         "isHoliday": false,
@@ -2918,25 +2780,7 @@
         "isReligious": true
       },
       {
-        "description": "رحلت  رسول اکرم؛شهادت امام حسن مجتبی علیه السلام",
-        "additional_description": "٢٨ صفر",
-        "isHoliday": true,
-        "isReligious": true
-      },
-      {
         "description": "درگذشت توماس مان نویسندهٔ آلمانی، برندهٔ جایزه نوبل ادبیات سال ۱۹۲۹",
-        "additional_description": "12 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت توماس مان نویسندهٔ آلمانی، برندهٔ جایزه نوبل ادبیات سال ۱۹۲۹",
-        "additional_description": "12 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز خاسینتو بناونته نمایش‌نامه‌نویس اسپانیایی، برندهٔ جایزه نوبل ادبیات سال ۱۹۲۲",
         "additional_description": "12 August",
         "isHoliday": false,
         "isReligious": false
@@ -3025,12 +2869,6 @@
     "date": "1405/05/25",
     "isHoliday": false,
     "events": [
-      {
-        "description": "درگذشت ایروینگ لانگمویر شیمی‌دان و فیزیک‌دان آمریکایی، برنده جایزه نوبل شیمی سال ۱۹۳۲",
-        "additional_description": "16 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
       {
         "description": "درگذشت ایروینگ لانگمویر شیمی‌دان و فیزیک‌دان آمریکایی، برنده جایزه نوبل شیمی سال ۱۹۳۲",
         "additional_description": "16 August",
@@ -3242,12 +3080,6 @@
       {
         "description": "زادروز آنتوان لاووازیه، شیمیدان فرانسوی و بنیان‌گذار علم شیمی مدرن",
         "additional_description": "26 August",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز کوروش بزرگ",
-        "additional_description": "",
         "isHoliday": false,
         "isReligious": false
       },
@@ -3865,12 +3697,6 @@
       {
         "description": "درگذشت پرویز مشکاتیان موسیقی‌دان و نوازنده ایرانی",
         "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز هایک کامرلینگ اونس فیزیکدان هلندی، برندهٔ جایزه نوبل فیزیک سال ۱۹۱۳",
-        "additional_description": "21 September",
         "isHoliday": false,
         "isReligious": false
       },
@@ -4997,26 +4823,8 @@
         "isReligious": false
       },
       {
-        "description": "توافق اتمی کره شمالی و ایالات متحده آمریکا بر سر متوقف کردن ساخت جنگ‌افزار هسته‌ای",
-        "additional_description": "21 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "زادروز آلفونس دولامارتین شاعر، نویسنده و سیاست‌مدار فرانسوی",
         "additional_description": "21 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز آلفونس دولامارتین شاعر، نویسنده و سیاست‌مدار فرانسوی",
-        "additional_description": "21 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "روز ملی کوهنورد",
-        "additional_description": "",
         "isHoliday": false,
         "isReligious": false
       },
@@ -5117,25 +4925,7 @@
         "isReligious": false
       },
       {
-        "description": "تأسیس سازمان ملل متحد",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "سقوط وال‌استریت در سال ۱۹۲۹ سقوط بازار سهام در بازار بورس نیویورک",
-        "additional_description": "24 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "سقوط وال‌استریت در سال ۱۹۲۹ سقوط بازار سهام در بازار بورس نیویورک",
-        "additional_description": "24 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت لوئی رنو صنعت‌گر فرانسوی، از بنیان‌گذاران شرکت خودرو سازی رنو",
         "additional_description": "24 October",
         "isHoliday": false,
         "isReligious": false
@@ -5231,18 +5021,6 @@
         "isReligious": false
       },
       {
-        "description": "هجرت محمد (ص) از مکه به مدینه و انتخاب این روز به عنوان مبدأ تاریخ مسلمانان در دو تقویم هجری شمسی و هجری قمری",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "تاسیس دانشگاه هاروارد نخستین مؤسسه آموزش عالی در آمریکا",
-        "additional_description": "28 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "تاسیس دانشگاه هاروارد نخستین مؤسسه آموزش عالی در آمریکا",
         "additional_description": "28 October",
         "isHoliday": false,
@@ -5250,18 +5028,6 @@
       },
       {
         "description": "زادروز جوناس سالک پزشک آمریکایی، کاشف واکسن فلج اطفال",
-        "additional_description": "28 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز جوناس سالک پزشک آمریکایی، کاشف واکسن فلج اطفال",
-        "additional_description": "28 October",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز ویلیام هنری گیتس سوم مشهور به بیل گیتس مدیر شرکت مایکروسافت",
         "additional_description": "28 October",
         "isHoliday": false,
         "isReligious": false
@@ -5698,12 +5464,6 @@
         "isReligious": true
       },
       {
-        "description": "شهادت حضرت فاطمه زهرا سلام الله علیها",
-        "additional_description": "٣ جمادي الثانيه",
-        "isHoliday": true,
-        "isReligious": true
-      },
-      {
         "description": "روز جهانی دیابت",
         "additional_description": "14 November",
         "isHoliday": false,
@@ -5855,12 +5615,6 @@
     "events": [
       {
         "description": "نخستین پرواز ثبت‌شده انسان با بالون توسط برادران مون‌گلفیه در پاریس",
-        "additional_description": "21 November",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز ولتر، فیلسوف و نویسندهٔ فرانسوی عصر روشنگر",
         "additional_description": "21 November",
         "isHoliday": false,
         "isReligious": false
@@ -6250,25 +6004,7 @@
         "isReligious": false
       },
       {
-        "description": "زادروز داریوش مهرجویی کارگردان، نویسنده و مترجم ایرانی.",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "زادروز ژان سیبلیوس، آهنگساز فنلاندی و از محبوب‌ترین چهره‌های موسیقی کلاسیک در قرن ۱۹ و اوایل قرن بیستم",
-        "additional_description": "8 December",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز ژان سیبلیوس، آهنگساز فنلاندی و از محبوب‌ترین چهره‌های موسیقی کلاسیک در قرن ۱۹ و اوایل قرن بیستم",
-        "additional_description": "8 December",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت جرج بول ریاضیدان و فیلسوف انگلیسی، از بنیان‌گذاران علم کامپیوتر",
         "additional_description": "8 December",
         "isHoliday": false,
         "isReligious": false
@@ -6468,12 +6204,6 @@
       {
         "description": "روز پژوهش",
         "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت ویلیام سامرست موآم، داستان‌نویس و نمایشنامه‌نویس انگلیسی",
-        "additional_description": "16 December",
         "isHoliday": false,
         "isReligious": false
       },
@@ -7486,25 +7216,7 @@
         "isReligious": false
       },
       {
-        "description": "بازگشت امام خمینی (ره) به ایران",
-        "additional_description": "",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "درگذشت ورنر کارل هایزنبرگ، فیزیک‌دان آلمانی، برندهٔ جایزه نوبل فیزیک سال ۱۹۳۲.",
-        "additional_description": "1 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت ورنر کارل هایزنبرگ، فیزیک‌دان آلمانی، برندهٔ جایزه نوبل فیزیک سال ۱۹۳۲.",
-        "additional_description": "1 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز امیلیو گینو سگر، فیزیکدان ایتالیایی، برندهٔ جایزه نوبل فیزیک سال ۱۹۵۹.",
         "additional_description": "1 February",
         "isHoliday": false,
         "isReligious": false
@@ -7684,18 +7396,6 @@
         "isReligious": false
       },
       {
-        "description": "زادروز والتر هاوسر براتین، فیزیکدان آمریکایی؛ برندهٔ جایزه نوبل فیزیک سال۱۹۵۶.",
-        "additional_description": "10 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت ویلهلم کنراد رونتگن، فیزیکدان آلمانی؛ کاشف اشعه ایکس، برندهٔ جایزه نوبل فیزیک سال ۱۹۰۱.",
-        "additional_description": "10 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
         "description": "درگذشت ویلهلم کنراد رونتگن، فیزیکدان آلمانی؛ کاشف اشعه ایکس، برندهٔ جایزه نوبل فیزیک سال ۱۹۰۱.",
         "additional_description": "10 February",
         "isHoliday": false,
@@ -7817,18 +7517,6 @@
     "events": [
       {
         "description": "زادروز ارنست هکل، زیست‌شناس، مورخ طبیعت، فیلسوف، پزشک و استاد آلمانی.",
-        "additional_description": "16 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "زادروز ارنست هکل، زیست‌شناس، مورخ طبیعت، فیلسوف، پزشک و استاد آلمانی.",
-        "additional_description": "16 February",
-        "isHoliday": false,
-        "isReligious": false
-      },
-      {
-        "description": "درگذشت فرانسیس راوس، ویروس‌شناس آمریکایی؛ برنده جایزه نوبل فیزیولوژی و پزشکی.",
         "additional_description": "16 February",
         "isHoliday": false,
         "isReligious": false
@@ -8114,18 +7802,6 @@
         "additional_description": "٢٢ رمضان",
         "isHoliday": false,
         "isReligious": true
-      },
-      {
-        "description": "شب قدر",
-        "additional_description": "٢٢ رمضان",
-        "isHoliday": false,
-        "isReligious": true
-      },
-      {
-        "description": "درگذشت هاوارد کارتر باستان‌شناس و مصرشناس بریتانیایی",
-        "additional_description": "2 March",
-        "isHoliday": false,
-        "isReligious": false
       },
       {
         "description": "درگذشت هاوارد کارتر باستان‌شناس و مصرشناس بریتانیایی",
