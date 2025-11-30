@@ -6,122 +6,97 @@ import '../../../model/day_period_status.dart';
 import '../../controller/home_controller.dart';
 import 'grid_calendar_day_card.dart';
 
-class CustomCalendarWidget extends StatelessWidget {
-  const CustomCalendarWidget({super.key});
+class WeeklyCalendarWidget extends StatelessWidget {
+  const WeeklyCalendarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(
       builder: (homeController) {
         final colorScheme = Theme.of(context).colorScheme;
-
-        // استفاده از تابع جدید که همه روزهای ماه + روزهای اضافه شده رو برمی‌گردونه
-        final days = homeController.getCalendarDaysWithStatus();
-
-        if (days.isEmpty) {
-          return Center(
-            child: Text(
-              'روزی برای نمایش وجود ندارد',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'BNazanin',
-                color: colorScheme.onSurface,
-              ),
-            ),
-          );
-        }
-
-        // محاسبه اولین روز هفته برای تنظیم offset در grid
-        final firstDay = days.first;
-        // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
-        final firstWeekday = firstDay.weekDay;
-
-        // تعداد slot های خالی قبل از اولین روز
-        // weekday - 1 چون grid از index 0 شروع می‌شود
-        final emptySlotsBefore = firstWeekday - 1;
-
-        // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
-        final totalSlots = days.length + emptySlotsBefore;
-        // تکمیل آخرین ردیف grid
-        final adjustedSlots =
-            (totalSlots % 7 == 0)
-                ? totalSlots
-                : totalSlots + (7 - totalSlots % 7);
+        final weekDays = homeController.getCurrentWeekDays();
 
         return Column(
           children: [
             // راهنمای رنگ‌ها
             if (homeController.isCurrentMonthPeriodCustom)
               _buildColorLegend(context),
-
-            // هدر روزهای هفته
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 4.0,
+            
+            // اطلاعات هفته
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children:
-                    [
-                      'شنبه', // index 0, weekday 1
-                      'یک‌شنبه', // index 1, weekday 2
-                      'دوشنبه', // index 2, weekday 3
-                      'سه‌شنبه', // index 3, weekday 4
-                      'چهارشنبه', // index 4, weekday 5
-                      'پنج‌شنبه', // index 5, weekday 6
-                      'جمعه', // index 6, weekday 7
-                    ].asMap().entries.map((entry) {
-                      return Expanded(
-                        child: Text(
-                          entry.value,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'BNazanin',
-                            color:
-                                entry.key == 6
-                                    ? colorScheme.error
-                                    : colorScheme.onSurface,
-                            fontSize: 12,
-                          ),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'هفته: ${weekDays.first.formatter.d} تا ${weekDays.last.formatter.d}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'BNazanin',
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: colorScheme.onPrimaryContainer,
+                          size: 18,
                         ),
-                      );
-                    }).toList(),
+                        onPressed: homeController.previousWeek,
+                        tooltip: 'هفته قبل',
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.today,
+                          color: colorScheme.onPrimaryContainer,
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          homeController.currentWeekStartDate.value = Jalali.now();
+                          homeController.update();
+                        },
+                        tooltip: 'هفته جاری',
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: colorScheme.onPrimaryContainer,
+                          size: 18,
+                        ),
+                        onPressed: homeController.nextWeek,
+                        tooltip: 'هفته بعد',
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-
-            // Grid تقویم با سایز افقی
+            
+            // Grid هفتگی
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.all(8.0),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 7,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                  childAspectRatio: 1.4, // مستطیل افقی برای وب
+                  crossAxisSpacing: 6.0,
+                  mainAxisSpacing: 6.0,
+                  childAspectRatio: 1.2, // کمی کوتاه‌تر از نمای ماهانه
                 ),
-                itemCount: adjustedSlots,
+                itemCount: 7,
                 itemBuilder: (context, index) {
-                  // اگر در محدوده slot های خالی قبل از اولین روز باشیم
-                  if (index < emptySlotsBefore) {
-                    return Container();
-                  }
-
-                  // محاسبه index روز در لیست days
-                  final dayIndex = index - emptySlotsBefore;
-
-                  // اگر index از تعداد روزها بیشتر باشد، slot خالی
-                  if (dayIndex >= days.length) {
-                    return Container();
-                  }
-
-                  // نمایش روز
-                  return GridCalendarDayCard(date: days[dayIndex]);
+                  return GridCalendarDayCard(date: weekDays[index]);
                 },
               ),
             ),
-
+            
             // دکمه جزئیات روز امروز
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -169,14 +144,16 @@ class CustomCalendarWidget extends StatelessWidget {
   /// راهنمای رنگ‌ها برای ماه‌های با بازه سفارشی
   Widget _buildColorLegend(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -211,7 +188,7 @@ class CustomCalendarWidget extends StatelessWidget {
     required IconData icon,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -399,3 +376,4 @@ class CustomCalendarWidget extends StatelessWidget {
     );
   }
 }
+

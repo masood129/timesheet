@@ -31,49 +31,50 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 taskController.isPersonalTimerRunning.value
                     ? DropdownButtonFormField(
-                        initialValue: taskController.selectedTimerProject.value,
-                        hint: Text(
-                          'select_project'.tr,
-                          style: TextStyle(color: colorScheme.onSurface),
-                        ),
-                        decoration: InputDecoration(
-                          labelText: 'projects'.tr,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        items:
-                            taskController.projects
-                                .map(
-                                  (project) => DropdownMenuItem(
-                                    value: project,
-                                    child: Text(project.projectName),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: null,
-                      )
-                    : SearchableDropdown<Project>(
-                        value: taskController.selectedTimerProject.value,
-                        decoration: InputDecoration(
-                          labelText: 'projects'.tr,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        searchHint: 'جستجوی پروژه...',
-                        items:
-                            taskController.projects
-                                .map(
-                                  (project) => DropdownMenuItem(
-                                    value: project,
-                                    child: Text(project.projectName),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (value) =>
-                            taskController.selectedTimerProject.value = value,
+                      initialValue: taskController.selectedTimerProject.value,
+                      hint: Text(
+                        'select_project'.tr,
+                        style: TextStyle(color: colorScheme.onSurface),
                       ),
+                      decoration: InputDecoration(
+                        labelText: 'projects'.tr,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      items:
+                          taskController.projects
+                              .map(
+                                (project) => DropdownMenuItem(
+                                  value: project,
+                                  child: Text(project.projectName),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: null,
+                    )
+                    : SearchableDropdown<Project>(
+                      value: taskController.selectedTimerProject.value,
+                      decoration: InputDecoration(
+                        labelText: 'projects'.tr,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      searchHint: 'جستجوی پروژه...',
+                      items:
+                          taskController.projects
+                              .map(
+                                (project) => DropdownMenuItem(
+                                  value: project,
+                                  child: Text(project.projectName),
+                                ),
+                              )
+                              .toList(),
+                      onChanged:
+                          (value) =>
+                              taskController.selectedTimerProject.value = value,
+                    ),
                 const SizedBox(height: 16),
                 Text(
                   taskController.isTimerRunning.value
@@ -244,14 +245,29 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
         Obx(
           () => IconButton(
             icon: Icon(
+              homeController.isWeekView.value
+                  ? Icons.view_module
+                  : Icons.view_week,
+            ),
+            onPressed: homeController.toggleWeekMonthView,
+            tooltip:
+                homeController.isWeekView.value ? 'نمای ماهانه' : 'نمای هفتگی',
+          ),
+        ),
+        Obx(
+          () => IconButton(
+            icon: Icon(
               homeController.isListView.value ? Icons.grid_view : Icons.list,
             ),
             onPressed: homeController.toggleView,
+            tooltip:
+                homeController.isListView.value ? 'نمای شبکه‌ای' : 'نمای لیست',
           ),
         ),
         IconButton(
           icon: const Icon(Icons.timer),
           onPressed: () => _showTimerDialog(context),
+          tooltip: 'تایمر',
         ),
       ],
     );

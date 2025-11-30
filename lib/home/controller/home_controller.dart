@@ -9,6 +9,7 @@ import '../../core/theme/snackbar_helper.dart';
 import '../../model/daily_detail_model.dart';
 import '../../model/draft_report_model.dart';
 import '../../model/leavetype_model.dart';
+import '../../model/day_period_status.dart';
 import '../../data/models/month_period_model.dart';
 import '../component/note_dialog.dart';
 import '../controller/task_controller.dart';
@@ -18,8 +19,10 @@ class HomeController extends GetxController {
 
   var currentMonth = Jalali.now().month.obs;
   var currentYear = Jalali.now().year.obs;
+  var currentWeekStartDate = Jalali.now().obs; // تاریخ شروع هفته جاری
   var dailyDetails = <DailyDetail>[].obs;
   var isListView = false.obs;
+  var isWeekView = false.obs; // نمای هفتگی یا ماهانه
   var holidays = <String, dynamic>{}.obs;
   var monthStatus = Rx<String?>(
     null,
@@ -97,6 +100,140 @@ class HomeController extends GetxController {
     return isCustom;
   }
 
+  /// دریافت لیست کامل روزهای ماه جاری (همه روزهای calendar از 1 تا آخر ماه)
+  List<Jalali> getAllDaysInCurrentCalendarMonth() {
+    final daysCount = calendarModel.getDaysInMonth(
+      currentYear.value,
+      currentMonth.value,
+    );
+    return List.generate(
+      daysCount,
+      (index) => Jalali(currentYear.value, currentMonth.value, index + 1),
+    );
+  }
+
+  /// تشخیص وضعیت یک روز در تقویم (عادی/اضافه شده/حذف شده)
+  DayPeriodStatus getDayPeriodStatus(Jalali date) {
+    // اگر بازه سفارشی نداریم، همه روزها عادی هستند
+    if (currentMonthPeriod == null) {
+      return DayPeriodStatus.normal;
+    }
+
+    final periodDays = currentMonthPeriod!.getDaysInPeriod();
+    final isInPeriod = periodDays.any(
+      (d) => d.year == date.year && d.month == date.month && d.day == date.day,
+    );
+
+    // اگر روز در بازه است و از ماه جاری است: عادی
+    if (isInPeriod &&
+        date.month == currentMonth.value &&
+        date.year == currentYear.value) {
+      return DayPeriodStatus.normal;
+    }
+
+    // اگر روز در بازه است ولی از ماه دیگر است: اضافه شده
+    if (isInPeriod &&
+        (date.month != currentMonth.value || date.year != currentYear.value)) {
+      return DayPeriodStatus.added;
+    }
+
+    // اگر روز در بازه نیست: حذف شده
+    return DayPeriodStatus.removed;
+  }
+
+  /// دریافت لیست روزهای نمایشی در تقویم (شامل همه روزهای ماه + وضعیت آنها)
+  /// این تابع برای نمایش در Grid Calendar استفاده می‌شود
+  List<Jalali> getCalendarDaysWithStatus() {
+    if (currentMonthPeriod == null) {
+      // اگر بازه سفارشی نداریم، همه روزهای ماه را نمایش بده
+      return getAllDaysInCurrentCalendarMonth();
+    }
+
+    // لیست همه روزهای ماه calendar (1 تا آخر ماه)
+    final allCalendarDays = getAllDaysInCurrentCalendarMonth();
+
+    // لیست روزهای بازه
+    final periodDays = currentMonthPeriod!.getDaysInPeriod();
+
+    // روزهایی که از ماه‌های دیگر به این ماه اضافه شده‌اند
+    final addedDaysFromOtherMonths =
+        periodDays
+            .where(
+              (d) =>
+                  (d.month != currentMonth.value ||
+                      d.year != currentYear.value),
+            )
+            .toList();
+
+    // ترکیب: ابتدا روزهای اضافه شده (اگر قبل از این ماه باشند)،
+    // سپس روزهای ماه جاری،
+    // سپس روزهای اضافه شده (اگر بعد از این ماه باشند)
+    final beforeDays =
+        addedDaysFromOtherMonths
+            .where(
+              (d) =>
+                  d.year < currentYear.value ||
+                  (d.year == currentYear.value && d.month < currentMonth.value),
+            )
+            .toList();
+
+    final afterDays =
+        addedDaysFromOtherMonths
+            .where(
+              (d) =>
+                  d.year > currentYear.value ||
+                  (d.year == currentYear.value && d.month > currentMonth.value),
+            )
+            .toList();
+
+    return [...beforeDays, ...allCalendarDays, ...afterDays];
+  }
+
+  /// دریافت روزهای هفته جاری (از شنبه تا جمعه)
+  List<Jalali> getCurrentWeekDays() {
+    // پیدا کردن اولین روز هفته (شنبه)
+    Jalali startDate = currentWeekStartDate.value;
+
+    // اگر روز شنبه نیست، به اولین شنبه قبلی برو
+    while (startDate.weekDay != 1) {
+      startDate = startDate.addDays(-1);
+    }
+
+    // به‌روزرسانی تاریخ شروع
+    currentWeekStartDate.value = startDate;
+
+    // تولید 7 روز هفته
+    return List.generate(7, (index) => startDate.addDays(index));
+  }
+
+  /// رفتن به هفته قبل
+  void previousWeek() {
+    currentWeekStartDate.value = currentWeekStartDate.value.addDays(-7);
+    update();
+  }
+
+  /// رفتن به هفته بعد
+  void nextWeek() {
+    currentWeekStartDate.value = currentWeekStartDate.value.addDays(7);
+    update();
+  }
+
+  /// تغییر بین نمای هفتگی و ماهانه
+  void toggleWeekMonthView() {
+    isWeekView.value = !isWeekView.value;
+
+    // اگر به نمای هفتگی رفتیم، روز جاری رو در هفته قرار بده
+    if (isWeekView.value) {
+      currentWeekStartDate.value = Jalali(
+        currentYear.value,
+        currentMonth.value,
+        1,
+      );
+    }
+
+    update();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -148,7 +285,7 @@ class HomeController extends GetxController {
     await taskController.loadDailyDetail(date, dailyDetails);
 
     if (!context.mounted) return;
-    
+
     showModalBottomSheet(
       useSafeArea: true,
       enableDrag: false,

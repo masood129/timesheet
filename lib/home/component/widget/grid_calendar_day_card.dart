@@ -1,8 +1,8 @@
-// grid_calendar_day_card.dart (بروزرسانی شده)
 import 'package:flutter/material.dart';
-import 'package:get/Get.dart';
+import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../../model/leavetype_model.dart';
+import '../../../model/day_period_status.dart';
 import '../../controller/home_controller.dart';
 
 class GridCalendarDayCard extends StatelessWidget {
@@ -27,205 +27,266 @@ class GridCalendarDayCard extends StatelessWidget {
       final cardStatus = homeController.getCardStatus(date, context);
       final effectiveWork = homeController.calculateEffectiveWork(date);
       final note = homeController.getNoteForDate(date);
-      // Calendar now only shows period days, so all days are "current month"
-      final isFromOtherMonth = false;
-      final isEditedPeriod = homeController.isCurrentMonthPeriodCustom;
 
-      return GestureDetector(
-        onTap: () {
-          homeController.openNoteDialog(context, date);
-        },
-        child: Card(
-          elevation:
-              isToday
-                  ? 6
-                  : isHoliday
-                  ? 4
-                  : 2,
-          shadowColor:
-              isToday
-                  ? Colors.blue.withValues(alpha: 0.4)
-                  : isHoliday
-                  ? Colors.red.withValues(alpha: 0.3)
-                  : colorScheme.shadow.withValues(alpha: 0.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side:
+      // دریافت وضعیت روز در بازه ماهانه
+      final periodStatus = homeController.getDayPeriodStatus(date);
+      final isRemoved = periodStatus == DayPeriodStatus.removed;
+      final isAdded = periodStatus == DayPeriodStatus.added;
+
+      // تعیین رنگ‌ها بر اساس وضعیت
+      Color? cardColor;
+      LinearGradient? cardGradient;
+      BorderSide? cardBorderSide;
+      Border? cardBorder;
+      double cardOpacity = 1.0;
+
+      if (isRemoved) {
+        // روز حذف شده: خاکستری
+        cardColor = Colors.grey[300];
+        cardOpacity = 0.5;
+        cardBorder = Border.all(color: Colors.grey[400]!, width: 1.5);
+      } else if (isToday) {
+        // روز امروز: آبی با gradient
+        cardGradient = LinearGradient(
+          colors: [Colors.blue[700]!, Colors.blue[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+        cardBorderSide = BorderSide(color: Colors.amber[300]!, width: 2);
+      } else if (isHoliday) {
+        // تعطیل: قرمز با gradient
+        cardGradient = LinearGradient(
+          colors: [Colors.red[600]!, Colors.red[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+        cardBorderSide = BorderSide(color: Colors.red[300]!, width: 1.5);
+      } else if (isAdded) {
+        // روز اضافه شده: بنفش
+        cardGradient = LinearGradient(
+          colors: [
+            Colors.purple[400]!.withValues(alpha: 0.7),
+            Colors.purple[100]!.withValues(alpha: 0.5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+        cardBorder = Border.all(color: Colors.purple[400]!, width: 2);
+      } else {
+        // روز عادی
+        cardColor = colorScheme.surface;
+      }
+
+      // تعیین رنگ متن
+      Color textColor;
+      if (isRemoved) {
+        textColor = Colors.grey[600]!;
+      } else if (isToday || isHoliday) {
+        textColor = Colors.white;
+      } else if (isAdded) {
+        textColor = Colors.purple[900]!;
+      } else if (isFriday) {
+        textColor = colorScheme.error;
+      } else {
+        textColor = colorScheme.onSurface;
+      }
+
+      return Opacity(
+        opacity: cardOpacity,
+        child: GestureDetector(
+          onTap:
+              isRemoved
+                  ? null
+                  : () {
+                    homeController.openNoteDialog(context, date);
+                  },
+          child: Card(
+            elevation:
                 isToday
-                    ? BorderSide(color: Colors.amber[300]!, width: 1.5)
+                    ? 6
                     : isHoliday
-                    ? BorderSide(color: Colors.red[300]!, width: 1.5)
-                    : BorderSide.none,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
+                    ? 4
+                    : isAdded
+                    ? 3
+                    : 2,
+            shadowColor:
+                isToday
+                    ? Colors.blue.withValues(alpha: 0.4)
+                    : isHoliday
+                    ? Colors.red.withValues(alpha: 0.3)
+                    : isAdded
+                    ? Colors.purple.withValues(alpha: 0.3)
+                    : colorScheme.shadow.withValues(alpha: 0.2),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
-              gradient:
-                  isToday
-                      ? LinearGradient(
-                        colors: [Colors.blue[700]!, Colors.blue[200]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                      : isHoliday
-                      ? LinearGradient(
-                        colors: [Colors.red[600]!, Colors.red[200]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                      : isEditedPeriod && !isFromOtherMonth
-                      ? LinearGradient(
-                        colors: [
-                          Colors.purple[100]!.withValues(alpha: 0.3),
-                          Colors.teal[50]!.withValues(alpha: 0.2),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                      : null,
-              color:
-                  isToday || isHoliday
-                      ? null
-                      : isEditedPeriod && !isFromOtherMonth
-                      ? null // Use gradient instead
-                      : colorScheme.surface,
-              border:
-                  isEditedPeriod && !isToday && !isHoliday
-                      ? Border.all(
-                        color: Colors.purple.withValues(alpha: 0.4),
-                        width: 1.5,
-                        style: BorderStyle.solid,
-                      )
-                      : null,
+              side: cardBorderSide ?? BorderSide.none,
             ),
-            padding: const EdgeInsets.all(6.0),
-            child: Stack(
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      date.day.toString(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'BNazanin',
-                        color:
-                            isToday || isHoliday
-                                ? Colors.white
-                                : isFriday
-                                ? colorScheme.error
-                                : colorScheme.onSurface,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      date.formatter.wN,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'BNazanin',
-                        color:
-                            isToday || isHoliday
-                                ? Colors.white70
-                                : isFriday
-                                ? colorScheme.error.withValues(alpha: 0.7)
-                                : colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      cardStatus['leaveType'] != null &&
-                              cardStatus['leaveType'] != LeaveType.work &&
-                              cardStatus['leaveType'] != LeaveType.mission
-                          ? (cardStatus['leaveType'] as LeaveType).displayName
-                          : effectiveWork,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontFamily: 'BNazanin',
-                        color:
-                            isToday || isHoliday
-                                ? Colors.white70
-                                : colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Tooltip(
-                    message: homeController.getTooltipMessage(date),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color:
-                              isToday || isHoliday
-                                  ? Colors.white54
-                                  : colorScheme.outline,
-                          width: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: cardGradient,
+                color: cardGradient == null ? cardColor : null,
+                border: cardBorder is Border ? cardBorder : null,
+              ),
+              padding: const EdgeInsets.all(6.0),
+              child: Stack(
+                children: [
+                  // محتوای اصلی
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // شماره روز
+                      Text(
+                        date.day.toString(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'BNazanin',
+                          color: textColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      child: CircleAvatar(
-                        radius: 10,
-                        backgroundColor:
-                            isToday
-                                ? Colors.tealAccent[400]
-                                : cardStatus['avatarColor'],
-                        child: Icon(
-                          isToday
-                              ? Icons.event_available
-                              : cardStatus['avatarIcon'],
-                          size: 14,
-                          color:
+
+                      // نام روز هفته
+                      Text(
+                        date.formatter.wN,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'BNazanin',
+                          color: textColor.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      // کار مفید یا نوع مرخصی
+                      if (!isRemoved)
+                        Text(
+                          cardStatus['leaveType'] != null &&
+                                  cardStatus['leaveType'] != LeaveType.work &&
+                                  cardStatus['leaveType'] != LeaveType.mission
+                              ? (cardStatus['leaveType'] as LeaveType)
+                                  .displayName
+                              : effectiveWork,
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontFamily: 'BNazanin',
+                            fontWeight: FontWeight.w500,
+                            color: textColor.withValues(alpha: 0.8),
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+
+                      // نمایش "حذف شده" برای روزهای removed
+                      if (isRemoved)
+                        Text(
+                          'خارج از بازه',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontFamily: 'BNazanin',
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                    ],
+                  ),
+
+                  // آیکون وضعیت (گوشه بالا راست)
+                  if (!isRemoved)
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: Tooltip(
+                        message: homeController.getTooltipMessage(date),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color:
+                                  isToday || isHoliday || isAdded
+                                      ? Colors.white54
+                                      : colorScheme.outline,
+                              width: 1,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 8,
+                            backgroundColor:
+                                isToday
+                                    ? Colors.tealAccent[400]
+                                    : cardStatus['avatarColor'],
+                            child: Icon(
                               isToday
-                                  ? Colors.white
-                                  : cardStatus['avatarIconColor'],
+                                  ? Icons.event_available
+                                  : cardStatus['avatarIcon'],
+                              size: 11,
+                              color:
+                                  isToday
+                                      ? Colors.white
+                                      : cardStatus['avatarIconColor'],
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                if (note != null && note.isNotEmpty)
-                  Positioned(
-                    bottom: 4,
-                    left: 4,
-                    child: Icon(
-                      Icons.note_alt_outlined,
-                      size: 14,
-                      color:
-                          isToday || isHoliday
-                              ? Colors.white70
-                              : colorScheme.secondary,
+
+                  // آیکون یادداشت (گوشه پایین چپ)
+                  if (note != null && note.isNotEmpty && !isRemoved)
+                    Positioned(
+                      bottom: 2,
+                      left: 2,
+                      child: Icon(
+                        Icons.note_alt_outlined,
+                        size: 12,
+                        color:
+                            isToday || isHoliday || isAdded
+                                ? Colors.white70
+                                : colorScheme.secondary,
+                      ),
                     ),
-                  ),
-                Positioned(
-                  bottom: 4,
-                  right: 4,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.info_outline,
-                      size: 14,
-                      color:
-                          isToday || isHoliday
-                              ? Colors.white70
-                              : colorScheme.primary.withValues(alpha: 0.7),
+
+                  // دکمه info (گوشه پایین راست)
+                  if (!isRemoved)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.info_outline,
+                          size: 12,
+                          color:
+                              isToday || isHoliday || isAdded
+                                  ? Colors.white70
+                                  : colorScheme.primary.withValues(alpha: 0.7),
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          _showDayDetailsDialog(context, date);
+                        },
+                        tooltip: 'جزئیات روز',
+                      ),
                     ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      _showDayDetailsDialog(context, date);
-                    },
-                    tooltip: 'جزئیات روز',
-                  ),
-                ),
-              ],
+
+                  // آیکون قفل برای روزهای حذف شده
+                  if (isRemoved)
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: Icon(
+                        Icons.lock_outline,
+                        size: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -250,6 +311,7 @@ class GridCalendarDayCard extends StatelessWidget {
         final holiday = homeController.getHolidayForDate(date);
         final cardStatus = homeController.getCardStatus(date, context);
         final note = homeController.getNoteForDate(date);
+        final periodStatus = homeController.getDayPeriodStatus(date);
 
         return Container(
           width: MediaQuery.of(context).size.width * 0.8,
@@ -260,6 +322,13 @@ class GridCalendarDayCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildDetailRow(context, 'کار مفید', effectiveWork),
+                const SizedBox(height: 8),
+                if (homeController.isCurrentMonthPeriodCustom)
+                  _buildDetailRow(
+                    context,
+                    'وضعیت بازه',
+                    periodStatus.displayName,
+                  ),
                 const SizedBox(height: 8),
                 if (holiday != null) ...[
                   _buildHolidaySection(context, holiday),

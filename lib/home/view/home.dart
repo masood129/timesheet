@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../component/widget/calendar_app_bar.dart';
 import '../component/widget/calendar_day_card.dart';
 import '../component/widget/custom_calendar.dart';
+import '../component/widget/weekly_calendar.dart';
 import '../component/widget/main_drawer.dart';
 import '../controller/home_controller.dart';
 import '../controller/task_controller.dart';
@@ -19,6 +20,13 @@ class CalendarView extends StatelessWidget {
       appBar: CalendarAppBar(),
       drawer: MainDrawer(),
       body: Obx(() {
+        // بررسی نمای هفتگی یا ماهانه
+        if (homeController.isWeekView.value) {
+          // نمای هفتگی
+          return const WeeklyCalendarWidget();
+        }
+
+        // نمای ماهانه
         // استفاده از daysInCurrentMonth که بازه سفارشی را در نظر می‌گیرد
         final days = homeController.daysInCurrentMonth;
 
@@ -32,7 +40,7 @@ class CalendarView extends StatelessWidget {
               },
             );
           } else {
-            return CustomCalendarWidget();
+            return const CustomCalendarWidget();
           }
         });
       }),
