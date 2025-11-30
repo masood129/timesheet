@@ -700,7 +700,8 @@ class HomeController extends GetxController {
         detail.leaveTime != null &&
         detail.leaveTime!.isNotEmpty;
 
-    if (detail == null && !hasWorkingHours) {
+    // اگر اصلاً detail نداریم
+    if (detail == null) {
       return {
         'avatarColor': colorScheme.noDataStatus,
         'avatarIcon': Icons.calendar_today,
@@ -711,33 +712,36 @@ class HomeController extends GetxController {
     }
 
     bool isComplete = false;
-    if (hasWorkingHours) {
-      final hasArrivalTime =
-          detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
-      final hasLeaveTime =
-          detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
-      final totalTaskMinutes = detail.tasks.fold<int>(
-        0,
-        (sum, task) => sum + (task.duration ?? 0),
-      );
-      final arrival = _parseTime(detail.arrivalTime);
-      final leave = _parseTime(detail.leaveTime);
-      int? effectiveWorkMinutes;
-      if (arrival != null && leave != null) {
-        final presenceDuration = Duration(
-          hours: leave.hour - arrival.hour,
-          minutes: leave.minute - arrival.minute,
+    // اگر روز کاری یا ماموریت است
+    if (detail.leaveType == LeaveType.work || detail.leaveType == LeaveType.mission) {
+      if (hasWorkingHours) {
+        final hasArrivalTime =
+            detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
+        final hasLeaveTime =
+            detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
+        final totalTaskMinutes = detail.tasks.fold<int>(
+          0,
+          (sum, task) => sum + (task.duration ?? 0),
         );
-        effectiveWorkMinutes =
-            presenceDuration.inMinutes - (detail.personalTime ?? 0);
+        final arrival = _parseTime(detail.arrivalTime);
+        final leave = _parseTime(detail.leaveTime);
+        int? effectiveWorkMinutes;
+        if (arrival != null && leave != null) {
+          final presenceDuration = Duration(
+            hours: leave.hour - arrival.hour,
+            minutes: leave.minute - arrival.minute,
+          );
+          effectiveWorkMinutes =
+              presenceDuration.inMinutes - (detail.personalTime ?? 0);
+        }
+        isComplete =
+            hasArrivalTime &&
+            hasLeaveTime &&
+            effectiveWorkMinutes != null &&
+            totalTaskMinutes == effectiveWorkMinutes &&
+            effectiveWorkMinutes > 0;
       }
-      isComplete =
-          hasArrivalTime &&
-          hasLeaveTime &&
-          effectiveWorkMinutes != null &&
-          totalTaskMinutes == effectiveWorkMinutes &&
-          effectiveWorkMinutes > 0;
-
+      // روز کاری یا ماموریت - همیشه وضعیت کامل یا ناقص رو برمی‌گردونه
       return {
         'avatarColor':
             isComplete
@@ -748,7 +752,7 @@ class HomeController extends GetxController {
             isComplete
                 ? colorScheme.onCompletedStatus
                 : colorScheme.onIncompleteStatus,
-        'leaveType': LeaveType.work, // تغییر به enum
+        'leaveType': detail.leaveType, // work یا mission
         'isComplete': isComplete,
       };
     }
