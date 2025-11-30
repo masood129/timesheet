@@ -145,41 +145,46 @@ class TimerDialog extends StatelessWidget {
                   // Project Timer Buttons
                   Row(
                     children: [
-                      // Start/Switch Project Timer Button
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton.icon(
-                          onPressed: !hasProject || isPersonalRunning
-                              ? null
-                              : () async {
-                                  await taskController.startTimer();
-                                  Navigator.pop(context);
-                                },
-                          icon: Icon(
-                            Icons.play_arrow,
-                            color: colorScheme.onPrimary,
-                          ),
-                          label: Text(
-                            isProjectRunning 
-                                ? 'شروع تایمر جدید'
-                                : 'start_project_timer'.tr,
-                            style: TextStyle(
-                              color: colorScheme.onPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
-                            disabledBackgroundColor: colorScheme.surfaceContainerHighest,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
+                  // Start/Switch Project Timer Button
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: !hasProject || isPersonalRunning
+                          ? null
+                          : () async {
+                              await taskController.startTimer();
+                              Navigator.pop(context);
+                            },
+                      icon: Icon(
+                        Icons.play_arrow,
+                        color: (!hasProject || isPersonalRunning)
+                            ? colorScheme.onSurface.withValues(alpha: 0.38)
+                            : colorScheme.onPrimary,
+                      ),
+                      label: Text(
+                        isProjectRunning 
+                            ? 'شروع تایمر جدید'
+                            : 'start_project_timer'.tr,
+                        style: TextStyle(
+                          color: (!hasProject || isPersonalRunning)
+                              ? colorScheme.onSurface.withValues(alpha: 0.38)
+                              : colorScheme.onPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                        disabledForegroundColor: colorScheme.onSurface.withValues(alpha: 0.38),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
                       if (isProjectRunning) ...[
                         const SizedBox(width: 8),
                         // Stop Current Timer Button
@@ -221,39 +226,44 @@ class TimerDialog extends StatelessWidget {
                   // Personal Timer Buttons
                   Row(
                     children: [
-                      // Start Personal Timer Button
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton.icon(
-                          onPressed: isProjectRunning
-                              ? null
-                              : () async {
-                                  taskController.startPersonalTimer();
-                                  Navigator.pop(context);
-                                },
-                          icon: Icon(
-                            Icons.play_arrow,
-                            color: colorScheme.onSecondary,
-                          ),
-                          label: Text(
-                            'start_personal_timer'.tr,
-                            style: TextStyle(
-                              color: colorScheme.onSecondary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.secondary,
-                            disabledBackgroundColor: colorScheme.surfaceContainerHighest,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
+                  // Start Personal Timer Button
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      onPressed: isProjectRunning
+                          ? null
+                          : () async {
+                              taskController.startPersonalTimer();
+                              Navigator.pop(context);
+                            },
+                      icon: Icon(
+                        Icons.play_arrow,
+                        color: isProjectRunning
+                            ? colorScheme.onSurface.withValues(alpha: 0.38)
+                            : colorScheme.onSecondary,
+                      ),
+                      label: Text(
+                        'start_personal_timer'.tr,
+                        style: TextStyle(
+                          color: isProjectRunning
+                              ? colorScheme.onSurface.withValues(alpha: 0.38)
+                              : colorScheme.onSecondary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.secondary,
+                        disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                        disabledForegroundColor: colorScheme.onSurface.withValues(alpha: 0.38),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
                       if (isPersonalRunning) ...[
                         const SizedBox(width: 8),
                         // Stop Personal Timer Button
