@@ -10,6 +10,138 @@ class GridCalendarDayCard extends StatelessWidget {
 
   const GridCalendarDayCard({super.key, required this.date});
 
+  List<Color> _getAllColorsForDay(
+    BuildContext context,
+    Map<String, dynamic> cardStatus,
+    bool isToday,
+    bool isHoliday,
+    bool isFriday,
+    bool isRemoved,
+    bool isAdded,
+  ) {
+    List<Color> colors = [];
+    Set<String> addedColorTypes = {}; // برای جلوگیری از رنگ‌های تکراری
+    
+    // 1. روز حذف شده فقط خاکستری (حالت خاص)
+    if (isRemoved) {
+      colors.add(Colors.grey[500]!);
+      return colors;
+    }
+    
+    // 2. رنگ روز امروز (اولویت اول)
+    if (isToday) {
+      colors.add(Colors.teal[700]!);
+      addedColorTypes.add('teal');
+    }
+    
+    // 3. رنگ تعطیلی رسمی
+    if (isHoliday) {
+      colors.add(Colors.red[700]!);
+      addedColorTypes.add('red');
+    }
+    
+    // 4. رنگ جمعه (اگر تعطیل رسمی نباشه)
+    if (isFriday && !isHoliday && !addedColorTypes.contains('red')) {
+      colors.add(Colors.deepOrange[600]!);
+      addedColorTypes.add('deepOrange');
+    }
+    
+    // 5. رنگ روز اضافه شده از بازه ماهانه
+    if (isAdded && !isToday) {
+      colors.add(Colors.deepPurple[500]!);
+      addedColorTypes.add('deepPurple');
+    }
+    
+    // 6. رنگ نوع روز (بر اساس leave type)
+    final leaveType = cardStatus['leaveType'] as LeaveType?;
+    final isComplete = cardStatus['isComplete'] as bool;
+    
+    if (leaveType != null) {
+      switch (leaveType) {
+        case LeaveType.work:
+        case LeaveType.mission:
+          // روز کاری یا ماموریت
+          if (isComplete) {
+            if (!addedColorTypes.contains('green')) {
+              colors.add(Colors.green[600]!);
+              addedColorTypes.add('green');
+            }
+          } else {
+            // روز کاری ناقص: زرد
+            if (!addedColorTypes.contains('amber') && !addedColorTypes.contains('yellow')) {
+              colors.add(Colors.amber[700]!);
+              addedColorTypes.add('amber');
+            }
+          }
+          break;
+          
+        case LeaveType.annualLeave:
+          // مرخصی استحقاقی
+          if (!addedColorTypes.contains('blue')) {
+            colors.add(Colors.blue[600]!);
+            addedColorTypes.add('blue');
+          }
+          break;
+          
+        case LeaveType.sickLeave:
+          // مرخصی استعلاجی
+          if (!addedColorTypes.contains('red')) {
+            colors.add(Colors.pink[700]!);
+            addedColorTypes.add('pink');
+          }
+          break;
+          
+        case LeaveType.giftLeave:
+          // مرخصی هدیه
+          if (!addedColorTypes.contains('purple') && !addedColorTypes.contains('deepPurple')) {
+            colors.add(Colors.purple[600]!);
+            addedColorTypes.add('purple');
+          }
+          break;
+      }
+    }
+    
+    // 7. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض خاکستری
+    if (colors.isEmpty) {
+      colors.add(Colors.grey[600]!);
+    }
+    
+    return colors;
+  }
+  
+  Color _getPrimaryIconColor(List<Color> colors) {
+    return colors.first;
+  }
+
+  IconData _getIconForDayType(
+    Map<String, dynamic> cardStatus,
+    bool isToday,
+    bool isRemoved,
+  ) {
+    if (isRemoved) return Icons.block_rounded;
+    if (isToday) return Icons.today_rounded;
+
+    final leaveType = cardStatus['leaveType'] as LeaveType?;
+    final isComplete = cardStatus['isComplete'] as bool;
+
+    if (leaveType == LeaveType.work || leaveType == LeaveType.mission) {
+      return isComplete ? Icons.check_circle_rounded : Icons.warning_rounded;
+    }
+
+    switch (leaveType) {
+      case LeaveType.annualLeave:
+        return Icons.beach_access_rounded;
+      case LeaveType.sickLeave:
+        return Icons.local_hospital_rounded;
+      case LeaveType.giftLeave:
+        return Icons.card_giftcard_rounded;
+      case LeaveType.mission:
+        return Icons.flight_takeoff_rounded;
+      default:
+        return Icons.event_note_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -33,58 +165,68 @@ class GridCalendarDayCard extends StatelessWidget {
       final isRemoved = periodStatus == DayPeriodStatus.removed;
       final isAdded = periodStatus == DayPeriodStatus.added;
 
+      // دریافت تمام رنگ‌های مرتبط با روز
+      final allColors = _getAllColorsForDay(
+        context,
+        cardStatus,
+        isToday,
+        isHoliday,
+        isFriday,
+        isRemoved,
+        isAdded,
+      );
+      final iconColor = _getPrimaryIconColor(allColors);
+      final iconData = _getIconForDayType(cardStatus, isToday, isRemoved);
+      
+      // آیا چند رنگ داریم؟
+      final hasMultipleColors = allColors.length > 1;
+
       // تعیین رنگ‌ها بر اساس وضعیت
       Color? cardColor;
       LinearGradient? cardGradient;
-      BorderSide? cardBorderSide;
-      Border? cardBorder;
+      BorderSide cardBorderSide;
       double cardOpacity = 1.0;
 
       if (isRemoved) {
         // روز حذف شده: خاکستری
-        cardColor = Colors.grey[300];
-        cardOpacity = 0.5;
-        cardBorder = Border.all(color: Colors.grey[400]!, width: 1.5);
-      } else if (isToday) {
-        // روز امروز: آبی با gradient
+        cardColor = Colors.grey[200];
+        cardOpacity = 0.6;
+        cardBorderSide = BorderSide(color: Colors.grey[400]!, width: 2);
+      } else if (hasMultipleColors) {
+        // چند رنگ: gradient ترکیبی
         cardGradient = LinearGradient(
-          colors: [Colors.blue[700]!, Colors.blue[200]!],
+          colors: allColors.map((c) => c.withValues(alpha: 0.2)).toList(),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          stops: List.generate(
+            allColors.length,
+            (i) => i / (allColors.length - 1),
+          ),
         );
-        cardBorderSide = BorderSide(color: Colors.amber[300]!, width: 2);
-      } else if (isHoliday) {
-        // تعطیل: قرمز با gradient
-        cardGradient = LinearGradient(
-          colors: [Colors.red[600]!, Colors.red[200]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        cardBorderSide = BorderSide(
+          color: iconColor,
+          width: isToday ? 3 : 2,
         );
-        cardBorderSide = BorderSide(color: Colors.red[300]!, width: 1.5);
-      } else if (isAdded) {
-        // روز اضافه شده: بنفش
+      } else {
+        // یک رنگ
         cardGradient = LinearGradient(
           colors: [
-            Colors.purple[400]!.withValues(alpha: 0.7),
-            Colors.purple[100]!.withValues(alpha: 0.5),
+            iconColor.withValues(alpha: 0.25),
+            iconColor.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-        cardBorder = Border.all(color: Colors.purple[400]!, width: 2);
-      } else {
-        // روز عادی
-        cardColor = colorScheme.surface;
+        cardBorderSide = BorderSide(
+          color: iconColor,
+          width: isToday ? 3 : 2,
+        );
       }
 
       // تعیین رنگ متن
       Color textColor;
       if (isRemoved) {
         textColor = Colors.grey[600]!;
-      } else if (isToday || isHoliday) {
-        textColor = Colors.white;
-      } else if (isAdded) {
-        textColor = Colors.purple[900]!;
       } else if (isFriday) {
         textColor = colorScheme.error;
       } else {
@@ -101,58 +243,48 @@ class GridCalendarDayCard extends StatelessWidget {
                     homeController.openNoteDialog(context, date);
                   },
           child: Card(
-            elevation:
-                isToday
-                    ? 6
-                    : isHoliday
-                    ? 4
-                    : isAdded
-                    ? 3
-                    : 2,
-            shadowColor:
-                isToday
-                    ? Colors.blue.withValues(alpha: 0.4)
-                    : isHoliday
-                    ? Colors.red.withValues(alpha: 0.3)
-                    : isAdded
-                    ? Colors.purple.withValues(alpha: 0.3)
-                    : colorScheme.shadow.withValues(alpha: 0.2),
+            elevation: isToday ? 8 : isHoliday || isAdded ? 4 : 2,
+            shadowColor: iconColor.withValues(alpha: isToday ? 0.5 : 0.3),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: cardBorderSide ?? BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              side: cardBorderSide,
             ),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 gradient: cardGradient,
                 color: cardGradient == null ? cardColor : null,
-                border: cardBorder is Border ? cardBorder : null,
               ),
-              padding: const EdgeInsets.all(6.0),
+              padding: const EdgeInsets.all(8.0),
               child: Stack(
                 children: [
                   // محتوای اصلی
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 20), // فضا برای ایکون بالا
+                      
                       // شماره روز
                       Text(
                         date.day.toString(),
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                           fontFamily: 'BNazanin',
                           color: textColor,
                         ),
                         textAlign: TextAlign.center,
                       ),
 
+                      const SizedBox(height: 2),
+
                       // نام روز هفته
                       Text(
                         date.formatter.wN,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontFamily: 'BNazanin',
+                          fontWeight: FontWeight.w500,
                           color: textColor.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
@@ -160,7 +292,7 @@ class GridCalendarDayCard extends StatelessWidget {
                         maxLines: 1,
                       ),
 
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
 
                       // کار مفید یا نوع مرخصی
                       if (!isRemoved)
@@ -172,10 +304,10 @@ class GridCalendarDayCard extends StatelessWidget {
                                   .displayName
                               : effectiveWork,
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: 10,
                             fontFamily: 'BNazanin',
-                            fontWeight: FontWeight.w500,
-                            color: textColor.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w600,
+                            color: textColor.withValues(alpha: 0.85),
                           ),
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
@@ -187,7 +319,7 @@ class GridCalendarDayCard extends StatelessWidget {
                         Text(
                           'خارج از بازه',
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: 10,
                             fontFamily: 'BNazanin',
                             fontWeight: FontWeight.bold,
                             color: textColor,
@@ -197,92 +329,112 @@ class GridCalendarDayCard extends StatelessWidget {
                     ],
                   ),
 
-                  // آیکون وضعیت (گوشه بالا راست)
-                  if (!isRemoved)
-                    Positioned(
-                      top: 2,
-                      right: 2,
+                  // ایکون وضعیت رنگی (گوشه بالا وسط)
+                  Positioned(
+                    top: 4,
+                    left: 0,
+                    right: 0,
+                    child: Center(
                       child: Tooltip(
                         message: homeController.getTooltipMessage(date),
                         child: Container(
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
+                            gradient: hasMultipleColors
+                                ? LinearGradient(
+                                    colors: allColors,
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    stops: List.generate(
+                                      allColors.length,
+                                      (i) => i / (allColors.length - 1),
+                                    ),
+                                  )
+                                : LinearGradient(
+                                    colors: [
+                                      iconColor.withValues(alpha: 0.9),
+                                      iconColor.withValues(alpha: 0.7),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  isToday || isHoliday || isAdded
-                                      ? Colors.white54
-                                      : colorScheme.outline,
-                              width: 1,
-                            ),
+                            boxShadow: hasMultipleColors
+                                ? [
+                                    BoxShadow(
+                                      color: allColors[0].withValues(alpha: 0.4),
+                                      blurRadius: 6,
+                                      offset: const Offset(-1, 1),
+                                    ),
+                                    if (allColors.length > 1)
+                                      BoxShadow(
+                                        color: allColors[allColors.length - 1]
+                                            .withValues(alpha: 0.4),
+                                        blurRadius: 6,
+                                        offset: const Offset(1, 3),
+                                      ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: iconColor.withValues(alpha: 0.4),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                           ),
-                          child: CircleAvatar(
-                            radius: 8,
-                            backgroundColor:
-                                isToday
-                                    ? Colors.tealAccent[400]
-                                    : cardStatus['avatarColor'],
-                            child: Icon(
-                              isToday
-                                  ? Icons.event_available
-                                  : cardStatus['avatarIcon'],
-                              size: 11,
-                              color:
-                                  isToday
-                                      ? Colors.white
-                                      : cardStatus['avatarIconColor'],
-                            ),
+                          child: Icon(
+                            iconData,
+                            size: 18,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
+                  ),
 
                   // آیکون یادداشت (گوشه پایین چپ)
                   if (note != null && note.isNotEmpty && !isRemoved)
                     Positioned(
-                      bottom: 2,
-                      left: 2,
-                      child: Icon(
-                        Icons.note_alt_outlined,
-                        size: 12,
-                        color:
-                            isToday || isHoliday || isAdded
-                                ? Colors.white70
-                                : colorScheme.secondary,
+                      bottom: 4,
+                      left: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[600],
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber[600]!.withValues(alpha: 0.4),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.note_rounded,
+                          size: 12,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
 
                   // دکمه info (گوشه پایین راست)
                   if (!isRemoved)
                     Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.info_outline,
-                          size: 12,
-                          color:
-                              isToday || isHoliday || isAdded
-                                  ? Colors.white70
-                                  : colorScheme.primary.withValues(alpha: 0.7),
-                        ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          _showDayDetailsDialog(context, date);
-                        },
-                        tooltip: 'جزئیات روز',
-                      ),
-                    ),
-
-                  // آیکون قفل برای روزهای حذف شده
-                  if (isRemoved)
-                    Positioned(
-                      top: 2,
+                      bottom: 2,
                       right: 2,
-                      child: Icon(
-                        Icons.lock_outline,
-                        size: 12,
-                        color: Colors.grey[600],
+                      child: InkWell(
+                        onTap: () => _showDayDetailsDialog(context, date),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.info_outline_rounded,
+                            size: 14,
+                            color: iconColor.withValues(alpha: 0.7),
+                          ),
+                        ),
                       ),
                     ),
                 ],

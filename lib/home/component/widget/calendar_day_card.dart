@@ -23,6 +23,126 @@ class _CalendarDayCardState extends State<CalendarDayCard>
   final TaskController taskController = Get.find<TaskController>();
   bool _isExpanded = false;
 
+  List<Color> _getAllColorsForDay(
+    BuildContext context,
+    Map<String, dynamic> cardStatus,
+    bool isToday,
+    bool isHoliday,
+    bool isFriday,
+    bool isFromOtherMonth,
+  ) {
+    List<Color> colors = [];
+    Set<String> addedColorTypes = {}; // برای جلوگیری از رنگ‌های تکراری
+    
+    // 1. رنگ روز امروز (اولویت اول)
+    if (isToday) {
+      colors.add(Colors.teal[700]!);
+      addedColorTypes.add('teal');
+    }
+    
+    // 2. رنگ تعطیلی رسمی
+    if (isHoliday) {
+      colors.add(Colors.red[700]!);
+      addedColorTypes.add('red');
+    }
+    
+    // 3. رنگ جمعه (اگر تعطیل رسمی نباشه)
+    if (isFriday && !isHoliday && !addedColorTypes.contains('red')) {
+      colors.add(Colors.deepOrange[600]!);
+      addedColorTypes.add('deepOrange');
+    }
+    
+    // 4. رنگ روز از ماه دیگر
+    if (isFromOtherMonth && !isToday) {
+      colors.add(Colors.indigo[400]!);
+      addedColorTypes.add('indigo');
+    }
+    
+    // 5. رنگ نوع روز (بر اساس leave type)
+    final leaveType = cardStatus['leaveType'] as LeaveType?;
+    final isComplete = cardStatus['isComplete'] as bool;
+    
+    if (leaveType != null) {
+      switch (leaveType) {
+        case LeaveType.work:
+        case LeaveType.mission:
+          // روز کاری یا ماموریت
+          if (isComplete) {
+            if (!addedColorTypes.contains('green')) {
+              colors.add(Colors.green[600]!);
+              addedColorTypes.add('green');
+            }
+          } else {
+            // روز کاری ناقص: زرد
+            if (!addedColorTypes.contains('amber') && !addedColorTypes.contains('yellow')) {
+              colors.add(Colors.amber[700]!);
+              addedColorTypes.add('amber');
+            }
+          }
+          break;
+          
+        case LeaveType.annualLeave:
+          // مرخصی استحقاقی
+          if (!addedColorTypes.contains('blue')) {
+            colors.add(Colors.blue[600]!);
+            addedColorTypes.add('blue');
+          }
+          break;
+          
+        case LeaveType.sickLeave:
+          // مرخصی استعلاجی
+          if (!addedColorTypes.contains('red')) {
+            colors.add(Colors.pink[700]!);
+            addedColorTypes.add('pink');
+          }
+          break;
+          
+        case LeaveType.giftLeave:
+          // مرخصی هدیه
+          if (!addedColorTypes.contains('purple')) {
+            colors.add(Colors.purple[600]!);
+            addedColorTypes.add('purple');
+          }
+          break;
+      }
+    }
+    
+    // 6. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض خاکستری
+    if (colors.isEmpty) {
+      colors.add(Colors.grey[600]!);
+    }
+    
+    return colors;
+  }
+  
+  Color _getPrimaryIconColor(List<Color> colors) {
+    return colors.first;
+  }
+
+  IconData _getIconForDayType(Map<String, dynamic> cardStatus, bool isToday) {
+    if (isToday) return Icons.today_rounded;
+    
+    final leaveType = cardStatus['leaveType'] as LeaveType?;
+    final isComplete = cardStatus['isComplete'] as bool;
+    
+    if (leaveType == LeaveType.work || leaveType == LeaveType.mission) {
+      return isComplete ? Icons.check_circle_rounded : Icons.warning_rounded;
+    }
+    
+    switch (leaveType) {
+      case LeaveType.annualLeave:
+        return Icons.beach_access_rounded;
+      case LeaveType.sickLeave:
+        return Icons.local_hospital_rounded;
+      case LeaveType.giftLeave:
+        return Icons.card_giftcard_rounded;
+      case LeaveType.mission:
+        return Icons.flight_takeoff_rounded;
+      default:
+        return Icons.event_note_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -37,143 +157,174 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     final cardStatus = homeController.getCardStatus(widget.date, context);
     final effectiveWork = homeController.calculateEffectiveWork(widget.date);
     final isFromOtherMonth = homeController.isDayFromOtherMonth(widget.date);
+    
+    // دریافت تمام رنگ‌های مرتبط با روز
+    final allColors = _getAllColorsForDay(
+      context,
+      cardStatus,
+      isToday,
+      isHoliday,
+      isFriday,
+      isFromOtherMonth,
+    );
+    final iconColor = _getPrimaryIconColor(allColors);
+    final iconData = _getIconForDayType(cardStatus, isToday);
+    
+    // ساخت gradient ترکیبی
+    final hasMultipleColors = allColors.length > 1;
+    final cardGradient = hasMultipleColors
+        ? LinearGradient(
+            colors: allColors.map((c) => c.withValues(alpha: 0.15)).toList(),
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: List.generate(
+              allColors.length,
+              (i) => i / (allColors.length - 1),
+            ),
+          )
+        : null;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
       child: GestureDetector(
         onTap: () {
           homeController.openNoteDialog(context, widget.date);
         },
-        child: Card(
-          elevation: isToday ? 8 : 4,
-          shadowColor: isToday ? Colors.blue.withValues(alpha: 0.3) : null,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side:
-                isToday
-                    ? BorderSide(color: Colors.amber[300]!, width: 1.5)
-                    : isHoliday
-                    ? BorderSide(color: Colors.red[300]!, width: 1.5)
-                    : BorderSide.none,
-          ),
-          child: Container(
-            decoration:
-                isToday
-                    ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [Colors.blue[800]!, Colors.blue[200]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: Card(
+            elevation: isToday ? 12 : hasMultipleColors ? 8 : 6,
+            shadowColor: iconColor.withValues(alpha: isToday ? 0.5 : 0.35),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: hasMultipleColors
+                  ? BorderSide(
+                      width: isToday ? 2.5 : 2,
+                      color: iconColor,
                     )
-                    : isHoliday
-                    ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [Colors.red[600]!, Colors.red[200]!],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    )
-                    : BoxDecoration(
-                      color: isFromOtherMonth 
-                          ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.7)
-                          : colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: isFromOtherMonth && !isToday && !isHoliday
-                          ? Border.all(
-                              color: colorScheme.primary.withValues(alpha: 0.3),
-                              width: 1.5,
-                            )
-                          : null,
-                    ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  leading: Tooltip(
-                    message: homeController.getTooltipMessage(widget.date),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? colorScheme.outline
-                                  : colorScheme.outlineVariant,
-                          width: 1.5,
+                  : isToday
+                      ? BorderSide(color: iconColor, width: 2.5)
+                      : BorderSide.none,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: cardGradient,
+                color: cardGradient == null
+                    ? (isFromOtherMonth
+                        ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                        : colorScheme.surface)
+                    : null,
+                border: !hasMultipleColors && isFromOtherMonth
+                    ? Border.all(
+                        color: colorScheme.outline.withValues(alpha: 0.3),
+                        width: 1,
+                      )
+                    : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    leading: Tooltip(
+                      message: homeController.getTooltipMessage(widget.date),
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: hasMultipleColors
+                              ? LinearGradient(
+                                  colors: allColors,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  stops: List.generate(
+                                    allColors.length,
+                                    (i) => i / (allColors.length - 1),
+                                  ),
+                                )
+                              : LinearGradient(
+                                  colors: [
+                                    iconColor.withValues(alpha: 0.9),
+                                    iconColor.withValues(alpha: 0.7),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                          shape: BoxShape.circle,
+                          boxShadow: hasMultipleColors
+                              ? allColors.map((c) => BoxShadow(
+                                    color: c.withValues(alpha: 0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  )).toList()
+                              : [
+                                  BoxShadow(
+                                    color: iconColor.withValues(alpha: 0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                         ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: CircleAvatar(
-                        backgroundColor:
-                            isToday
-                                ? Colors.tealAccent[400]
-                                : cardStatus['avatarColor'],
                         child: Icon(
-                          isToday
-                              ? Icons.event_available
-                              : cardStatus['avatarIcon'],
-                          color:
-                              isToday
-                                  ? Colors.white
-                                  : cardStatus['avatarIconColor'],
+                          iconData,
+                          color: Colors.white,
+                          size: 28,
                         ),
                       ),
                     ),
-                  ),
-                  title: Text(
-                    '${widget.date.formatter.wN} ${widget.date.day}${isFromOtherMonth ? ' (${widget.date.formatter.mN})' : ''}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color:
-                          isToday || isHoliday
-                              ? Colors.white
-                              : isFromOtherMonth
-                              ? colorScheme.primary.withValues(alpha: 0.7)
-                              : isFriday
-                              ? colorScheme.error
-                              : null,
-                      fontWeight:
-                          isToday || isFriday || isHoliday
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                    title: Text(
+                      '${widget.date.formatter.wN} ${widget.date.day}${isFromOtherMonth ? ' (${widget.date.formatter.mN})' : ''}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isFromOtherMonth
+                            ? colorScheme.onSurface.withValues(alpha: 0.6)
+                            : isFriday
+                                ? colorScheme.error
+                                : colorScheme.onSurface,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    effectiveWork,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          isToday || isHoliday
-                              ? Colors.white70
-                              : colorScheme.onSurface.withValues(alpha: 0.7),
+                    subtitle: Text(
+                      effectiveWork,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: IconButton(
-                    iconSize: 24,
-                    icon: Icon(
-                      _isExpanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: isToday || isHoliday ? Colors.white : null,
+                    trailing: IconButton(
+                      iconSize: 28,
+                      icon: AnimatedRotation(
+                        turns: _isExpanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Icon(
+                          Icons.expand_more_rounded,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isExpanded = !_isExpanded;
-                      });
-                    },
                   ),
-                ),
-                if (_isExpanded)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: _buildExpandedContent(context, widget.date),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: _isExpanded
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 12.0),
+                            child: _buildExpandedContent(context, widget.date),
+                          )
+                        : const SizedBox.shrink(),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
