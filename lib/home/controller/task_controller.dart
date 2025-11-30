@@ -93,6 +93,7 @@ class TaskController extends GetxController {
   // Timer-related variables
   final RxBool isTimerRunning = false.obs;
   final Rx<Project?> selectedTimerProject = Rx<Project?>(null);
+  final Rx<Project?> runningTimerProject = Rx<Project?>(null); // Project currently running
   final RxString timerDuration = '00:00:00'.obs;
   DateTime? timerStartTime;
 
@@ -142,8 +143,8 @@ class TaskController extends GetxController {
     if (isTimerRunning.value) {
       await stopTimer(Jalali.now());
     }
-    // Restore the new project after stopping
-    selectedTimerProject.value = newProject;
+    // Start new timer with the selected project
+    runningTimerProject.value = newProject;
     isTimerRunning.value = true;
     timerStartTime = DateTime.now();
     _updateTimerDuration();
@@ -157,7 +158,7 @@ class TaskController extends GetxController {
   }
 
   Future<void> stopTimer(Jalali date) async {
-    if (!isTimerRunning.value || selectedTimerProject.value == null) return;
+    if (!isTimerRunning.value || runningTimerProject.value == null) return;
     isTimerRunning.value = false;
     final duration = DateTime.now().difference(timerStartTime!).inMinutes;
     if (duration > 0) {
@@ -166,14 +167,14 @@ class TaskController extends GetxController {
       // Always add as new task - never merge with existing ones
       addTaskRow();
       final index = selectedProjects.length - 1;
-      selectedProjects[index].value = selectedTimerProject.value;
+      selectedProjects[index].value = runningTimerProject.value;
       durationControllers[index].text = _minutesToHHMM(duration);
       descriptionControllers[index].text = 'اضافه‌شده توسط تایمر';
       calculateStats();
     }
     timerStartTime = null;
     timerDuration.value = '00:00:00';
-    selectedTimerProject.value = null;
+    runningTimerProject.value = null;
   }
 
   Future<void> stopPersonalTimer(Jalali date) async {

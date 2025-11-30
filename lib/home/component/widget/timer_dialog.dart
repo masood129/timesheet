@@ -52,7 +52,7 @@ class TimerDialog extends StatelessWidget {
               final isPersonalRunning = taskController.isPersonalTimerRunning.value;
               final projectDuration = taskController.timerDuration.value;
               final personalDuration = taskController.personalTimerDuration.value;
-              final projectName = taskController.selectedTimerProject.value?.projectName;
+              final projectName = taskController.runningTimerProject.value?.projectName;
 
               return Column(
                 children: [
@@ -84,7 +84,7 @@ class TimerDialog extends StatelessWidget {
             
             const SizedBox(height: 20),
             
-            // Project Selector
+            // Project Selector (Always enabled unless personal timer is running)
             Obx(() {
               final isPersonalRunning = taskController.isPersonalTimerRunning.value;
               return SearchableDropdown<Project>(
@@ -106,6 +106,13 @@ class TimerDialog extends StatelessWidget {
                   filled: true,
                   fillColor: colorScheme.surfaceContainerHighest,
                   enabled: !isPersonalRunning,
+                  helperText: isPersonalRunning 
+                      ? null 
+                      : 'انتخاب پروژه جدید، تایمر قبلی را متوقف می‌کند',
+                  helperStyle: TextStyle(
+                    fontSize: 11,
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
                 searchHint: 'جستجوی پروژه...',
                 items: taskController.projects
@@ -135,89 +142,153 @@ class TimerDialog extends StatelessWidget {
               
               return Column(
                 children: [
-                  // Project Timer Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: (!hasProject && !isProjectRunning) || isPersonalRunning
-                          ? null
-                          : () async {
-                              if (isProjectRunning) {
-                                await taskController.stopTimer(today);
-                                await taskController.saveDailyDetail();
-                                Navigator.pop(context);
-                              } else {
-                                await taskController.startTimer();
-                                Navigator.pop(context);
-                              }
+                  // Project Timer Buttons
+                  Row(
+                    children: [
+                      // Start/Switch Project Timer Button
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: !hasProject || isPersonalRunning
+                              ? null
+                              : () async {
+                                  await taskController.startTimer();
+                                  Navigator.pop(context);
+                                },
+                          icon: Icon(
+                            Icons.play_arrow,
+                            color: colorScheme.onPrimary,
+                          ),
+                          label: Text(
+                            isProjectRunning 
+                                ? 'شروع تایمر جدید'
+                                : 'start_project_timer'.tr,
+                            style: TextStyle(
+                              color: colorScheme.onPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                        ),
+                      ),
+                      if (isProjectRunning) ...[
+                        const SizedBox(width: 8),
+                        // Stop Current Timer Button
+                        Expanded(
+                          flex: 1,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              await taskController.stopTimer(today);
+                              await taskController.saveDailyDetail();
+                              Navigator.pop(context);
                             },
-                      icon: Icon(
-                        isProjectRunning ? Icons.stop : Icons.play_arrow,
-                        color: colorScheme.onPrimary,
-                      ),
-                      label: Text(
-                        isProjectRunning
-                            ? 'stop_project_timer'.tr
-                            : 'start_project_timer'.tr,
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                            icon: Icon(
+                              Icons.stop,
+                              color: colorScheme.onError,
+                            ),
+                            label: Text(
+                              'توقف',
+                              style: TextStyle(
+                                color: colorScheme.onError,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.error,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        disabledBackgroundColor: colorScheme.surfaceContainerHighest,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                    ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 12),
                   
-                  // Personal Timer Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: isProjectRunning
-                          ? null
-                          : () async {
-                              if (isPersonalRunning) {
-                                await taskController.stopPersonalTimer(today);
-                                await taskController.saveDailyDetail();
-                                Navigator.pop(context);
-                              } else {
-                                taskController.startPersonalTimer();
-                                Navigator.pop(context);
-                              }
+                  // Personal Timer Buttons
+                  Row(
+                    children: [
+                      // Start Personal Timer Button
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton.icon(
+                          onPressed: isProjectRunning
+                              ? null
+                              : () async {
+                                  taskController.startPersonalTimer();
+                                  Navigator.pop(context);
+                                },
+                          icon: Icon(
+                            Icons.play_arrow,
+                            color: colorScheme.onSecondary,
+                          ),
+                          label: Text(
+                            'start_personal_timer'.tr,
+                            style: TextStyle(
+                              color: colorScheme.onSecondary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.secondary,
+                            disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                        ),
+                      ),
+                      if (isPersonalRunning) ...[
+                        const SizedBox(width: 8),
+                        // Stop Personal Timer Button
+                        Expanded(
+                          flex: 1,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              await taskController.stopPersonalTimer(today);
+                              await taskController.saveDailyDetail();
+                              Navigator.pop(context);
                             },
-                      icon: Icon(
-                        isPersonalRunning ? Icons.stop : Icons.play_arrow,
-                        color: colorScheme.onSecondary,
-                      ),
-                      label: Text(
-                        isPersonalRunning
-                            ? 'stop_personal_timer'.tr
-                            : 'start_personal_timer'.tr,
-                        style: TextStyle(
-                          color: colorScheme.onSecondary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                            icon: Icon(
+                              Icons.stop,
+                              color: colorScheme.onError,
+                            ),
+                            label: Text(
+                              'توقف',
+                              style: TextStyle(
+                                color: colorScheme.onError,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.error,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.secondary,
-                        disabledBackgroundColor: colorScheme.surfaceContainerHighest,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                    ),
+                      ],
+                    ],
                   ),
                 ],
               );
