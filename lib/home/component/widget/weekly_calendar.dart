@@ -88,7 +88,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                   crossAxisCount: 7,
                   crossAxisSpacing: 6.0,
                   mainAxisSpacing: 6.0,
-                  childAspectRatio: 0.85, // مستطیل عمودی مناسب برای وب
+                  childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
                 ),
                 itemCount: 7,
                 itemBuilder: (context, index) {
