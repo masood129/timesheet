@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+import 'page_title_manager_stub.dart'
+    if (dart.library.html) 'page_title_manager_web.dart';
 
 class PageTitleManager {
   static final PageTitleManager _instance = PageTitleManager._internal();
@@ -15,9 +14,7 @@ class PageTitleManager {
         ? '$_baseTitle - $subtitle' 
         : _baseTitle;
     
-    if (kIsWeb) {
-      html.document.title = fullTitle;
-    }
+    setDocumentTitle(fullTitle);
   }
 
   /// Reset to base title
