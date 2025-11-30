@@ -259,77 +259,84 @@ class GridCalendarDayCard extends StatelessWidget {
               child: Stack(
                 children: [
                   // محتوای اصلی
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 18), // فضا برای ایکون بالا (کاهش از 20 به 18)
-                      
-                      // شماره روز
-                      Text(
-                        date.day.toString(),
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'BNazanin',
-                          color: textColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 1), // کاهش از 2 به 1
-
-                      // نام روز هفته
-                      Text(
-                        date.formatter.wN,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontFamily: 'BNazanin',
-                          fontWeight: FontWeight.w500,
-                          color: textColor.withValues(alpha: 0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-
-                      const SizedBox(height: 4), // کاهش از 6 به 4
-
-                      // کار مفید یا نوع مرخصی
-                      if (!isRemoved)
-                        Flexible(
-                          child: Text(
-                            cardStatus['leaveType'] != null &&
-                                    cardStatus['leaveType'] != LeaveType.work &&
-                                    cardStatus['leaveType'] != LeaveType.mission
-                                ? (cardStatus['leaveType'] as LeaveType)
-                                    .displayName
-                                : effectiveWork,
-                            style: TextStyle(
-                              fontSize: 9.5, // کاهش از 10 به 9.5
-                              fontFamily: 'BNazanin',
-                              fontWeight: FontWeight.w600,
-                              color: textColor.withValues(alpha: 0.85),
-                            ),
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-
-                      // نمایش "حذف شده" برای روزهای removed
-                      if (isRemoved)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2, bottom: 2),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 16), // فضا برای ایکون بالا
+                        
+                        // شماره روز
                         Text(
-                          'خارج از بازه',
+                          date.day.toString(),
                           style: TextStyle(
-                            fontSize: 10,
-                            fontFamily: 'BNazanin',
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'BNazanin',
                             color: textColor,
+                            height: 1.0,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                    ],
+
+                        const SizedBox(height: 1),
+
+                        // نام روز هفته
+                        Text(
+                          date.formatter.wN,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontFamily: 'BNazanin',
+                            fontWeight: FontWeight.w500,
+                            color: textColor.withValues(alpha: 0.7),
+                            height: 1.0,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+
+                        const SizedBox(height: 3),
+
+                        // کار مفید یا نوع مرخصی
+                        if (!isRemoved)
+                          Flexible(
+                            child: Text(
+                              cardStatus['leaveType'] != null &&
+                                      cardStatus['leaveType'] != LeaveType.work &&
+                                      cardStatus['leaveType'] != LeaveType.mission
+                                  ? (cardStatus['leaveType'] as LeaveType)
+                                      .displayName
+                                  : effectiveWork,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontFamily: 'BNazanin',
+                                fontWeight: FontWeight.w600,
+                                color: textColor.withValues(alpha: 0.85),
+                                height: 1.1,
+                              ),
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ),
+
+                        // نمایش "حذف شده" برای روزهای removed
+                        if (isRemoved)
+                          Text(
+                            'خارج از بازه',
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontFamily: 'BNazanin',
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                              height: 1.0,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
+                    ),
                   ),
 
                   // ایکون وضعیت رنگی (گوشه بالا وسط)
@@ -468,40 +475,43 @@ class GridCalendarDayCard extends StatelessWidget {
         final note = homeController.getNoteForDate(date);
         final periodStatus = homeController.getDayPeriodStatus(date);
 
-        return Container(
+        final leaveType = cardStatus['leaveType'] as LeaveType?;
+        
+        return SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
-          padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildDetailRow(context, 'کار مفید', effectiveWork),
-                const SizedBox(height: 8),
-                if (homeController.isCurrentMonthPeriodCustom)
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildDetailRow(context, 'کار مفید', effectiveWork),
+                  const SizedBox(height: 8),
+                  if (homeController.isCurrentMonthPeriodCustom)
+                    _buildDetailRow(
+                      context,
+                      'وضعیت بازه',
+                      periodStatus.displayName,
+                    ),
+                  const SizedBox(height: 8),
+                  if (holiday != null) ...[
+                    _buildHolidaySection(context, holiday),
+                    const SizedBox(height: 8),
+                  ],
+                  if (note != null && note.isNotEmpty)
+                    _buildDetailRow(context, 'یادداشت', note),
                   _buildDetailRow(
                     context,
-                    'وضعیت بازه',
-                    periodStatus.displayName,
+                    'وضعیت',
+                    leaveType == LeaveType.work || leaveType == LeaveType.mission
+                        ? (cardStatus['isComplete']
+                            ? 'روز کاری: کامل'
+                            : 'روز کاری: ناقص')
+                        : leaveType?.displayName ?? 'بدون اطلاعات',
                   ),
-                const SizedBox(height: 8),
-                if (holiday != null) ...[
-                  _buildHolidaySection(context, holiday),
-                  const SizedBox(height: 8),
                 ],
-                if (note != null && note.isNotEmpty)
-                  _buildDetailRow(context, 'یادداشت', note),
-                _buildDetailRow(
-                  context,
-                  'وضعیت',
-                  cardStatus['leaveType'] == LeaveType.work ||
-                          cardStatus['leaveType'] == LeaveType.mission
-                      ? (cardStatus['isComplete']
-                          ? 'روز کاری: کامل'
-                          : 'روز کاری: ناقص')
-                      : cardStatus['leaveType']?.displayName ?? 'بدون اطلاعات',
-                ),
-              ],
+              ),
             ),
           ),
         );
