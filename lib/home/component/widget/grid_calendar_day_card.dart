@@ -22,34 +22,34 @@ class GridCalendarDayCard extends StatelessWidget {
     List<Color> colors = [];
     Set<String> addedColorTypes = {}; // برای جلوگیری از رنگ‌های تکراری
 
-    // 1. روز حذف شده فقط خاکستری (حالت خاص)
+    // 1. روز حذف شده - طبق راهنما: grey[300]
     if (isRemoved) {
-      colors.add(Colors.grey[500]!);
+      colors.add(Colors.grey[300]!);
       return colors;
     }
 
-    // 2. رنگ روز امروز (اولویت اول)
+    // 2. رنگ روز امروز (اولویت اول) - طبق راهنما: teal[700]
     if (isToday) {
       colors.add(Colors.teal[700]!);
       addedColorTypes.add('teal');
     }
 
-    // 3. رنگ تعطیلی رسمی
+    // 3. رنگ تعطیلی رسمی - طبق راهنما: red[700]
     if (isHoliday) {
       colors.add(Colors.red[700]!);
       addedColorTypes.add('red');
     }
 
-    // 4. رنگ جمعه (اگر تعطیل رسمی نباشه)
+    // 4. رنگ جمعه (اگر تعطیل رسمی نباشه) - طبق راهنما: deepOrange[600]
     if (isFriday && !isHoliday && !addedColorTypes.contains('red')) {
       colors.add(Colors.deepOrange[600]!);
       addedColorTypes.add('deepOrange');
     }
 
-    // 5. رنگ روز اضافه شده از بازه ماهانه
+    // 5. رنگ روز اضافه شده از بازه ماهانه - طبق راهنما: purple[100]
     if (isAdded && !isToday) {
-      colors.add(Colors.deepPurple[500]!);
-      addedColorTypes.add('deepPurple');
+      colors.add(Colors.purple[100]!);
+      addedColorTypes.add('purple100');
     }
 
     // 6. رنگ نوع روز (بر اساس leave type)
@@ -59,15 +59,15 @@ class GridCalendarDayCard extends StatelessWidget {
     if (leaveType != null) {
       switch (leaveType) {
         case LeaveType.work:
-        case LeaveType.mission:
-          // روز کاری یا ماموریت
+          // روز کاری - طبق راهنما
           if (isComplete) {
+            // روز کاری کامل: green[600]
             if (!addedColorTypes.contains('green')) {
               colors.add(Colors.green[600]!);
               addedColorTypes.add('green');
             }
           } else {
-            // روز کاری ناقص: زرد
+            // روز کاری ناقص: amber[700]
             if (!addedColorTypes.contains('amber') &&
                 !addedColorTypes.contains('yellow')) {
               colors.add(Colors.amber[700]!);
@@ -76,8 +76,17 @@ class GridCalendarDayCard extends StatelessWidget {
           }
           break;
 
+        case LeaveType.mission:
+          // ماموریت - طبق راهنما: deepPurple[500]
+          if (!addedColorTypes.contains('deepPurple') && 
+              !addedColorTypes.contains('purple100')) {
+            colors.add(Colors.deepPurple[500]!);
+            addedColorTypes.add('deepPurple');
+          }
+          break;
+
         case LeaveType.annualLeave:
-          // مرخصی استحقاقی
+          // مرخصی استحقاقی - طبق راهنما: blue[600]
           if (!addedColorTypes.contains('blue')) {
             colors.add(Colors.blue[600]!);
             addedColorTypes.add('blue');
@@ -85,17 +94,18 @@ class GridCalendarDayCard extends StatelessWidget {
           break;
 
         case LeaveType.sickLeave:
-          // مرخصی استعلاجی
-          if (!addedColorTypes.contains('red')) {
+          // مرخصی استعلاجی - طبق راهنما: pink[700]
+          if (!addedColorTypes.contains('red') && !addedColorTypes.contains('pink')) {
             colors.add(Colors.pink[700]!);
             addedColorTypes.add('pink');
           }
           break;
 
         case LeaveType.giftLeave:
-          // مرخصی هدیه
+          // مرخصی هدیه - طبق راهنما: purple[600]
           if (!addedColorTypes.contains('purple') &&
-              !addedColorTypes.contains('deepPurple')) {
+              !addedColorTypes.contains('deepPurple') &&
+              !addedColorTypes.contains('purple100')) {
             colors.add(Colors.purple[600]!);
             addedColorTypes.add('purple');
           }
@@ -105,7 +115,7 @@ class GridCalendarDayCard extends StatelessWidget {
 
     // 7. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض خاکستری
     if (colors.isEmpty) {
-      colors.add(Colors.grey[600]!);
+      colors.add(Colors.grey[400]!);
     }
 
     return colors;
@@ -119,29 +129,46 @@ class GridCalendarDayCard extends StatelessWidget {
     Map<String, dynamic> cardStatus,
     bool isToday,
     bool isRemoved,
+    bool isHoliday,
+    bool isFriday,
+    bool isAdded,
   ) {
-    if (isRemoved) return Icons.block_rounded;
-    if (isToday) return Icons.today_rounded;
+    // طبق راهنما
+    if (isRemoved) return Icons.remove_circle_outline; // حذف شده
+    if (isToday) return Icons.today_rounded; // روز امروز
+    if (isHoliday) return Icons.event_busy_rounded; // تعطیل رسمی
+    if (isFriday) return Icons.weekend_rounded; // جمعه
+    if (isAdded) return Icons.add_circle_outline; // اضافه شده
 
     final leaveType = cardStatus['leaveType'] as LeaveType?;
     final isComplete = cardStatus['isComplete'] as bool;
 
-    if (leaveType == LeaveType.work || leaveType == LeaveType.mission) {
-      return isComplete ? Icons.check_circle_rounded : Icons.warning_rounded;
+    if (leaveType != null) {
+      switch (leaveType) {
+        case LeaveType.work:
+          // روز کاری کامل یا ناقص
+          return isComplete ? Icons.check_circle_rounded : Icons.warning_rounded;
+          
+        case LeaveType.mission:
+          // ماموریت
+          return Icons.flight_takeoff_rounded;
+          
+        case LeaveType.annualLeave:
+          // مرخصی استحقاقی
+          return Icons.beach_access_rounded;
+          
+        case LeaveType.sickLeave:
+          // مرخصی استعلاجی
+          return Icons.local_hospital_rounded;
+          
+        case LeaveType.giftLeave:
+          // مرخصی هدیه
+          return Icons.card_giftcard_rounded;
+      }
     }
 
-    switch (leaveType) {
-      case LeaveType.annualLeave:
-        return Icons.beach_access_rounded;
-      case LeaveType.sickLeave:
-        return Icons.local_hospital_rounded;
-      case LeaveType.giftLeave:
-        return Icons.card_giftcard_rounded;
-      case LeaveType.mission:
-        return Icons.flight_takeoff_rounded;
-      default:
-        return Icons.event_note_rounded;
-    }
+    // پیش‌فرض
+    return Icons.check_circle_outline;
   }
 
   @override
@@ -178,7 +205,14 @@ class GridCalendarDayCard extends StatelessWidget {
         isAdded,
       );
       final iconColor = _getPrimaryIconColor(allColors);
-      final iconData = _getIconForDayType(cardStatus, isToday, isRemoved);
+      final iconData = _getIconForDayType(
+        cardStatus,
+        isToday,
+        isRemoved,
+        isHoliday,
+        isFriday,
+        isAdded,
+      );
 
       // آیا چند رنگ داریم؟
       final hasMultipleColors = allColors.length > 1;
@@ -190,10 +224,10 @@ class GridCalendarDayCard extends StatelessWidget {
       double cardOpacity = 1.0;
 
       if (isRemoved) {
-        // روز حذف شده: خاکستری
-        cardColor = Colors.grey[200];
-        cardOpacity = 0.6;
-        cardBorderSide = BorderSide(color: Colors.grey[400]!, width: 2);
+        // روز حذف شده - طبق راهنما: grey[300]
+        cardColor = Colors.grey[300];
+        cardOpacity = 0.7;
+        cardBorderSide = BorderSide(color: Colors.grey[500]!, width: 2);
       } else if (hasMultipleColors) {
         // چند رنگ: gradient ترکیبی
         cardGradient = LinearGradient(
