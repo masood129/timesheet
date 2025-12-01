@@ -16,12 +16,12 @@ class CustomCalendarWidget extends StatelessWidget {
       builder: (homeController) {
         final colorScheme = Theme.of(context).colorScheme;
         final screenWidth = MediaQuery.of(context).size.width;
-        
+
         // محاسبه اندازه‌های responsive بر اساس عرض صفحه
         final double maxCalendarWidth;
         final double headerFontSize;
         final double horizontalPadding;
-        
+
         if (screenWidth > 1400) {
           // صفحات خیلی بزرگ (desktop/web)
           maxCalendarWidth = 1400;
@@ -122,31 +122,32 @@ class CustomCalendarWidget extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               crossAxisCount: 7,
                               childAspectRatio: 2.5,
-                              children: [
-                                'شنبه', // index 0, weekday 1
-                                'یک‌شنبه', // index 1, weekday 2
-                                'دوشنبه', // index 2, weekday 3
-                                'سه‌شنبه', // index 3, weekday 4
-                                'چهارشنبه', // index 4, weekday 5
-                                'پنج‌شنبه', // index 5, weekday 6
-                                'جمعه', // index 6, weekday 7
-                              ].asMap().entries.map((entry) {
-                                return Center(
-                                  child: Text(
-                                    entry.value,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'BNazanin',
-                                      color:
-                                          entry.key == 6
-                                              ? colorScheme.error
-                                              : colorScheme.onSurface,
-                                      fontSize: headerFontSize,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                              children:
+                                  [
+                                    'شنبه', // index 0, weekday 1
+                                    'یک‌شنبه', // index 1, weekday 2
+                                    'دوشنبه', // index 2, weekday 3
+                                    'سه‌شنبه', // index 3, weekday 4
+                                    'چهارشنبه', // index 4, weekday 5
+                                    'پنج‌شنبه', // index 5, weekday 6
+                                    'جمعه', // index 6, weekday 7
+                                  ].asMap().entries.map((entry) {
+                                    return Center(
+                                      child: Text(
+                                        entry.value,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'BNazanin',
+                                          color:
+                                              entry.key == 6
+                                                  ? colorScheme.error
+                                                  : colorScheme.onSurface,
+                                          fontSize: headerFontSize,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                             ),
                           ),
 
@@ -158,10 +159,13 @@ class CustomCalendarWidget extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 7, // 7 ستون ثابت برای 7 روز هفته
-                                    crossAxisSpacing: screenWidth > 1000 ? 6.0 : 4.0,
-                                    mainAxisSpacing: screenWidth > 1000 ? 6.0 : 4.0,
-                                    childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                                    crossAxisCount:
+                                        7, // 7 ستون ثابت برای 7 روز هفته
+                                    crossAxisSpacing:
+                                        screenWidth > 1000 ? 6.0 : 4.0,
+                                    mainAxisSpacing:
+                                        screenWidth > 1000 ? 6.0 : 4.0,
+                                    childAspectRatio: 1.0, // مربع کردن کارت‌ها
                                   ),
                               itemCount: adjustedSlots,
                               itemBuilder: (context, index) {
@@ -179,7 +183,9 @@ class CustomCalendarWidget extends StatelessWidget {
                                 }
 
                                 // نمایش روز
-                                return GridCalendarDayCard(date: days[dayIndex]);
+                                return GridCalendarDayCard(
+                                  date: days[dayIndex],
+                                );
                               },
                             ),
                           ),
@@ -208,7 +214,9 @@ class CustomCalendarWidget extends StatelessWidget {
                             color: colorScheme.secondaryContainer,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: colorScheme.secondary.withValues(alpha: 0.5),
+                              color: colorScheme.secondary.withValues(
+                                alpha: 0.5,
+                              ),
                               width: 1.5,
                             ),
                           ),
@@ -235,9 +243,9 @@ class CustomCalendarWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(width: 12),
-                    
+
                     // دکمه جزئیات روز امروز
                     ElevatedButton(
                       onPressed: () {
@@ -259,7 +267,11 @@ class CustomCalendarWidget extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.info_outline, color: colorScheme.onPrimary, size: 20),
+                          Icon(
+                            Icons.info_outline,
+                            color: colorScheme.onPrimary,
+                            size: 20,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             'جزئیات روز امروز',
@@ -288,7 +300,7 @@ class CustomCalendarWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     // محاسبه اندازه‌های responsive
     final double dialogWidth = screenWidth > 600 ? 550 : screenWidth * 0.95;
     final double titleFontSize = screenWidth > 600 ? 24 : 20;
@@ -306,9 +318,7 @@ class CustomCalendarWidget extends StatelessWidget {
           ),
           child: Container(
             width: dialogWidth,
-            constraints: BoxConstraints(
-              maxHeight: screenHeight * 0.85,
-            ),
+            constraints: BoxConstraints(maxHeight: screenHeight * 0.85),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -367,7 +377,7 @@ class CustomCalendarWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // محتوای دیالوگ
                 Flexible(
                   child: SingleChildScrollView(
@@ -409,9 +419,9 @@ class CustomCalendarWidget extends StatelessWidget {
                           itemFontSize: itemFontSize,
                           iconSize: iconSize,
                         ),
-                        
+
                         const Divider(height: 32, thickness: 1.5),
-                        
+
                         // بخش دوم: وضعیت کاری
                         _buildSectionHeader(
                           context,
@@ -464,9 +474,9 @@ class CustomCalendarWidget extends StatelessWidget {
                           itemFontSize: itemFontSize,
                           iconSize: iconSize,
                         ),
-                        
+
                         const Divider(height: 32, thickness: 1.5),
-                        
+
                         // بخش سوم: انواع مرخصی
                         _buildSectionHeader(
                           context,
@@ -514,7 +524,7 @@ class CustomCalendarWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // دکمه بستن
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -594,11 +604,12 @@ class CustomCalendarWidget extends StatelessWidget {
     required double iconSize,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     // تعیین رنگ آیکون بر اساس روشنایی رنگ پس‌زمینه
     final brightness = ThemeData.estimateBrightnessForColor(color);
-    final iconColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
-    
+    final iconColor =
+        brightness == Brightness.dark ? Colors.white : Colors.black87;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -629,11 +640,7 @@ class CustomCalendarWidget extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(
-              icon,
-              size: iconSize * 0.65,
-              color: iconColor,
-            ),
+            child: Icon(icon, size: iconSize * 0.65, color: iconColor),
           ),
           const SizedBox(width: 16),
           Expanded(
