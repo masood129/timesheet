@@ -3,6 +3,7 @@ import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../../model/leavetype_model.dart';
 import '../../../model/day_period_status.dart';
+import '../../../core/theme/theme.dart';
 import '../../controller/home_controller.dart';
 import 'grid_calendar_day_card.dart';
 
@@ -375,7 +376,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.purple[100]!,
+                          color: colorScheme.addedDayColor,
                           label: 'اضافه شده (از ماه دیگر)',
                           icon: Icons.add_circle_outline,
                           itemFontSize: itemFontSize,
@@ -384,7 +385,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.grey[300]!,
+                          color: colorScheme.removedDayColor,
                           label: 'حذف شده (خارج از بازه)',
                           icon: Icons.remove_circle_outline,
                           itemFontSize: itemFontSize,
@@ -403,7 +404,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 12),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.teal[700]!,
+                          color: colorScheme.todayColor,
                           label: 'روز امروز',
                           icon: Icons.today_rounded,
                           itemFontSize: itemFontSize,
@@ -412,7 +413,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.green[600]!,
+                          color: colorScheme.workCompleteColor,
                           label: 'روز کاری کامل',
                           icon: Icons.check_circle_rounded,
                           itemFontSize: itemFontSize,
@@ -421,7 +422,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.amber[700]!,
+                          color: colorScheme.workIncompleteColor,
                           label: 'روز کاری ناقص',
                           icon: Icons.warning_rounded,
                           itemFontSize: itemFontSize,
@@ -430,7 +431,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.red[700]!,
+                          color: colorScheme.holidayColor,
                           label: 'تعطیل رسمی',
                           icon: Icons.event_busy_rounded,
                           itemFontSize: itemFontSize,
@@ -439,7 +440,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.deepOrange[600]!,
+                          color: colorScheme.fridayColor,
                           label: 'جمعه',
                           icon: Icons.weekend_rounded,
                           itemFontSize: itemFontSize,
@@ -458,7 +459,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 12),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.blue[600]!,
+                          color: colorScheme.annualLeaveColor,
                           label: 'مرخصی استحقاقی',
                           icon: Icons.beach_access_rounded,
                           itemFontSize: itemFontSize,
@@ -467,7 +468,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.pink[700]!,
+                          color: colorScheme.sickLeaveColor,
                           label: 'مرخصی استعلاجی',
                           icon: Icons.local_hospital_rounded,
                           itemFontSize: itemFontSize,
@@ -476,7 +477,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.purple[600]!,
+                          color: colorScheme.giftLeaveColor,
                           label: 'مرخصی هدیه',
                           icon: Icons.card_giftcard_rounded,
                           itemFontSize: itemFontSize,
@@ -485,7 +486,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
                         const SizedBox(height: 10),
                         _buildDialogLegendItem(
                           context,
-                          color: Colors.deepPurple[500]!,
+                          color: colorScheme.missionColor,
                           label: 'ماموریت',
                           icon: Icons.flight_takeoff_rounded,
                           itemFontSize: itemFontSize,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../../model/leavetype_model.dart';
 import '../../../model/day_period_status.dart';
+import '../../../core/theme/theme.dart';
 import '../../controller/home_controller.dart';
 
 class GridCalendarDayCard extends StatelessWidget {
@@ -22,100 +23,101 @@ class GridCalendarDayCard extends StatelessWidget {
     List<Color> colors = [];
     Set<String> addedColorTypes = {}; // برای جلوگیری از رنگ‌های تکراری
 
-    // 1. روز حذف شده - طبق راهنما: grey[300]
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    // 1. روز حذف شده - از theme
     if (isRemoved) {
-      colors.add(Colors.grey[300]!);
+      colors.add(colorScheme.removedDayColor);
       return colors;
     }
 
-    // 2. رنگ روز امروز (اولویت اول) - طبق راهنما: teal[700]
+    // 2. رنگ روز امروز (اولویت اول) - از theme
     if (isToday) {
-      colors.add(Colors.teal[700]!);
-      addedColorTypes.add('teal');
+      colors.add(colorScheme.todayColor);
+      addedColorTypes.add('today');
     }
 
-    // 3. رنگ تعطیلی رسمی - طبق راهنما: red[700]
+    // 3. رنگ تعطیلی رسمی - از theme
     if (isHoliday) {
-      colors.add(Colors.red[700]!);
-      addedColorTypes.add('red');
+      colors.add(colorScheme.holidayColor);
+      addedColorTypes.add('holiday');
     }
 
-    // 4. رنگ جمعه (اگر تعطیل رسمی نباشه) - طبق راهنما: deepOrange[600]
-    if (isFriday && !isHoliday && !addedColorTypes.contains('red')) {
-      colors.add(Colors.deepOrange[600]!);
-      addedColorTypes.add('deepOrange');
+    // 4. رنگ جمعه (اگر تعطیل رسمی نباشه) - از theme
+    if (isFriday && !isHoliday && !addedColorTypes.contains('holiday')) {
+      colors.add(colorScheme.fridayColor);
+      addedColorTypes.add('friday');
     }
 
-    // 5. رنگ روز اضافه شده از بازه ماهانه - طبق راهنما: purple[100]
+    // 5. رنگ روز اضافه شده از بازه ماهانه - از theme
     if (isAdded && !isToday) {
-      colors.add(Colors.purple[100]!);
-      addedColorTypes.add('purple100');
+      colors.add(colorScheme.addedDayColor);
+      addedColorTypes.add('added');
     }
 
-    // 6. رنگ نوع روز (بر اساس leave type)
+    // 6. رنگ نوع روز (بر اساس leave type) - از theme
     final leaveType = cardStatus['leaveType'] as LeaveType?;
     final isComplete = cardStatus['isComplete'] as bool;
 
     if (leaveType != null) {
       switch (leaveType) {
         case LeaveType.work:
-          // روز کاری - طبق راهنما
+          // روز کاری - از theme
           if (isComplete) {
-            // روز کاری کامل: green[600]
-            if (!addedColorTypes.contains('green')) {
-              colors.add(Colors.green[600]!);
-              addedColorTypes.add('green');
+            // روز کاری کامل
+            if (!addedColorTypes.contains('work')) {
+              colors.add(colorScheme.workCompleteColor);
+              addedColorTypes.add('work');
             }
           } else {
-            // روز کاری ناقص: amber[700]
-            if (!addedColorTypes.contains('amber') &&
-                !addedColorTypes.contains('yellow')) {
-              colors.add(Colors.amber[700]!);
-              addedColorTypes.add('amber');
+            // روز کاری ناقص
+            if (!addedColorTypes.contains('work')) {
+              colors.add(colorScheme.workIncompleteColor);
+              addedColorTypes.add('work');
             }
           }
           break;
 
         case LeaveType.mission:
-          // ماموریت - طبق راهنما: deepPurple[500]
-          if (!addedColorTypes.contains('deepPurple') && 
-              !addedColorTypes.contains('purple100')) {
-            colors.add(Colors.deepPurple[500]!);
-            addedColorTypes.add('deepPurple');
+          // ماموریت - از theme
+          if (!addedColorTypes.contains('mission') && 
+              !addedColorTypes.contains('added')) {
+            colors.add(colorScheme.missionColor);
+            addedColorTypes.add('mission');
           }
           break;
 
         case LeaveType.annualLeave:
-          // مرخصی استحقاقی - طبق راهنما: blue[600]
-          if (!addedColorTypes.contains('blue')) {
-            colors.add(Colors.blue[600]!);
-            addedColorTypes.add('blue');
+          // مرخصی استحقاقی - از theme
+          if (!addedColorTypes.contains('annual')) {
+            colors.add(colorScheme.annualLeaveColor);
+            addedColorTypes.add('annual');
           }
           break;
 
         case LeaveType.sickLeave:
-          // مرخصی استعلاجی - طبق راهنما: pink[700]
-          if (!addedColorTypes.contains('red') && !addedColorTypes.contains('pink')) {
-            colors.add(Colors.pink[700]!);
-            addedColorTypes.add('pink');
+          // مرخصی استعلاجی - از theme
+          if (!addedColorTypes.contains('holiday') && !addedColorTypes.contains('sick')) {
+            colors.add(colorScheme.sickLeaveColor);
+            addedColorTypes.add('sick');
           }
           break;
 
         case LeaveType.giftLeave:
-          // مرخصی هدیه - طبق راهنما: purple[600]
-          if (!addedColorTypes.contains('purple') &&
-              !addedColorTypes.contains('deepPurple') &&
-              !addedColorTypes.contains('purple100')) {
-            colors.add(Colors.purple[600]!);
-            addedColorTypes.add('purple');
+          // مرخصی هدیه - از theme
+          if (!addedColorTypes.contains('gift') &&
+              !addedColorTypes.contains('mission') &&
+              !addedColorTypes.contains('added')) {
+            colors.add(colorScheme.giftLeaveColor);
+            addedColorTypes.add('gift');
           }
           break;
       }
     }
 
-    // 7. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض خاکستری
+    // 7. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض
     if (colors.isEmpty) {
-      colors.add(Colors.grey[400]!);
+      colors.add(colorScheme.surfaceContainerHighest);
     }
 
     return colors;
@@ -224,10 +226,10 @@ class GridCalendarDayCard extends StatelessWidget {
       double cardOpacity = 1.0;
 
       if (isRemoved) {
-        // روز حذف شده - طبق راهنما: grey[300]
-        cardColor = Colors.grey[300];
+        // روز حذف شده - از theme
+        cardColor = colorScheme.removedDayColor;
         cardOpacity = 0.7;
-        cardBorderSide = BorderSide(color: Colors.grey[500]!, width: 2);
+        cardBorderSide = BorderSide(color: colorScheme.outline, width: 2);
       } else if (hasMultipleColors) {
         // چند رنگ: gradient ترکیبی
         cardGradient = LinearGradient(

@@ -162,6 +162,52 @@ extension CustomColorSchemeExtension on ColorScheme {
         ? _onLightNoDataStatusColor
         : _onDarkNoDataStatusColor;
   }
+
+  // --- رنگ‌های تقویم ---
+  
+  // وضعیت روزها
+  Color get todayColor => brightness == Brightness.light 
+      ? const Color(0xFF00796B) // Teal 700 - همسو با primary
+      : const Color(0xFF4DB6AC); // Teal 300
+  
+  Color get workCompleteColor => brightness == Brightness.light
+      ? _lightCompletedStatusColor // سبز فسفری
+      : _darkCompletedStatusColor;
+  
+  Color get workIncompleteColor => brightness == Brightness.light
+      ? _lightIncompleteStatusColor // Amber 600
+      : _darkIncompleteStatusColor;
+  
+  Color get holidayColor => error; // استفاده از error theme
+  
+  Color get fridayColor => brightness == Brightness.light
+      ? const Color(0xFFFF6F00) // Deep Orange 800 
+      : const Color(0xFFFF9E80); // Deep Orange A100
+  
+  Color get removedDayColor => brightness == Brightness.light
+      ? const Color(0xFFE0E0E0) // Grey 300
+      : const Color(0xFF424242); // Grey 800
+  
+  Color get addedDayColor => brightness == Brightness.light
+      ? const Color(0xFFE1BEE7) // Purple 100
+      : const Color(0xFF4A148C); // Purple 900
+  
+  // انواع مرخصی
+  Color get annualLeaveColor => brightness == Brightness.light
+      ? const Color(0xFF1E88E5) // Blue 600
+      : const Color(0xFF64B5F6); // Blue 300
+  
+  Color get sickLeaveColor => brightness == Brightness.light
+      ? const Color(0xFFD81B60) // Pink 600
+      : const Color(0xFFF48FB1); // Pink 200
+  
+  Color get giftLeaveColor => brightness == Brightness.light
+      ? const Color(0xFF8E24AA) // Purple 600
+      : const Color(0xFFCE93D8); // Purple 200
+  
+  Color get missionColor => brightness == Brightness.light
+      ? const Color(0xFF5E35B1) // Deep Purple 600
+      : const Color(0xFF9575CD); // Deep Purple 300
 }
 
 // --- ThemeData Definitions ---
