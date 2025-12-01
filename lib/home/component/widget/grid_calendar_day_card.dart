@@ -21,41 +21,41 @@ class GridCalendarDayCard extends StatelessWidget {
   ) {
     List<Color> colors = [];
     Set<String> addedColorTypes = {}; // برای جلوگیری از رنگ‌های تکراری
-    
+
     // 1. روز حذف شده فقط خاکستری (حالت خاص)
     if (isRemoved) {
       colors.add(Colors.grey[500]!);
       return colors;
     }
-    
+
     // 2. رنگ روز امروز (اولویت اول)
     if (isToday) {
       colors.add(Colors.teal[700]!);
       addedColorTypes.add('teal');
     }
-    
+
     // 3. رنگ تعطیلی رسمی
     if (isHoliday) {
       colors.add(Colors.red[700]!);
       addedColorTypes.add('red');
     }
-    
+
     // 4. رنگ جمعه (اگر تعطیل رسمی نباشه)
     if (isFriday && !isHoliday && !addedColorTypes.contains('red')) {
       colors.add(Colors.deepOrange[600]!);
       addedColorTypes.add('deepOrange');
     }
-    
+
     // 5. رنگ روز اضافه شده از بازه ماهانه
     if (isAdded && !isToday) {
       colors.add(Colors.deepPurple[500]!);
       addedColorTypes.add('deepPurple');
     }
-    
+
     // 6. رنگ نوع روز (بر اساس leave type)
     final leaveType = cardStatus['leaveType'] as LeaveType?;
     final isComplete = cardStatus['isComplete'] as bool;
-    
+
     if (leaveType != null) {
       switch (leaveType) {
         case LeaveType.work:
@@ -68,13 +68,14 @@ class GridCalendarDayCard extends StatelessWidget {
             }
           } else {
             // روز کاری ناقص: زرد
-            if (!addedColorTypes.contains('amber') && !addedColorTypes.contains('yellow')) {
+            if (!addedColorTypes.contains('amber') &&
+                !addedColorTypes.contains('yellow')) {
               colors.add(Colors.amber[700]!);
               addedColorTypes.add('amber');
             }
           }
           break;
-          
+
         case LeaveType.annualLeave:
           // مرخصی استحقاقی
           if (!addedColorTypes.contains('blue')) {
@@ -82,7 +83,7 @@ class GridCalendarDayCard extends StatelessWidget {
             addedColorTypes.add('blue');
           }
           break;
-          
+
         case LeaveType.sickLeave:
           // مرخصی استعلاجی
           if (!addedColorTypes.contains('red')) {
@@ -90,25 +91,26 @@ class GridCalendarDayCard extends StatelessWidget {
             addedColorTypes.add('pink');
           }
           break;
-          
+
         case LeaveType.giftLeave:
           // مرخصی هدیه
-          if (!addedColorTypes.contains('purple') && !addedColorTypes.contains('deepPurple')) {
+          if (!addedColorTypes.contains('purple') &&
+              !addedColorTypes.contains('deepPurple')) {
             colors.add(Colors.purple[600]!);
             addedColorTypes.add('purple');
           }
           break;
       }
     }
-    
+
     // 7. اگر هیچ رنگی نداشتیم، رنگ پیش‌فرض خاکستری
     if (colors.isEmpty) {
       colors.add(Colors.grey[600]!);
     }
-    
+
     return colors;
   }
-  
+
   Color _getPrimaryIconColor(List<Color> colors) {
     return colors.first;
   }
@@ -177,7 +179,7 @@ class GridCalendarDayCard extends StatelessWidget {
       );
       final iconColor = _getPrimaryIconColor(allColors);
       final iconData = _getIconForDayType(cardStatus, isToday, isRemoved);
-      
+
       // آیا چند رنگ داریم؟
       final hasMultipleColors = allColors.length > 1;
 
@@ -203,10 +205,7 @@ class GridCalendarDayCard extends StatelessWidget {
             (i) => i / (allColors.length - 1),
           ),
         );
-        cardBorderSide = BorderSide(
-          color: iconColor,
-          width: isToday ? 3 : 2,
-        );
+        cardBorderSide = BorderSide(color: iconColor, width: isToday ? 3 : 2);
       } else {
         // یک رنگ
         cardGradient = LinearGradient(
@@ -217,10 +216,7 @@ class GridCalendarDayCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
-        cardBorderSide = BorderSide(
-          color: iconColor,
-          width: isToday ? 3 : 2,
-        );
+        cardBorderSide = BorderSide(color: iconColor, width: isToday ? 3 : 2);
       }
 
       // تعیین رنگ متن
@@ -243,7 +239,12 @@ class GridCalendarDayCard extends StatelessWidget {
                     homeController.openNoteDialog(context, date);
                   },
           child: Card(
-            elevation: isToday ? 8 : isHoliday || isAdded ? 4 : 2,
+            elevation:
+                isToday
+                    ? 8
+                    : isHoliday || isAdded
+                    ? 4
+                    : 2,
             shadowColor: iconColor.withValues(alpha: isToday ? 0.5 : 0.3),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -263,10 +264,10 @@ class GridCalendarDayCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 2, bottom: 2),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SizedBox(height: 16), // فضا برای ایکون بالا
-                        
                         // شماره روز
                         Text(
                           date.day.toString(),
@@ -280,13 +281,13 @@ class GridCalendarDayCard extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
 
-                        const SizedBox(height: 1),
+                        const SizedBox(height: 2),
 
                         // نام روز هفته
                         Text(
                           date.formatter.wN,
                           style: TextStyle(
-                            fontSize: 10.5,
+                            fontSize: 10,
                             fontFamily: 'BNazanin',
                             fontWeight: FontWeight.w500,
                             color: textColor.withValues(alpha: 0.7),
@@ -297,43 +298,53 @@ class GridCalendarDayCard extends StatelessWidget {
                           maxLines: 1,
                         ),
 
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 4),
 
                         // کار مفید یا نوع مرخصی
                         if (!isRemoved)
                           Flexible(
-                            child: Text(
-                              cardStatus['leaveType'] != null &&
-                                      cardStatus['leaveType'] != LeaveType.work &&
-                                      cardStatus['leaveType'] != LeaveType.mission
-                                  ? (cardStatus['leaveType'] as LeaveType)
-                                      .displayName
-                                  : effectiveWork,
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontFamily: 'BNazanin',
-                                fontWeight: FontWeight.w600,
-                                color: textColor.withValues(alpha: 0.85),
-                                height: 1.1,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
                               ),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
+                              child: Text(
+                                cardStatus['leaveType'] != null &&
+                                        cardStatus['leaveType'] !=
+                                            LeaveType.work &&
+                                        cardStatus['leaveType'] !=
+                                            LeaveType.mission
+                                    ? (cardStatus['leaveType'] as LeaveType)
+                                        .displayName
+                                    : effectiveWork,
+                                style: TextStyle(
+                                  fontSize: 8.5,
+                                  fontFamily: 'BNazanin',
+                                  fontWeight: FontWeight.w600,
+                                  color: textColor.withValues(alpha: 0.85),
+                                  height: 1.1,
+                                ),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
                             ),
                           ),
 
-                        // نمایش "حذف شده" برای روزهای removed
+                        // نمایش "خارج از بازه" برای روزهای removed
                         if (isRemoved)
-                          Text(
-                            'خارج از بازه',
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              fontFamily: 'BNazanin',
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                              height: 1.0,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              'خارج از بازه',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontFamily: 'BNazanin',
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                       ],
                     ),
@@ -351,53 +362,53 @@ class GridCalendarDayCard extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            gradient: hasMultipleColors
-                                ? LinearGradient(
-                                    colors: allColors,
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    stops: List.generate(
-                                      allColors.length,
-                                      (i) => i / (allColors.length - 1),
-                                    ),
-                                  )
-                                : LinearGradient(
-                                    colors: [
-                                      iconColor.withValues(alpha: 0.9),
-                                      iconColor.withValues(alpha: 0.7),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                            shape: BoxShape.circle,
-                            boxShadow: hasMultipleColors
-                                ? [
-                                    BoxShadow(
-                                      color: allColors[0].withValues(alpha: 0.4),
-                                      blurRadius: 6,
-                                      offset: const Offset(-1, 1),
-                                    ),
-                                    if (allColors.length > 1)
-                                      BoxShadow(
-                                        color: allColors[allColors.length - 1]
-                                            .withValues(alpha: 0.4),
-                                        blurRadius: 6,
-                                        offset: const Offset(1, 3),
+                            gradient:
+                                hasMultipleColors
+                                    ? LinearGradient(
+                                      colors: allColors,
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      stops: List.generate(
+                                        allColors.length,
+                                        (i) => i / (allColors.length - 1),
                                       ),
-                                  ]
-                                : [
-                                    BoxShadow(
-                                      color: iconColor.withValues(alpha: 0.4),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
+                                    )
+                                    : LinearGradient(
+                                      colors: [
+                                        iconColor.withValues(alpha: 0.9),
+                                        iconColor.withValues(alpha: 0.7),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
-                                  ],
+                            shape: BoxShape.circle,
+                            boxShadow:
+                                hasMultipleColors
+                                    ? [
+                                      BoxShadow(
+                                        color: allColors[0].withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        blurRadius: 6,
+                                        offset: const Offset(-1, 1),
+                                      ),
+                                      if (allColors.length > 1)
+                                        BoxShadow(
+                                          color: allColors[allColors.length - 1]
+                                              .withValues(alpha: 0.4),
+                                          blurRadius: 6,
+                                          offset: const Offset(1, 3),
+                                        ),
+                                    ]
+                                    : [
+                                      BoxShadow(
+                                        color: iconColor.withValues(alpha: 0.4),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                           ),
-                          child: Icon(
-                            iconData,
-                            size: 18,
-                            color: Colors.white,
-                          ),
+                          child: Icon(iconData, size: 18, color: Colors.white),
                         ),
                       ),
                     ),
@@ -476,7 +487,7 @@ class GridCalendarDayCard extends StatelessWidget {
         final periodStatus = homeController.getDayPeriodStatus(date);
 
         final leaveType = cardStatus['leaveType'] as LeaveType?;
-        
+
         return SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
           child: SingleChildScrollView(
@@ -504,7 +515,8 @@ class GridCalendarDayCard extends StatelessWidget {
                   _buildDetailRow(
                     context,
                     'وضعیت',
-                    leaveType == LeaveType.work || leaveType == LeaveType.mission
+                    leaveType == LeaveType.work ||
+                            leaveType == LeaveType.mission
                         ? (cardStatus['isComplete']
                             ? 'روز کاری: کامل'
                             : 'روز کاری: ناقص')

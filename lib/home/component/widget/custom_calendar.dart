@@ -113,34 +113,44 @@ class CustomCalendarWidget extends StatelessWidget {
                 ),
               ),
 
-              // Grid تقویم با سایز افقی
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                    childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+              // Grid تقویم با سایز ثابت و وسط‌چین
+              SingleChildScrollView(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 1000, // حداکثر عرض برای صفحات بزرگ
+                    ),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(8.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 120, // حداکثر عرض هر کارت
+                            crossAxisSpacing: 4.0,
+                            mainAxisSpacing: 4.0,
+                            childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                          ),
+                      itemCount: adjustedSlots,
+                      itemBuilder: (context, index) {
+                        // اگر در محدوده slot های خالی قبل از اولین روز باشیم
+                        if (index < emptySlotsBefore) {
+                          return Container();
+                        }
+
+                        // محاسبه index روز در لیست days
+                        final dayIndex = index - emptySlotsBefore;
+
+                        // اگر index از تعداد روزها بیشتر باشد، slot خالی
+                        if (dayIndex >= days.length) {
+                          return Container();
+                        }
+
+                        // نمایش روز
+                        return GridCalendarDayCard(date: days[dayIndex]);
+                      },
+                    ),
                   ),
-                  itemCount: adjustedSlots,
-                  itemBuilder: (context, index) {
-                    // اگر در محدوده slot های خالی قبل از اولین روز باشیم
-                    if (index < emptySlotsBefore) {
-                      return Container();
-                    }
-
-                    // محاسبه index روز در لیست days
-                    final dayIndex = index - emptySlotsBefore;
-
-                    // اگر index از تعداد روزها بیشتر باشد، slot خالی
-                    if (dayIndex >= days.length) {
-                      return Container();
-                    }
-
-                    // نمایش روز
-                    return GridCalendarDayCard(date: days[dayIndex]);
-                  },
                 ),
               ),
 
