@@ -196,6 +196,44 @@ class TaskController extends GetxController {
     personalTimerDuration.value = '00:00:00';
   }
 
+  void adjustTimerTime(int minutes) {
+    if (!isTimerRunning.value || timerStartTime == null) return;
+    
+    // If subtracting minutes (negative value), check if result would be negative
+    if (minutes < 0) {
+      final currentDuration = DateTime.now().difference(timerStartTime!);
+      final currentMinutes = currentDuration.inMinutes;
+      // If current time is less than the absolute value of minutes to subtract, don't allow
+      if (currentMinutes < minutes.abs()) {
+        return; // Prevent negative timer
+      }
+    }
+    
+    // To add minutes: subtract from start time (makes duration larger)
+    // To subtract minutes: add to start time (makes duration smaller)
+    timerStartTime = timerStartTime!.subtract(Duration(minutes: minutes));
+    _updateTimerDuration();
+  }
+
+  void adjustPersonalTimerTime(int minutes) {
+    if (!isPersonalTimerRunning.value || personalTimerStartTime == null) return;
+    
+    // If subtracting minutes (negative value), check if result would be negative
+    if (minutes < 0) {
+      final currentDuration = DateTime.now().difference(personalTimerStartTime!);
+      final currentMinutes = currentDuration.inMinutes;
+      // If current time is less than the absolute value of minutes to subtract, don't allow
+      if (currentMinutes < minutes.abs()) {
+        return; // Prevent negative timer
+      }
+    }
+    
+    // To add minutes: subtract from start time (makes duration larger)
+    // To subtract minutes: add to start time (makes duration smaller)
+    personalTimerStartTime = personalTimerStartTime!.subtract(Duration(minutes: minutes));
+    _updateTimerDuration();
+  }
+
   void _updateTimerDuration() {
     if (isTimerRunning.value && timerStartTime != null) {
       Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -529,7 +567,7 @@ class TaskController extends GetxController {
     }
   }
 
-  Future<void> saveDailyDetail() async {
+  Future<void> saveDailyDetail({bool shouldClose = true}) async {
     if (currentDate == null) return;
 
     for (var error in carCostProjectErrors) {
@@ -624,7 +662,9 @@ class TaskController extends GetxController {
 
     try {
       await ApiCalls().saveDailyDetail(detail);
-      Get.back();
+      if (shouldClose) {
+        Get.back();
+      }
       ThemedSnackbar.showSuccess('success'.tr, 'details_saved_snackbar'.tr);
       Get.find<HomeController>().fetchMonthlyDetails();
     } catch (e) {

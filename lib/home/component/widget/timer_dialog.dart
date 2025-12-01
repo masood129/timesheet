@@ -84,6 +84,127 @@ class TimerDialog extends StatelessWidget {
             
             const SizedBox(height: 20),
             
+            // Timer Adjustment Buttons
+            Obx(() {
+              final isProjectRunning = taskController.isTimerRunning.value;
+              final isPersonalRunning = taskController.isPersonalTimerRunning.value;
+              
+              if (!isProjectRunning && !isPersonalRunning) {
+                return const SizedBox.shrink();
+              }
+              
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'تنظیم زمان تایمر',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [5, 10, 15, 30, 60, 120].map((minutes) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Positive button (on top)
+                          InkWell(
+                            onTap: isProjectRunning
+                                ? () => taskController.adjustTimerTime(minutes)
+                                : isPersonalRunning
+                                    ? () => taskController.adjustPersonalTimerTime(minutes)
+                                    : null,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: colorScheme.primary.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    size: 18,
+                                    color: colorScheme.onPrimaryContainer,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$minutes',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Negative button (below)
+                          InkWell(
+                            onTap: isProjectRunning
+                                ? () => taskController.adjustTimerTime(-minutes)
+                                : isPersonalRunning
+                                    ? () => taskController.adjustPersonalTimerTime(-minutes)
+                                    : null,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.errorContainer,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: colorScheme.error.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.remove,
+                                    size: 18,
+                                    color: colorScheme.onErrorContainer,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$minutes',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onErrorContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            }),
+            
+            const SizedBox(height: 20),
+            
             // Project Selector (Always enabled unless personal timer is running)
             Obx(() {
               final isPersonalRunning = taskController.isPersonalTimerRunning.value;
@@ -153,7 +274,6 @@ class TimerDialog extends StatelessWidget {
                           ? null
                           : () async {
                               await taskController.startTimer();
-                              Navigator.pop(context);
                             },
                       icon: Icon(
                         Icons.play_arrow,
@@ -193,8 +313,7 @@ class TimerDialog extends StatelessWidget {
                           child: ElevatedButton.icon(
                             onPressed: () async {
                               await taskController.stopTimer(today);
-                              await taskController.saveDailyDetail();
-                              // Don't call Navigator.pop here, saveDailyDetail already calls Get.back()
+                              await taskController.saveDailyDetail(shouldClose: false);
                             },
                             icon: Icon(
                               Icons.stop,
@@ -230,22 +349,21 @@ class TimerDialog extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: ElevatedButton.icon(
-                      onPressed: isProjectRunning
+                      onPressed: isProjectRunning || isPersonalRunning
                           ? null
-                          : () async {
+                          : () {
                               taskController.startPersonalTimer();
-                              Navigator.pop(context);
                             },
                       icon: Icon(
                         Icons.play_arrow,
-                        color: isProjectRunning
+                        color: (isProjectRunning || isPersonalRunning)
                             ? colorScheme.onSurface.withValues(alpha: 0.38)
                             : colorScheme.onSecondary,
                       ),
                       label: Text(
                         'start_personal_timer'.tr,
                         style: TextStyle(
-                          color: isProjectRunning
+                          color: (isProjectRunning || isPersonalRunning)
                               ? colorScheme.onSurface.withValues(alpha: 0.38)
                               : colorScheme.onSecondary,
                           fontSize: 16,
@@ -272,8 +390,7 @@ class TimerDialog extends StatelessWidget {
                           child: ElevatedButton.icon(
                             onPressed: () async {
                               await taskController.stopPersonalTimer(today);
-                              await taskController.saveDailyDetail();
-                              // Don't call Navigator.pop here, saveDailyDetail already calls Get.back()
+                              await taskController.saveDailyDetail(shouldClose: false);
                             },
                             icon: Icon(
                               Icons.stop,
