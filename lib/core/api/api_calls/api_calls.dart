@@ -26,6 +26,7 @@ part 'api_call_users.dart';
 part 'api_call_table_export.dart';
 part 'api_call_month_periods.dart';
 part 'api_call_user_project_access.dart';
+part 'api_call_eos.dart';
 
 class ApiCalls {
   static final ApiCalls _instance = ApiCalls._internal();

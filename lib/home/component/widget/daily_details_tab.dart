@@ -62,41 +62,93 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'company_arrival_time'.tr,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              '08:00',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 24),
-            Text(
-              'company_leave_time'.tr,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              '17:00',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
-              ),
-            ),
+            Obx(() {
+              final records = widget.controller.timeRecords;
+              final firstRecord =
+                  records.isNotEmpty
+                      ? records.first['Rtime']?.toString() ?? '--:--'
+                      : '--:--';
+              final lastRecord =
+                  records.isNotEmpty && records.length > 1
+                      ? records.last['Rtime']?.toString() ?? '--:--'
+                      : '--:--';
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'company_arrival_time'.tr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    firstRecord,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  Text(
+                    'company_leave_time'.tr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    lastRecord,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  IconButton(
+                    icon: Icon(Icons.visibility, color: colorScheme.primary),
+                    onPressed: () {
+                      Get.defaultDialog(
+                        title: 'ترددهای ثبت شده',
+                        content: SizedBox(
+                          height: 200,
+                          width: 300,
+                          child: ListView.builder(
+                            itemCount: records.length,
+                            itemBuilder: (context, index) {
+                              final record = records[index];
+                              return ListTile(
+                                title: Text(
+                                  record['Rtime'] ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                leading: Icon(
+                                  Icons.access_time,
+                                  color: colorScheme.primary,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        confirm: TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text('bastan'.tr),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            }),
           ],
         ),
         const SizedBox(height: 10),

@@ -13,6 +13,7 @@ import '../../model/personal_car_cost_model.dart';
 import '../../model/project_model.dart';
 import '../../model/task_model.dart';
 import 'home_controller.dart';
+import 'auth_controller.dart';
 
 class ThousandSeparatorInputFormatter extends TextInputFormatter {
   @override
@@ -64,6 +65,7 @@ class TaskController extends GetxController {
   final RxList<RxBool> carCostProjectErrors = <RxBool>[].obs;
   final RxList<RxBool> taskProjectErrors = <RxBool>[].obs;
   final RxBool hasTimeError = false.obs; // خطا در زمان‌های ورود و خروج
+  final RxList<Map<String, dynamic>> timeRecords = <Map<String, dynamic>>[].obs;
 
   final arrivalTimeController = TextEditingController();
   final leaveTimeController = TextEditingController();
@@ -94,7 +96,9 @@ class TaskController extends GetxController {
   // Timer-related variables
   final RxBool isTimerRunning = false.obs;
   final Rx<Project?> selectedTimerProject = Rx<Project?>(null);
-  final Rx<Project?> runningTimerProject = Rx<Project?>(null); // Project currently running
+  final Rx<Project?> runningTimerProject = Rx<Project?>(
+    null,
+  ); // Project currently running
   final RxString timerDuration = '00:00:00'.obs;
   DateTime? timerStartTime;
 
@@ -199,7 +203,7 @@ class TaskController extends GetxController {
 
   void adjustTimerTime(int minutes) {
     if (!isTimerRunning.value || timerStartTime == null) return;
-    
+
     // If subtracting minutes (negative value), check if result would be negative
     if (minutes < 0) {
       final currentDuration = DateTime.now().difference(timerStartTime!);
@@ -209,7 +213,7 @@ class TaskController extends GetxController {
         return; // Prevent negative timer
       }
     }
-    
+
     // To add minutes: subtract from start time (makes duration larger)
     // To subtract minutes: add to start time (makes duration smaller)
     timerStartTime = timerStartTime!.subtract(Duration(minutes: minutes));
@@ -218,20 +222,24 @@ class TaskController extends GetxController {
 
   void adjustPersonalTimerTime(int minutes) {
     if (!isPersonalTimerRunning.value || personalTimerStartTime == null) return;
-    
+
     // If subtracting minutes (negative value), check if result would be negative
     if (minutes < 0) {
-      final currentDuration = DateTime.now().difference(personalTimerStartTime!);
+      final currentDuration = DateTime.now().difference(
+        personalTimerStartTime!,
+      );
       final currentMinutes = currentDuration.inMinutes;
       // If current time is less than the absolute value of minutes to subtract, don't allow
       if (currentMinutes < minutes.abs()) {
         return; // Prevent negative timer
       }
     }
-    
+
     // To add minutes: subtract from start time (makes duration larger)
     // To subtract minutes: add to start time (makes duration smaller)
-    personalTimerStartTime = personalTimerStartTime!.subtract(Duration(minutes: minutes));
+    personalTimerStartTime = personalTimerStartTime!.subtract(
+      Duration(minutes: minutes),
+    );
     _updateTimerDuration();
   }
 
@@ -373,11 +381,30 @@ class TaskController extends GetxController {
     }
   }
 
+  Future<void> fetchTimeRecords(Jalali date) async {
+    timeRecords.clear();
+    try {
+      final authController = Get.find<AuthController>();
+      final cardNo = authController.user.value?['Username'];
+      if (cardNo == null) return;
+
+      final formattedDate =
+          '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
+      final records = await ApiCalls().getTimeRecords(cardNo, formattedDate);
+      timeRecords.assignAll(records);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching time records: $e');
+      }
+    }
+  }
+
   Future<void> loadDailyDetail(
     Jalali date,
     List<DailyDetail> dailyDetails,
   ) async {
     currentDate = date;
+    fetchTimeRecords(date);
     try {
       final gregorianDate = date.toGregorian();
       final formattedDate =
@@ -799,7 +826,7 @@ class TaskController extends GetxController {
 
     if (arrival != null && leave != null) {
       final presence = leave - arrival;
-      
+
       // بررسی که تفاضل نباید منفی باشد
       if (presence.inMinutes < 0) {
         hasTimeError.value = true;
@@ -812,12 +839,12 @@ class TaskController extends GetxController {
             '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
         return;
       }
-      
+
       // اگر خطایی نیست، hasTimeError را false کنیم
       hasTimeError.value = false;
-      
+
       final effective = presence.inMinutes - personal;
-      
+
       // بررسی که کار مؤثر نباید منفی باشد (زمان شخصی بیشتر از حضور)
       final effectiveMinutes = effective < 0 ? 0 : effective;
 
