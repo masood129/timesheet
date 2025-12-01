@@ -11,6 +11,7 @@ import '../../view/project_access_page.dart';
 import 'draft_reports_dialog.dart';
 import 'gym_cost_dialog.dart';
 import 'monthly_report_dialog.dart';
+import 'color_legend_dialog.dart';
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});
@@ -172,6 +173,18 @@ class MainDrawer extends StatelessWidget {
           ),
 
           const Divider(),
+          ListTile(
+            leading: Icon(Icons.palette_outlined, color: colorScheme.primary),
+            title: Text(
+              'راهنمای رنگ‌ها',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              // نمایش دیالوگ راهنمای رنگ‌ها
+              showColorLegendDialog(context);
+            },
+          ),
           ListTile(
             leading: Icon(Icons.description, color: colorScheme.primary),
             title: Text(

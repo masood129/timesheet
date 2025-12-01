@@ -110,15 +110,15 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                   FilteringTextInputFormatter.digitsOnly,
                   // فقط اعداد
                   LengthLimitingTextInputFormatter(7),
-                  // حداکثر 7 رقم (برای 800,000)
+                  // حداکثر 7 رقم (برای 400,000)
                 ],
                 onChanged: (value) {
                   // حذف کاماها برای پردازش
                   String newValue = value.replaceAll(',', '');
                   if (newValue.isNotEmpty) {
                     int cost = int.parse(newValue);
-                    if (cost > 800000) {
-                      cost = 800000;
+                    if (cost > 400000) {
+                      cost = 400000;
                       newValue = cost.toString();
                     }
                     // اعمال فرمت کاما
