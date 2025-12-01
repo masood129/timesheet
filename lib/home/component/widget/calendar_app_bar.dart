@@ -40,10 +40,16 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.arrow_back),
+          iconSize: 22,
+          padding: const EdgeInsets.all(8),
+          constraints: const BoxConstraints(),
           onPressed: homeController.previousMonth,
         ),
         IconButton(
           icon: const Icon(Icons.arrow_forward),
+          iconSize: 22,
+          padding: const EdgeInsets.all(8),
+          constraints: const BoxConstraints(),
           onPressed: homeController.nextMonth,
         ),
         Obx(
@@ -53,6 +59,9 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ? Icons.view_module
                   : Icons.view_week,
             ),
+            iconSize: 22,
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(),
             onPressed: homeController.toggleWeekMonthView,
             tooltip:
                 homeController.isWeekView.value ? 'نمای ماهانه' : 'نمای هفتگی',
@@ -63,6 +72,9 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: Icon(
               homeController.isListView.value ? Icons.grid_view : Icons.list,
             ),
+            iconSize: 22,
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(),
             onPressed: homeController.toggleView,
             tooltip:
                 homeController.isListView.value ? 'نمای شبکه‌ای' : 'نمای لیست',

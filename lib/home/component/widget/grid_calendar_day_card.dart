@@ -261,18 +261,18 @@ class GridCalendarDayCard extends StatelessWidget {
                 children: [
                   // محتوای اصلی
                   Padding(
-                    padding: const EdgeInsets.only(top: 2, bottom: 2),
+                    padding: const EdgeInsets.only(top: 1, bottom: 1),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 16), // فضا برای ایکون بالا
+                        const SizedBox(height: 14), // فضا برای ایکون بالا
                         // شماره روز
                         Text(
                           date.day.toString(),
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'BNazanin',
                             color: textColor,
@@ -281,13 +281,13 @@ class GridCalendarDayCard extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
 
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 1),
 
                         // نام روز هفته
                         Text(
                           date.formatter.wN,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 9,
                             fontFamily: 'BNazanin',
                             fontWeight: FontWeight.w500,
                             color: textColor.withValues(alpha: 0.7),
@@ -298,7 +298,7 @@ class GridCalendarDayCard extends StatelessWidget {
                           maxLines: 1,
                         ),
 
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
 
                         // کار مفید یا نوع مرخصی
                         if (!isRemoved)
@@ -317,7 +317,7 @@ class GridCalendarDayCard extends StatelessWidget {
                                         .displayName
                                     : effectiveWork,
                                 style: TextStyle(
-                                  fontSize: 8.5,
+                                  fontSize: 8,
                                   fontFamily: 'BNazanin',
                                   fontWeight: FontWeight.w600,
                                   color: textColor.withValues(alpha: 0.85),
@@ -337,7 +337,7 @@ class GridCalendarDayCard extends StatelessWidget {
                             child: Text(
                               'خارج از بازه',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 8,
                                 fontFamily: 'BNazanin',
                                 fontWeight: FontWeight.bold,
                                 color: textColor,

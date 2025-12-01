@@ -177,12 +177,12 @@ class CustomCalendarWidget extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.info_outline, color: colorScheme.onPrimary),
-                      const SizedBox(width: 8),
+                      Icon(Icons.info_outline, color: colorScheme.onPrimary, size: 20),
+                      const SizedBox(width: 6),
                       Text(
                         'جزئیات روز امروز',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'BNazanin',
                           color: colorScheme.onPrimary,
