@@ -50,14 +50,14 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
 
     return ListView(
       children: [
-        Text(
-          'day_details'.tr,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: colorScheme.primary,
-          ),
-        ),
+        //   Text(
+        //     'day_details'.tr,
+        //     style: TextStyle(
+        //       fontWeight: FontWeight.bold,
+        //       fontSize: 16,
+        //       color: colorScheme.primary,
+        //     ),
+        //   ),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -104,6 +104,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
           final isEnabled =
               widget.controller.leaveType.value == LeaveType.work ||
               widget.controller.leaveType.value == LeaveType.mission;
+          final hasError = widget.controller.hasTimeError.value;
           return Row(
             children: [
               Expanded(
@@ -112,6 +113,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
                   controller: widget.controller.arrivalTimeController,
                   icon: Icons.login,
                   isEnabled: isEnabled,
+                  hasError: hasError,
                 ),
               ),
               const SizedBox(width: 10),
@@ -121,6 +123,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
                   controller: widget.controller.leaveTimeController,
                   icon: Icons.logout,
                   isEnabled: isEnabled,
+                  hasError: hasError,
                 ),
               ),
               const SizedBox(width: 10),

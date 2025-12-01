@@ -8,6 +8,8 @@ class TimePickerField extends StatelessWidget {
   final TextEditingController controller;
   final IconData icon;
   final bool isEnabled;
+  final bool hasError;
+  final String? errorText;
 
   const TimePickerField({
     super.key,
@@ -15,6 +17,8 @@ class TimePickerField extends StatelessWidget {
     required this.controller,
     required this.icon,
     required this.isEnabled,
+    this.hasError = false,
+    this.errorText,
   });
 
   TimeOfDay _getInitialTime() {
@@ -43,6 +47,8 @@ class TimePickerField extends StatelessWidget {
           labelKey,
           icon,
           isEnabled,
+          hasError: hasError,
+          errorText: errorText,
         ),
         onTap: isEnabled
             ? () async {

@@ -63,6 +63,7 @@ class TaskController extends GetxController {
   final RxList<String> costDetails = <String>[].obs;
   final RxList<RxBool> carCostProjectErrors = <RxBool>[].obs;
   final RxList<RxBool> taskProjectErrors = <RxBool>[].obs;
+  final RxBool hasTimeError = false.obs; // خطا در زمان‌های ورود و خروج
 
   final arrivalTimeController = TextEditingController();
   final leaveTimeController = TextEditingController();
@@ -798,19 +799,40 @@ class TaskController extends GetxController {
 
     if (arrival != null && leave != null) {
       final presence = leave - arrival;
+      
+      // بررسی که تفاضل نباید منفی باشد
+      if (presence.inMinutes < 0) {
+        hasTimeError.value = true;
+        summaryReport.value = 'زمان پایان کار نباید زودتر از زمان شروع باشد';
+        presenceDuration.value = 'خطا: زمان نامعتبر';
+        effectiveWork.value = 'خطا: زمان نامعتبر';
+        taskTotalTime.value =
+            '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${'live_calc_minutes_suffix'.tr}';
+        totalCost.value =
+            '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
+        return;
+      }
+      
+      // اگر خطایی نیست، hasTimeError را false کنیم
+      hasTimeError.value = false;
+      
       final effective = presence.inMinutes - personal;
+      
+      // بررسی که کار مؤثر نباید منفی باشد (زمان شخصی بیشتر از حضور)
+      final effectiveMinutes = effective < 0 ? 0 : effective;
 
       summaryReport.value =
-          '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_effective_work_prefix'.tr}${effectiveMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${effectiveMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       presenceDuration.value =
           '${'live_calc_presence_duration_prefix'.tr}${presence.inHours}${'live_calc_hours_and_suffix'.tr}${presence.inMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       effectiveWork.value =
-          '${'live_calc_effective_work_prefix'.tr}${effective ~/ 60}${'live_calc_hours_and_suffix'.tr}${effective % 60}${'live_calc_minutes_suffix'.tr}';
+          '${'live_calc_effective_work_prefix'.tr}${effectiveMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${effectiveMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       taskTotalTime.value =
           '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       totalCost.value =
           '${'live_calc_total_cost_prefix'.tr}${ThousandSeparatorInputFormatter()._formatNumber(totalCosts)}';
     } else {
+      hasTimeError.value = false;
       summaryReport.value = '';
       presenceDuration.value = '';
       effectiveWork.value = '';
