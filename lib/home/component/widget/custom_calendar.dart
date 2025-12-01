@@ -15,153 +15,176 @@ class CustomCalendarWidget extends StatelessWidget {
       builder: (homeController) {
         final colorScheme = Theme.of(context).colorScheme;
 
-        // استفاده از تابع جدید که همه روزهای ماه + روزهای اضافه شده رو برمی‌گردونه
-        final days = homeController.getCalendarDaysWithStatus();
-
-        if (days.isEmpty) {
-          return Center(
-            child: Text(
-              'روزی برای نمایش وجود ندارد',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'BNazanin',
-                color: colorScheme.onSurface,
+        // نمایش loading indicator هنگام بارگذاری داده‌های ماه جدید
+        return Obx(() {
+          if (homeController.isLoadingMonthData.value) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: colorScheme.primary),
+                  const SizedBox(height: 16),
+                  Text(
+                    'در حال بارگذاری...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'BNazanin',
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          );
-        }
+            );
+          }
 
-        // محاسبه اولین روز هفته برای تنظیم offset در grid
-        final firstDay = days.first;
-        // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
-        final firstWeekday = firstDay.weekDay;
+          // استفاده از تابع جدید که همه روزهای ماه + روزهای اضافه شده رو برمی‌گردونه
+          final days = homeController.getCalendarDaysWithStatus();
 
-        // تعداد slot های خالی قبل از اولین روز
-        // weekday - 1 چون grid از index 0 شروع می‌شود
-        final emptySlotsBefore = firstWeekday - 1;
-
-        // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
-        final totalSlots = days.length + emptySlotsBefore;
-        // تکمیل آخرین ردیف grid
-        final adjustedSlots =
-            (totalSlots % 7 == 0)
-                ? totalSlots
-                : totalSlots + (7 - totalSlots % 7);
-
-        return Column(
-          children: [
-            // راهنمای رنگ‌ها
-            if (homeController.isCurrentMonthPeriodCustom)
-              _buildColorLegend(context),
-
-            // هدر روزهای هفته
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 4.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children:
-                    [
-                      'شنبه', // index 0, weekday 1
-                      'یک‌شنبه', // index 1, weekday 2
-                      'دوشنبه', // index 2, weekday 3
-                      'سه‌شنبه', // index 3, weekday 4
-                      'چهارشنبه', // index 4, weekday 5
-                      'پنج‌شنبه', // index 5, weekday 6
-                      'جمعه', // index 6, weekday 7
-                    ].asMap().entries.map((entry) {
-                      return Expanded(
-                        child: Text(
-                          entry.value,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'BNazanin',
-                            color:
-                                entry.key == 6
-                                    ? colorScheme.error
-                                    : colorScheme.onSurface,
-                            fontSize: 12,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-              ),
-            ),
-
-            // Grid تقویم با سایز افقی
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                  childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+          if (days.isEmpty) {
+            return Center(
+              child: Text(
+                'روزی برای نمایش وجود ندارد',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'BNazanin',
+                  color: colorScheme.onSurface,
                 ),
-                itemCount: adjustedSlots,
-                itemBuilder: (context, index) {
-                  // اگر در محدوده slot های خالی قبل از اولین روز باشیم
-                  if (index < emptySlotsBefore) {
-                    return Container();
-                  }
-
-                  // محاسبه index روز در لیست days
-                  final dayIndex = index - emptySlotsBefore;
-
-                  // اگر index از تعداد روزها بیشتر باشد، slot خالی
-                  if (dayIndex >= days.length) {
-                    return Container();
-                  }
-
-                  // نمایش روز
-                  return GridCalendarDayCard(date: days[dayIndex]);
-                },
               ),
-            ),
+            );
+          }
 
-            // دکمه جزئیات روز امروز
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showDayDetailsDialog(context, Jalali.now());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  elevation: 4,
-                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+          // محاسبه اولین روز هفته برای تنظیم offset در grid
+          final firstDay = days.first;
+          // weekday در Jalali: 1=شنبه, 2=یک‌شنبه, ..., 7=جمعه
+          final firstWeekday = firstDay.weekDay;
+
+          // تعداد slot های خالی قبل از اولین روز
+          // weekday - 1 چون grid از index 0 شروع می‌شود
+          final emptySlotsBefore = firstWeekday - 1;
+
+          // محاسبه تعداد کل slot ها برای grid (شامل روزها + slot های خالی)
+          final totalSlots = days.length + emptySlotsBefore;
+          // تکمیل آخرین ردیف grid
+          final adjustedSlots =
+              (totalSlots % 7 == 0)
+                  ? totalSlots
+                  : totalSlots + (7 - totalSlots % 7);
+
+          return Column(
+            children: [
+              // راهنمای رنگ‌ها
+              if (homeController.isCurrentMonthPeriodCustom)
+                _buildColorLegend(context),
+
+              // هدر روزهای هفته
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4.0,
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.info_outline, color: colorScheme.onPrimary),
-                    const SizedBox(width: 8),
-                    Text(
-                      'جزئیات روز امروز',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'BNazanin',
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children:
+                      [
+                        'شنبه', // index 0, weekday 1
+                        'یک‌شنبه', // index 1, weekday 2
+                        'دوشنبه', // index 2, weekday 3
+                        'سه‌شنبه', // index 3, weekday 4
+                        'چهارشنبه', // index 4, weekday 5
+                        'پنج‌شنبه', // index 5, weekday 6
+                        'جمعه', // index 6, weekday 7
+                      ].asMap().entries.map((entry) {
+                        return Expanded(
+                          child: Text(
+                            entry.value,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'BNazanin',
+                              color:
+                                  entry.key == 6
+                                      ? colorScheme.error
+                                      : colorScheme.onSurface,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                 ),
               ),
-            ),
-          ],
-        );
+
+              // Grid تقویم با سایز افقی
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                    crossAxisSpacing: 4.0,
+                    mainAxisSpacing: 4.0,
+                    childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                  ),
+                  itemCount: adjustedSlots,
+                  itemBuilder: (context, index) {
+                    // اگر در محدوده slot های خالی قبل از اولین روز باشیم
+                    if (index < emptySlotsBefore) {
+                      return Container();
+                    }
+
+                    // محاسبه index روز در لیست days
+                    final dayIndex = index - emptySlotsBefore;
+
+                    // اگر index از تعداد روزها بیشتر باشد، slot خالی
+                    if (dayIndex >= days.length) {
+                      return Container();
+                    }
+
+                    // نمایش روز
+                    return GridCalendarDayCard(date: days[dayIndex]);
+                  },
+                ),
+              ),
+
+              // دکمه جزئیات روز امروز
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showDayDetailsDialog(context, Jalali.now());
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    elevation: 4,
+                    shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.info_outline, color: colorScheme.onPrimary),
+                      const SizedBox(width: 8),
+                      Text(
+                        'جزئیات روز امروز',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'BNazanin',
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        });
       },
     );
   }

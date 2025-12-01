@@ -29,6 +29,7 @@ class HomeController extends GetxController {
   ); // استفاده از Rx<String?> برای نگهداری null
   List<DraftReportModel> drafts =
       <DraftReportModel>[].obs; // لیست drafts (json objects)
+  var isLoadingMonthData = false.obs; // وضعیت بارگذاری داده‌های ماه
 
   // Month period settings
   MonthPeriodModel? currentMonthPeriod;
@@ -445,26 +446,38 @@ class HomeController extends GetxController {
     return calendarModel.getNoteForDate(date);
   }
 
-  void nextMonth() {
+  Future<void> nextMonth() async {
     if (currentMonth.value == 12) {
       currentMonth.value = 1;
       currentYear.value += 1;
     } else {
       currentMonth.value += 1;
     }
-    _fetchCurrentMonthPeriod();
-    fetchMonthlyDetails();
+
+    isLoadingMonthData.value = true;
+    try {
+      await _fetchCurrentMonthPeriod();
+      await fetchMonthlyDetails();
+    } finally {
+      isLoadingMonthData.value = false;
+    }
   }
 
-  void previousMonth() {
+  Future<void> previousMonth() async {
     if (currentMonth.value == 1) {
       currentMonth.value = 12;
       currentYear.value -= 1;
     } else {
       currentMonth.value -= 1;
     }
-    _fetchCurrentMonthPeriod();
-    fetchMonthlyDetails();
+
+    isLoadingMonthData.value = true;
+    try {
+      await _fetchCurrentMonthPeriod();
+      await fetchMonthlyDetails();
+    } finally {
+      isLoadingMonthData.value = false;
+    }
   }
 
   void toggleView() {
@@ -713,7 +726,8 @@ class HomeController extends GetxController {
 
     bool isComplete = false;
     // اگر روز کاری یا ماموریت است
-    if (detail.leaveType == LeaveType.work || detail.leaveType == LeaveType.mission) {
+    if (detail.leaveType == LeaveType.work ||
+        detail.leaveType == LeaveType.mission) {
       if (hasWorkingHours) {
         final hasArrivalTime =
             detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
