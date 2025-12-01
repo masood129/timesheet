@@ -285,196 +285,369 @@ class CustomCalendarWidget extends StatelessWidget {
   /// نمایش دیالوگ راهنمای رنگ‌ها
   void _showColorLegendDialog(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // محاسبه اندازه‌های responsive
+    final double dialogWidth = screenWidth > 600 ? 550 : screenWidth * 0.95;
+    final double titleFontSize = screenWidth > 600 ? 24 : 20;
+    final double headerFontSize = screenWidth > 600 ? 18 : 16;
+    final double itemFontSize = screenWidth > 600 ? 16 : 15;
+    final double iconSize = screenWidth > 600 ? 32 : 28;
 
-    Get.defaultDialog(
-      title: 'راهنمای رنگ‌های تقویم',
-      titleStyle: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        fontFamily: 'BNazanin',
-        color: colorScheme.primary,
-      ),
-      content: Container(
-        width: MediaQuery.of(context).size.width * 0.85,
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // رنگ‌های وضعیت بازه (اگر ماه سفارشی باشد)
-              Text(
-                'وضعیت روزها در بازه:',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'BNazanin',
-                  color: colorScheme.primary,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            width: dialogWidth,
+            constraints: BoxConstraints(
+              maxHeight: screenHeight * 0.85,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // هدر دیالوگ
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.primary,
+                        colorScheme.primary.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.palette_rounded,
+                          color: colorScheme.onPrimary,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          'راهنمای رنگ‌های تقویم',
+                          style: TextStyle(
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'BNazanin',
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: colorScheme.onPrimary,
+                          size: 28,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildLegendItem(
-                context,
-                color: colorScheme.surface,
-                label: 'روز عادی (در بازه ماه)',
-                icon: Icons.check_circle_outline,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.purple[100]!,
-                label: 'اضافه شده (از ماه دیگر)',
-                icon: Icons.add_circle_outline,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.grey[300]!,
-                label: 'حذف شده (خارج از بازه)',
-                icon: Icons.remove_circle_outline,
-              ),
-              const Divider(height: 24),
-              
-              // رنگ‌های وضعیت کاری
-              Text(
-                'وضعیت کاری:',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'BNazanin',
-                  color: colorScheme.primary,
+                
+                // محتوای دیالوگ
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // بخش اول: وضعیت بازه
+                        _buildSectionHeader(
+                          context,
+                          'وضعیت روزها در بازه:',
+                          Icons.date_range_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDialogLegendItem(
+                          context,
+                          color: colorScheme.surface,
+                          label: 'روز عادی (در بازه ماه)',
+                          icon: Icons.check_circle_outline,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.purple[100]!,
+                          label: 'اضافه شده (از ماه دیگر)',
+                          icon: Icons.add_circle_outline,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.grey[300]!,
+                          label: 'حذف شده (خارج از بازه)',
+                          icon: Icons.remove_circle_outline,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        
+                        const Divider(height: 32, thickness: 1.5),
+                        
+                        // بخش دوم: وضعیت کاری
+                        _buildSectionHeader(
+                          context,
+                          'وضعیت کاری:',
+                          Icons.work_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.teal[700]!,
+                          label: 'روز امروز',
+                          icon: Icons.today_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.green[600]!,
+                          label: 'روز کاری کامل',
+                          icon: Icons.check_circle_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.amber[700]!,
+                          label: 'روز کاری ناقص',
+                          icon: Icons.warning_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.red[700]!,
+                          label: 'تعطیل رسمی',
+                          icon: Icons.event_busy_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.deepOrange[600]!,
+                          label: 'جمعه',
+                          icon: Icons.weekend_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        
+                        const Divider(height: 32, thickness: 1.5),
+                        
+                        // بخش سوم: انواع مرخصی
+                        _buildSectionHeader(
+                          context,
+                          'انواع مرخصی:',
+                          Icons.event_available_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.blue[600]!,
+                          label: 'مرخصی استحقاقی',
+                          icon: Icons.beach_access_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.pink[700]!,
+                          label: 'مرخصی استعلاجی',
+                          icon: Icons.local_hospital_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.purple[600]!,
+                          label: 'مرخصی هدیه',
+                          icon: Icons.card_giftcard_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                        const SizedBox(height: 10),
+                        _buildDialogLegendItem(
+                          context,
+                          color: Colors.deepPurple[500]!,
+                          label: 'ماموریت',
+                          icon: Icons.flight_takeoff_rounded,
+                          itemFontSize: itemFontSize,
+                          iconSize: iconSize,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildLegendItem(
-                context,
-                color: Colors.teal[700]!,
-                label: 'روز امروز',
-                icon: Icons.today_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.green[600]!,
-                label: 'روز کاری کامل',
-                icon: Icons.check_circle_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.amber[700]!,
-                label: 'روز کاری ناقص',
-                icon: Icons.warning_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.red[700]!,
-                label: 'تعطیل رسمی',
-                icon: Icons.event_busy_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.deepOrange[600]!,
-                label: 'جمعه',
-                icon: Icons.weekend_rounded,
-              ),
-              const Divider(height: 24),
-              
-              // رنگ‌های انواع مرخصی
-              Text(
-                'انواع مرخصی:',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'BNazanin',
-                  color: colorScheme.primary,
+                
+                // دکمه بستن
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        'متوجه شدم',
+                        style: TextStyle(
+                          fontSize: itemFontSize,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'BNazanin',
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildLegendItem(
-                context,
-                color: Colors.blue[600]!,
-                label: 'مرخصی استحقاقی',
-                icon: Icons.beach_access_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.pink[700]!,
-                label: 'مرخصی استعلاجی',
-                icon: Icons.local_hospital_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.purple[600]!,
-                label: 'مرخصی هدیه',
-                icon: Icons.card_giftcard_rounded,
-              ),
-              const SizedBox(height: 6),
-              _buildLegendItem(
-                context,
-                color: Colors.deepPurple[500]!,
-                label: 'ماموریت',
-                icon: Icons.flight_takeoff_rounded,
-              ),
-            ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    IconData icon,
+    double fontSize,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: colorScheme.onPrimaryContainer,
+            size: fontSize + 4,
           ),
         ),
-      ),
-      backgroundColor: colorScheme.surface,
-      radius: 12,
-      actions: [
-        TextButton(
-          onPressed: () => Get.back(),
-          child: Text(
-            'متوجه شدم',
-            style: TextStyle(
-              fontFamily: 'BNazanin',
-              color: colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'BNazanin',
+            color: colorScheme.primary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLegendItem(
+  Widget _buildDialogLegendItem(
     BuildContext context, {
     required Color color,
     required String label,
     required IconData icon,
+    required double itemFontSize,
+    required double iconSize,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: colorScheme.outline.withValues(alpha: 0.5),
+    
+    // تعیین رنگ آیکون بر اساس روشنایی رنگ پس‌زمینه
+    final brightness = ThemeData.estimateBrightnessForColor(color);
+    final iconColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
+    
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: iconSize + 12,
+            height: iconSize + 12,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: iconSize * 0.65,
+              color: iconColor,
             ),
           ),
-          child: Icon(icon, size: 14, color: colorScheme.primary),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontFamily: 'BNazanin',
-            color: colorScheme.onSurface,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: itemFontSize,
+                fontFamily: 'BNazanin',
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
