@@ -14,6 +14,34 @@ class CustomCalendarWidget extends StatelessWidget {
     return GetBuilder<HomeController>(
       builder: (homeController) {
         final colorScheme = Theme.of(context).colorScheme;
+        final screenWidth = MediaQuery.of(context).size.width;
+        
+        // محاسبه اندازه‌های responsive بر اساس عرض صفحه
+        final double maxCalendarWidth;
+        final double headerFontSize;
+        final double horizontalPadding;
+        
+        if (screenWidth > 1400) {
+          // صفحات خیلی بزرگ (desktop/web)
+          maxCalendarWidth = 1400;
+          headerFontSize = 16;
+          horizontalPadding = 16;
+        } else if (screenWidth > 1000) {
+          // صفحات متوسط به بزرگ
+          maxCalendarWidth = 1200;
+          headerFontSize = 15;
+          horizontalPadding = 12;
+        } else if (screenWidth > 600) {
+          // صفحات متوسط (tablets)
+          maxCalendarWidth = screenWidth * 0.95;
+          headerFontSize = 14;
+          horizontalPadding = 8;
+        } else {
+          // صفحات کوچک (mobile)
+          maxCalendarWidth = screenWidth;
+          headerFontSize = 13;
+          horizontalPadding = 6;
+        }
 
         // نمایش loading indicator هنگام بارگذاری داده‌های ماه جدید
         return Obx(() {
@@ -76,79 +104,90 @@ class CustomCalendarWidget extends StatelessWidget {
               if (homeController.isCurrentMonthPeriodCustom)
                 _buildColorLegend(context),
 
-              // هدر روزهای هفته
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 4.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:
-                      [
-                        'شنبه', // index 0, weekday 1
-                        'یک‌شنبه', // index 1, weekday 2
-                        'دوشنبه', // index 2, weekday 3
-                        'سه‌شنبه', // index 3, weekday 4
-                        'چهارشنبه', // index 4, weekday 5
-                        'پنج‌شنبه', // index 5, weekday 6
-                        'جمعه', // index 6, weekday 7
-                      ].asMap().entries.map((entry) {
-                        return Expanded(
-                          child: Text(
-                            entry.value,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'BNazanin',
-                              color:
-                                  entry.key == 6
-                                      ? colorScheme.error
-                                      : colorScheme.onSurface,
-                              fontSize: 12,
+              // Grid تقویم با سایز ثابت و وسط‌چین
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: maxCalendarWidth, // عرض responsive
+                      ),
+                      child: Column(
+                        children: [
+                          // هدر روزهای هفته - با همان ساختار Grid
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                              vertical: 4.0,
+                            ),
+                            child: GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 7,
+                              childAspectRatio: 2.5,
+                              children: [
+                                'شنبه', // index 0, weekday 1
+                                'یک‌شنبه', // index 1, weekday 2
+                                'دوشنبه', // index 2, weekday 3
+                                'سه‌شنبه', // index 3, weekday 4
+                                'چهارشنبه', // index 4, weekday 5
+                                'پنج‌شنبه', // index 5, weekday 6
+                                'جمعه', // index 6, weekday 7
+                              ].asMap().entries.map((entry) {
+                                return Center(
+                                  child: Text(
+                                    entry.value,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'BNazanin',
+                                      color:
+                                          entry.key == 6
+                                              ? colorScheme.error
+                                              : colorScheme.onSurface,
+                                      fontSize: headerFontSize,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ),
-                        );
-                      }).toList(),
-                ),
-              ),
 
-              // Grid تقویم با سایز ثابت و وسط‌چین
-              SingleChildScrollView(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 1000, // حداکثر عرض برای صفحات بزرگ
-                    ),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(8.0),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 120, // حداکثر عرض هر کارت
-                            crossAxisSpacing: 4.0,
-                            mainAxisSpacing: 4.0,
-                            childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                          // Grid تقویم با 7 ستون ثابت
+                          Padding(
+                            padding: EdgeInsets.all(horizontalPadding),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 7, // 7 ستون ثابت برای 7 روز هفته
+                                    crossAxisSpacing: screenWidth > 1000 ? 6.0 : 4.0,
+                                    mainAxisSpacing: screenWidth > 1000 ? 6.0 : 4.0,
+                                    childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                                  ),
+                              itemCount: adjustedSlots,
+                              itemBuilder: (context, index) {
+                                // اگر در محدوده slot های خالی قبل از اولین روز باشیم
+                                if (index < emptySlotsBefore) {
+                                  return Container();
+                                }
+
+                                // محاسبه index روز در لیست days
+                                final dayIndex = index - emptySlotsBefore;
+
+                                // اگر index از تعداد روزها بیشتر باشد، slot خالی
+                                if (dayIndex >= days.length) {
+                                  return Container();
+                                }
+
+                                // نمایش روز
+                                return GridCalendarDayCard(date: days[dayIndex]);
+                              },
+                            ),
                           ),
-                      itemCount: adjustedSlots,
-                      itemBuilder: (context, index) {
-                        // اگر در محدوده slot های خالی قبل از اولین روز باشیم
-                        if (index < emptySlotsBefore) {
-                          return Container();
-                        }
-
-                        // محاسبه index روز در لیست days
-                        final dayIndex = index - emptySlotsBefore;
-
-                        // اگر index از تعداد روزها بیشتر باشد، slot خالی
-                        if (dayIndex >= days.length) {
-                          return Container();
-                        }
-
-                        // نمایش روز
-                        return GridCalendarDayCard(date: days[dayIndex]);
-                      },
+                        ],
+                      ),
                     ),
                   ),
                 ),

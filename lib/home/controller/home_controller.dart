@@ -238,7 +238,20 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // تشخیص پلتفرم و تنظیم دیفالت view
+    _initializePlatformSettings();
     initializeApp();
+  }
+
+  /// تشخیص پلتفرم و تنظیم view دیفالت
+  void _initializePlatformSettings() {
+    // برای موبایل (Android/iOS) دیفالت List View
+    if (GetPlatform.isMobile) {
+      isListView.value = true;
+    } else {
+      // برای وب و دسکتاپ (Windows/macOS/Linux) دیفالت Grid View
+      isListView.value = false;
+    }
   }
 
   Future<List<DraftReportModel>> fetchMyDrafts() async {

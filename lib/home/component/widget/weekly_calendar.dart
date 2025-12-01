@@ -15,6 +15,30 @@ class WeeklyCalendarWidget extends StatelessWidget {
       builder: (homeController) {
         final colorScheme = Theme.of(context).colorScheme;
         final weekDays = homeController.getCurrentWeekDays();
+        final screenWidth = MediaQuery.of(context).size.width;
+        
+        // محاسبه اندازه‌های responsive بر اساس عرض صفحه
+        final double maxCalendarWidth;
+        final double headerFontSize;
+        final double horizontalPadding;
+        
+        if (screenWidth > 1400) {
+          maxCalendarWidth = 1400;
+          headerFontSize = 16;
+          horizontalPadding = 16;
+        } else if (screenWidth > 1000) {
+          maxCalendarWidth = 1200;
+          headerFontSize = 15;
+          horizontalPadding = 12;
+        } else if (screenWidth > 600) {
+          maxCalendarWidth = screenWidth * 0.95;
+          headerFontSize = 14;
+          horizontalPadding = 8;
+        } else {
+          maxCalendarWidth = screenWidth;
+          headerFontSize = 13;
+          horizontalPadding = 6;
+        }
 
         return Column(
           children: [
@@ -82,18 +106,73 @@ class WeeklyCalendarWidget extends StatelessWidget {
             
             // Grid هفتگی
             Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  crossAxisSpacing: 6.0,
-                  mainAxisSpacing: 6.0,
-                  childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: maxCalendarWidth, // عرض responsive
+                  ),
+                  child: Column(
+                    children: [
+                      // هدر روزهای هفته - با همان ساختار Grid
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                          vertical: 4.0,
+                        ),
+                        child: GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 7,
+                          childAspectRatio: 2.5,
+                          children: [
+                            'شنبه', // index 0, weekday 1
+                            'یک‌شنبه', // index 1, weekday 2
+                            'دوشنبه', // index 2, weekday 3
+                            'سه‌شنبه', // index 3, weekday 4
+                            'چهارشنبه', // index 4, weekday 5
+                            'پنج‌شنبه', // index 5, weekday 6
+                            'جمعه', // index 6, weekday 7
+                          ].asMap().entries.map((entry) {
+                            return Center(
+                              child: Text(
+                                entry.value,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'BNazanin',
+                                  color:
+                                      entry.key == 6
+                                          ? colorScheme.error
+                                          : colorScheme.onSurface,
+                                  fontSize: headerFontSize,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+
+                      // Grid هفتگی
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(horizontalPadding),
+                          child: GridView.builder(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 7,
+                              crossAxisSpacing: screenWidth > 1000 ? 8.0 : 6.0,
+                              mainAxisSpacing: screenWidth > 1000 ? 8.0 : 6.0,
+                              childAspectRatio: 0.7, // ارتفاع بیشتر از عرض
+                            ),
+                            itemCount: 7,
+                            itemBuilder: (context, index) {
+                              return GridCalendarDayCard(date: weekDays[index]);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                itemCount: 7,
-                itemBuilder: (context, index) {
-                  return GridCalendarDayCard(date: weekDays[index]);
-                },
               ),
             ),
             

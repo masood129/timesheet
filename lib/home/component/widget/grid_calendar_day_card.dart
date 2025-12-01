@@ -238,229 +238,255 @@ class GridCalendarDayCard extends StatelessWidget {
                   : () {
                     homeController.openNoteDialog(context, date);
                   },
-          child: Card(
-            elevation:
-                isToday
-                    ? 8
-                    : isHoliday || isAdded
-                    ? 4
-                    : 2,
-            shadowColor: iconColor.withValues(alpha: isToday ? 0.5 : 0.3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: cardBorderSide,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: cardGradient,
-                color: cardGradient == null ? cardColor : null,
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Stack(
-                children: [
-                  // محتوای اصلی
-                  Padding(
-                    padding: const EdgeInsets.only(top: 1, bottom: 1),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 14), // فضا برای ایکون بالا
-                        // شماره روز
-                        Text(
-                          date.day.toString(),
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'BNazanin',
-                            color: textColor,
-                            height: 1.0,
-                          ),
-                          textAlign: TextAlign.center,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // محاسبه اندازه‌های responsive بر اساس عرض کارت
+              final cardWidth = constraints.maxWidth;
+              final cardHeight = constraints.maxHeight;
+              
+              // محاسبه سایزهای متناسب
+              final dayFontSize = (cardWidth * 0.22).clamp(16.0, 24.0);
+              final weekDayFontSize = (cardWidth * 0.09).clamp(8.0, 11.0);
+              final detailFontSize = (cardWidth * 0.08).clamp(7.0, 10.0);
+              final iconSize = (cardWidth * 0.28).clamp(14.0, 20.0);
+              final noteIconSize = (cardWidth * 0.12).clamp(10.0, 14.0);
+              final infoIconSize = (cardWidth * 0.14).clamp(12.0, 16.0);
+              final topPadding = (cardHeight * 0.08).clamp(2.0, 6.0);
+              
+              return Card(
+                elevation:
+                    isToday
+                        ? 8
+                        : isHoliday || isAdded
+                        ? 4
+                        : 2,
+                shadowColor: iconColor.withValues(alpha: isToday ? 0.5 : 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: cardBorderSide,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    gradient: cardGradient,
+                    color: cardGradient == null ? cardColor : null,
+                  ),
+                  padding: EdgeInsets.all((cardWidth * 0.06).clamp(4.0, 8.0)),
+                  child: Stack(
+                    children: [
+                      // محتوای اصلی
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: topPadding,
+                          bottom: topPadding,
                         ),
-
-                        const SizedBox(height: 1),
-
-                        // نام روز هفته
-                        Text(
-                          date.formatter.wN,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontFamily: 'BNazanin',
-                            fontWeight: FontWeight.w500,
-                            color: textColor.withValues(alpha: 0.7),
-                            height: 1.0,
-                          ),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        // کار مفید یا نوع مرخصی
-                        if (!isRemoved)
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: Text(
-                                cardStatus['leaveType'] != null &&
-                                        cardStatus['leaveType'] !=
-                                            LeaveType.work &&
-                                        cardStatus['leaveType'] !=
-                                            LeaveType.mission
-                                    ? (cardStatus['leaveType'] as LeaveType)
-                                        .displayName
-                                    : effectiveWork,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontFamily: 'BNazanin',
-                                  fontWeight: FontWeight.w600,
-                                  color: textColor.withValues(alpha: 0.85),
-                                  height: 1.1,
-                                ),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
-                            ),
-                          ),
-
-                        // نمایش "خارج از بازه" برای روزهای removed
-                        if (isRemoved)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Text(
-                              'خارج از بازه',
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(height: iconSize + 2), // فضا برای ایکون بالا
+                            // شماره روز
+                            Text(
+                              date.day.toString(),
                               style: TextStyle(
-                                fontSize: 8,
-                                fontFamily: 'BNazanin',
+                                fontSize: dayFontSize,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'BNazanin',
                                 color: textColor,
                                 height: 1.0,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                          ),
-                      ],
-                    ),
-                  ),
 
-                  // ایکون وضعیت رنگی (گوشه بالا وسط)
-                  Positioned(
-                    top: 4,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Tooltip(
-                        message: homeController.getTooltipMessage(date),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            gradient:
-                                hasMultipleColors
-                                    ? LinearGradient(
-                                      colors: allColors,
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      stops: List.generate(
-                                        allColors.length,
-                                        (i) => i / (allColors.length - 1),
-                                      ),
-                                    )
-                                    : LinearGradient(
-                                      colors: [
-                                        iconColor.withValues(alpha: 0.9),
-                                        iconColor.withValues(alpha: 0.7),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                            shape: BoxShape.circle,
-                            boxShadow:
-                                hasMultipleColors
-                                    ? [
-                                      BoxShadow(
-                                        color: allColors[0].withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        blurRadius: 6,
-                                        offset: const Offset(-1, 1),
-                                      ),
-                                      if (allColors.length > 1)
-                                        BoxShadow(
-                                          color: allColors[allColors.length - 1]
-                                              .withValues(alpha: 0.4),
-                                          blurRadius: 6,
-                                          offset: const Offset(1, 3),
-                                        ),
-                                    ]
-                                    : [
-                                      BoxShadow(
-                                        color: iconColor.withValues(alpha: 0.4),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                          ),
-                          child: Icon(iconData, size: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
+                            SizedBox(height: cardHeight * 0.01),
 
-                  // آیکون یادداشت (گوشه پایین چپ)
-                  if (note != null && note.isNotEmpty && !isRemoved)
-                    Positioned(
-                      bottom: 4,
-                      left: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.amber[600],
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.amber[600]!.withValues(alpha: 0.4),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                            // نام روز هفته
+                            Text(
+                              date.formatter.wN,
+                              style: TextStyle(
+                                fontSize: weekDayFontSize,
+                                fontFamily: 'BNazanin',
+                                fontWeight: FontWeight.w500,
+                                color: textColor.withValues(alpha: 0.7),
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
+
+                            SizedBox(height: cardHeight * 0.02),
+
+                            // کار مفید یا نوع مرخصی
+                            if (!isRemoved)
+                              Flexible(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: cardWidth * 0.04,
+                                  ),
+                                  child: Text(
+                                    cardStatus['leaveType'] != null &&
+                                            cardStatus['leaveType'] !=
+                                                LeaveType.work &&
+                                            cardStatus['leaveType'] !=
+                                                LeaveType.mission
+                                        ? (cardStatus['leaveType'] as LeaveType)
+                                            .displayName
+                                        : effectiveWork,
+                                    style: TextStyle(
+                                      fontSize: detailFontSize,
+                                      fontFamily: 'BNazanin',
+                                      fontWeight: FontWeight.w600,
+                                      color: textColor.withValues(alpha: 0.85),
+                                      height: 1.1,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ),
+
+                            // نمایش "خارج از بازه" برای روزهای removed
+                            if (isRemoved)
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: cardWidth * 0.04,
+                                ),
+                                child: Text(
+                                  'خارج از بازه',
+                                  style: TextStyle(
+                                    fontSize: detailFontSize,
+                                    fontFamily: 'BNazanin',
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                    height: 1.0,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.note_rounded,
-                          size: 12,
-                          color: Colors.white,
-                        ),
                       ),
-                    ),
 
-                  // دکمه info (گوشه پایین راست)
-                  if (!isRemoved)
-                    Positioned(
-                      bottom: 2,
-                      right: 2,
-                      child: InkWell(
-                        onTap: () => _showDayDetailsDialog(context, date),
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          child: Icon(
-                            Icons.info_outline_rounded,
-                            size: 14,
-                            color: iconColor.withValues(alpha: 0.7),
+                      // ایکون وضعیت رنگی (گوشه بالا وسط)
+                      Positioned(
+                        top: cardHeight * 0.04,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Tooltip(
+                            message: homeController.getTooltipMessage(date),
+                            child: Container(
+                              width: iconSize,
+                              height: iconSize,
+                              decoration: BoxDecoration(
+                                gradient:
+                                    hasMultipleColors
+                                        ? LinearGradient(
+                                          colors: allColors,
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          stops: List.generate(
+                                            allColors.length,
+                                            (i) => i / (allColors.length - 1),
+                                          ),
+                                        )
+                                        : LinearGradient(
+                                          colors: [
+                                            iconColor.withValues(alpha: 0.9),
+                                            iconColor.withValues(alpha: 0.7),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                shape: BoxShape.circle,
+                                boxShadow:
+                                    hasMultipleColors
+                                        ? [
+                                          BoxShadow(
+                                            color: allColors[0].withValues(
+                                              alpha: 0.4,
+                                            ),
+                                            blurRadius: 6,
+                                            offset: const Offset(-1, 1),
+                                          ),
+                                          if (allColors.length > 1)
+                                            BoxShadow(
+                                              color: allColors[allColors.length - 1]
+                                                  .withValues(alpha: 0.4),
+                                              blurRadius: 6,
+                                              offset: const Offset(1, 3),
+                                            ),
+                                        ]
+                                        : [
+                                          BoxShadow(
+                                            color: iconColor.withValues(alpha: 0.4),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                              ),
+                              child: Icon(
+                                iconData,
+                                size: iconSize * 0.6,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
+
+                      // آیکون یادداشت (گوشه پایین چپ)
+                      if (note != null && note.isNotEmpty && !isRemoved)
+                        Positioned(
+                          bottom: cardHeight * 0.04,
+                          left: cardWidth * 0.04,
+                          child: Container(
+                            padding: EdgeInsets.all(noteIconSize * 0.25),
+                            decoration: BoxDecoration(
+                              color: Colors.amber[600],
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.amber[600]!.withValues(alpha: 0.4),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.note_rounded,
+                              size: noteIconSize,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+
+                      // دکمه info (گوشه پایین راست)
+                      if (!isRemoved)
+                        Positioned(
+                          bottom: cardHeight * 0.02,
+                          right: cardWidth * 0.02,
+                          child: InkWell(
+                            onTap: () => _showDayDetailsDialog(context, date),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: EdgeInsets.all(infoIconSize * 0.25),
+                              child: Icon(
+                                Icons.info_outline_rounded,
+                                size: infoIconSize,
+                                color: iconColor.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       );
