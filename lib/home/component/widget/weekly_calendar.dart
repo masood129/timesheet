@@ -42,10 +42,6 @@ class WeeklyCalendarWidget extends StatelessWidget {
 
         return Column(
           children: [
-            // راهنمای رنگ‌ها
-            if (homeController.isCurrentMonthPeriodCustom)
-              _buildColorLegend(context),
-            
             // اطلاعات هفته
             Container(
               padding: const EdgeInsets.all(12),
@@ -176,42 +172,90 @@ class WeeklyCalendarWidget extends StatelessWidget {
               ),
             ),
             
-            // دکمه جزئیات روز امروز
+            // دکمه‌های جزئیات و راهنما
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showDayDetailsDialog(context, Jalali.now());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  elevation: 4,
-                  shadowColor: colorScheme.primary.withValues(alpha: 0.3),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.info_outline, color: colorScheme.onPrimary),
-                    const SizedBox(width: 8),
-                    Text(
-                      'جزئیات روز امروز',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'BNazanin',
-                        color: colorScheme.onPrimary,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // دکمه راهنمای رنگ‌ها
+                  Tooltip(
+                    message: 'راهنمای رنگ‌ها',
+                    child: InkWell(
+                      onTap: () => _showColorLegendDialog(context),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: colorScheme.secondary.withValues(alpha: 0.5),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.palette_outlined,
+                              color: colorScheme.onSecondaryContainer,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'راهنما',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'BNazanin',
+                                color: colorScheme.onSecondaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  
+                  const SizedBox(width: 12),
+                  
+                  // دکمه جزئیات روز امروز
+                  ElevatedButton(
+                    onPressed: () {
+                      _showDayDetailsDialog(context, Jalali.now());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      elevation: 4,
+                      shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.info_outline, color: colorScheme.onPrimary, size: 20),
+                        const SizedBox(width: 6),
+                        Text(
+                          'جزئیات روز امروز',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'BNazanin',
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -220,43 +264,163 @@ class WeeklyCalendarWidget extends StatelessWidget {
     );
   }
 
-  /// راهنمای رنگ‌ها برای ماه‌های با بازه سفارشی
-  Widget _buildColorLegend(BuildContext context) {
+  /// نمایش دیالوگ راهنمای رنگ‌ها
+  void _showColorLegendDialog(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.3),
+
+    Get.defaultDialog(
+      title: 'راهنمای رنگ‌های تقویم',
+      titleStyle: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        fontFamily: 'BNazanin',
+        color: colorScheme.primary,
+      ),
+      content: Container(
+        width: MediaQuery.of(context).size.width * 0.85,
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // رنگ‌های وضعیت بازه (اگر ماه سفارشی باشد)
+              Text(
+                'وضعیت روزها در بازه:',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'BNazanin',
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildLegendItem(
+                context,
+                color: colorScheme.surface,
+                label: 'روز عادی (در بازه ماه)',
+                icon: Icons.check_circle_outline,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.purple[100]!,
+                label: 'اضافه شده (از ماه دیگر)',
+                icon: Icons.add_circle_outline,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.grey[300]!,
+                label: 'حذف شده (خارج از بازه)',
+                icon: Icons.remove_circle_outline,
+              ),
+              const Divider(height: 24),
+              
+              // رنگ‌های وضعیت کاری
+              Text(
+                'وضعیت کاری:',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'BNazanin',
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildLegendItem(
+                context,
+                color: Colors.teal[700]!,
+                label: 'روز امروز',
+                icon: Icons.today_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.green[600]!,
+                label: 'روز کاری کامل',
+                icon: Icons.check_circle_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.amber[700]!,
+                label: 'روز کاری ناقص',
+                icon: Icons.warning_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.red[700]!,
+                label: 'تعطیل رسمی',
+                icon: Icons.event_busy_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.deepOrange[600]!,
+                label: 'جمعه',
+                icon: Icons.weekend_rounded,
+              ),
+              const Divider(height: 24),
+              
+              // رنگ‌های انواع مرخصی
+              Text(
+                'انواع مرخصی:',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'BNazanin',
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildLegendItem(
+                context,
+                color: Colors.blue[600]!,
+                label: 'مرخصی استحقاقی',
+                icon: Icons.beach_access_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.pink[700]!,
+                label: 'مرخصی استعلاجی',
+                icon: Icons.local_hospital_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.purple[600]!,
+                label: 'مرخصی هدیه',
+                icon: Icons.card_giftcard_rounded,
+              ),
+              const SizedBox(height: 6),
+              _buildLegendItem(
+                context,
+                color: Colors.deepPurple[500]!,
+                label: 'ماموریت',
+                icon: Icons.flight_takeoff_rounded,
+              ),
+            ],
+          ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildLegendItem(
-            context,
-            color: colorScheme.surface,
-            label: 'روز عادی',
-            icon: Icons.check_circle_outline,
+      backgroundColor: colorScheme.surface,
+      radius: 12,
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: Text(
+            'متوجه شدم',
+            style: TextStyle(
+              fontFamily: 'BNazanin',
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          _buildLegendItem(
-            context,
-            color: Colors.purple[100]!,
-            label: 'اضافه شده',
-            icon: Icons.add_circle_outline,
-          ),
-          _buildLegendItem(
-            context,
-            color: Colors.grey[300]!,
-            label: 'حذف شده',
-            icon: Icons.remove_circle_outline,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
