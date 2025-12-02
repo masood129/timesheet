@@ -14,6 +14,7 @@ import '../../../model/project_model.dart';
 import '../../../model/project_access_model.dart';
 import '../../../model/user_model.dart';
 import '../../../data/models/month_period_model.dart';
+import '../../../model/time_record_model.dart';
 
 part 'api_call_auth.dart';
 part 'api_call_gym_cost.dart';

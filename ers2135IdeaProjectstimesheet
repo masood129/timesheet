@@ -1,29 +1,0 @@
-[33mcommit 26578629adb309b8bc8da223a3a53b34d32557d1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
-Author: 2135 <masoud.shayei@gmail.com>
-Date:   Sun Nov 30 13:30:00 2025 +0330
-
-    feat: بازنویسی کامل تقویم با پشتیبانی از بازه ماهانه ادمین و نمای هفتگی
-    
-    - اضافه شدن enum DayPeriodStatus برای وضعیت روزها (عادی/اضافه/حذف شده)
-    - رنگ‌بندی جدید تقویم بر اساس بازه ماهانه:
-      * روزهای عادی: سفید (فعال)
-      * روزهای اضافه شده: بنفش (فعال)
-      * روزهای حذف شده: خاکستری (غیرفعال)
-    - اضافه شدن نمای هفتگی کامل با ناوبری
-    - سایز مستطیل افقی (1.4) مناسب وب
-    - راهنمای رنگ‌ها در بالای تقویم
-    - توابع جدید در HomeController:
-      * getDayPeriodStatus() - تشخیص وضعیت روز
-      * getCalendarDaysWithStatus() - دریافت روزها با وضعیت
-      * getCurrentWeekDays() - دریافت روزهای هفته
-      * toggleWeekMonthView() - تغییر نمای هفتگی/ماهانه
-    - حفظ تمام قابلیت‌های قبلی (مرخصی، تعطیلات، کامل/ناقص، و...)
-
- lib/home/component/widget/calendar_app_bar.dart    |  94 [32m+++[m[31m--[m
- lib/home/component/widget/custom_calendar.dart     | 100 [32m++++[m[31m-[m
- .../component/widget/grid_calendar_day_card.dart   | 437 [32m++++++++++++[m[31m---------[m
- lib/home/component/widget/weekly_calendar.dart     | 379 [32m++++++++++++++++++[m
- lib/home/controller/home_controller.dart           | 139 [32m++++++[m[31m-[m
- lib/home/view/home.dart                            |  12 [32m+[m[31m-[m
- lib/model/day_period_status.dart                   |  36 [32m++[m
- 7 files changed, 968 insertions(+), 229 deletions(-)

@@ -1,10 +1,10 @@
-// daily_details_tab.dart (بروزرسانی شده)
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/Get.dart';
+import 'package:get/get.dart';
 import '../../../core/theme/app_styles.dart';
 import '../../../core/widgets/searchable_dropdown.dart';
 import '../../../model/leavetype_model.dart';
+import 'package:timesheet/home/component/widget/time_records_dialog.dart';
 import '../../controller/task_controller.dart';
 import 'time_picker_field.dart';
 
@@ -50,14 +50,6 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
 
     return ListView(
       children: [
-        //   Text(
-        //     'day_details'.tr,
-        //     style: TextStyle(
-        //       fontWeight: FontWeight.bold,
-        //       fontSize: 16,
-        //       color: colorScheme.primary,
-        //     ),
-        //   ),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -65,12 +57,10 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
             Obx(() {
               final records = widget.controller.timeRecords;
               final firstRecord =
-                  records.isNotEmpty
-                      ? records.first['Rtime']?.toString() ?? '--:--'
-                      : '--:--';
+                  records.isNotEmpty ? records.first.time : '--:--';
               final lastRecord =
                   records.isNotEmpty && records.length > 1
-                      ? records.last['Rtime']?.toString() ?? '--:--'
+                      ? records.last.time
                       : '--:--';
 
               return Row(
@@ -111,41 +101,15 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
                       color: colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    icon: Icon(Icons.visibility, color: colorScheme.primary),
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: 'ترددهای ثبت شده',
-                        content: SizedBox(
-                          height: 200,
-                          width: 300,
-                          child: ListView.builder(
-                            itemCount: records.length,
-                            itemBuilder: (context, index) {
-                              final record = records[index];
-                              return ListTile(
-                                title: Text(
-                                  record['Rtime'] ?? '',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                leading: Icon(
-                                  Icons.access_time,
-                                  color: colorScheme.primary,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        confirm: TextButton(
-                          onPressed: () => Get.back(),
-                          child: Text('bastan'.tr),
-                        ),
-                      );
-                    },
-                  ),
+                  const SizedBox(width: 8),
+                  if (records.isNotEmpty)
+                    IconButton(
+                      onPressed: () {
+                        Get.dialog(TimeRecordsDialog(records: records));
+                      },
+                      icon: const Icon(Icons.history, color: Colors.blue),
+                      tooltip: 'مشاهده ترددها',
+                    ),
                 ],
               );
             }),

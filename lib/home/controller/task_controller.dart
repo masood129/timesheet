@@ -12,6 +12,7 @@ import '../../model/leavetype_model.dart';
 import '../../model/personal_car_cost_model.dart';
 import '../../model/project_model.dart';
 import '../../model/task_model.dart';
+import '../../model/time_record_model.dart';
 import 'home_controller.dart';
 import 'auth_controller.dart';
 
@@ -65,7 +66,7 @@ class TaskController extends GetxController {
   final RxList<RxBool> carCostProjectErrors = <RxBool>[].obs;
   final RxList<RxBool> taskProjectErrors = <RxBool>[].obs;
   final RxBool hasTimeError = false.obs; // خطا در زمان‌های ورود و خروج
-  final RxList<Map<String, dynamic>> timeRecords = <Map<String, dynamic>>[].obs;
+  final RxList<TimeRecord> timeRecords = <TimeRecord>[].obs;
 
   final arrivalTimeController = TextEditingController();
   final leaveTimeController = TextEditingController();
@@ -385,12 +386,16 @@ class TaskController extends GetxController {
     timeRecords.clear();
     try {
       final authController = Get.find<AuthController>();
-      final cardNo = authController.user.value?['Username'];
+      // Use userId (personalId) as cardNo since timeRecords table uses numeric CardNo
+      final cardNo = authController.user.value?['userId'];
       if (cardNo == null) return;
 
       final formattedDate =
           '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
-      final records = await ApiCalls().getTimeRecords(cardNo, formattedDate);
+      final records = await ApiCalls().getTimeRecords(
+        cardNo.toString(),
+        formattedDate,
+      );
       timeRecords.assignAll(records);
     } catch (e) {
       if (kDebugMode) {
