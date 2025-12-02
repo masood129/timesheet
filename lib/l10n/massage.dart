@@ -4,6 +4,8 @@ class Messages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'fa': {
+      "calculated_cost" : "محاسبه هزینه",
+      "detail_go_and_return": "جزئیات رفت و آمد",
       "failed_to_load_holidays": "خطا در بارگذاری داده‌های تعطیلات",
       "holiday": "تعطیل",
       "events": "رویدادها",
@@ -196,8 +198,11 @@ class Messages extends Translations {
       'retry': 'تلاش مجدد',
       'logs': 'لاگ‌ها',
       'timer': 'تایمر',
+      'kilometers': 'کیلومتر',
     },
     'en': {
+      "calculated_cost": "calculated cost",
+      "detail_go_and_return": "detail go and return",
       "failed_to_load_holidays": "Failed to load holiday data",
       "holiday": "Holiday",
       "events": "Events",
@@ -390,6 +395,7 @@ class Messages extends Translations {
       'retry': 'Retry',
       'logs': 'Logs',
       'timer': 'Timer',
+      'kilometers': 'Kilometers',
     },
   };
 }

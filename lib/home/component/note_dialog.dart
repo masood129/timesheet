@@ -53,8 +53,8 @@ class NoteDialog extends StatelessWidget {
                       unselectedLabelColor: Theme.of(context).disabledColor,
                       indicatorColor: colorScheme.primary,
                       tabs: [
-                        Tab(text: 'day_details'.tr),
-                        Tab(text: 'task'.tr),
+                        Tab(text: 'detail_go_and_return'.tr),
+                        Tab(text: 'project'.tr),
                         Tab(text: 'personal_car_costs'.tr),
                       ],
                     ),

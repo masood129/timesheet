@@ -106,7 +106,7 @@ class CarCostRow extends StatelessWidget {
                   controller: controller.carCostControllers[index],
                   readOnly: true,
                   enabled: false,
-                  decoration: AppStyles.inputDecoration(context, 'calculated_cost', Icons.monetization_on, false),
+                  decoration: AppStyles.inputDecoration(context, 'calculated_cost'.tr, Icons.monetization_on, false),
                 ),
               ),
               IconButton(

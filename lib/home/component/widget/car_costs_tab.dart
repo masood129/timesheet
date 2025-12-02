@@ -16,15 +16,15 @@ class CarCostsTab extends StatelessWidget {
 
     return ListView(
       children: [
-        Text(
-          'personal_car_costs'.tr,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 8),
+        // Text(
+        //   'personal_car_costs'.tr,
+        //   style: TextStyle(
+        //     fontWeight: FontWeight.bold,
+        //     fontSize: 16,
+        //     color: colorScheme.primary,
+        //   ),
+        // ),
+        const SizedBox(height: 15),
         Obx(() {
           final isEnabled =
               controller.leaveType.value == LeaveType.work ||

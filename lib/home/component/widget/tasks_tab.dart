@@ -16,15 +16,15 @@ class TasksTab extends StatelessWidget {
 
     return ListView(
       children: [
-        Text(
-          'task'.tr,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 8),
+        // Text(
+        //   'task'.tr,
+        //   style: TextStyle(
+        //     fontWeight: FontWeight.bold,
+        //     fontSize: 16,
+        //     color: colorScheme.primary,
+        //   ),
+        // ),
+        const SizedBox(height: 15),
         Obx(() {
           final isEnabled =
               controller.leaveType.value == LeaveType.work ||

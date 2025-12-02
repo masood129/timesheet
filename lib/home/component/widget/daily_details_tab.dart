@@ -50,7 +50,7 @@ class _DailyDetailsTabState extends State<DailyDetailsTab> {
 
     return ListView(
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
