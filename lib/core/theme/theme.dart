@@ -53,7 +53,7 @@ final ColorScheme _lightColorScheme = ColorScheme.fromSeed(
   // Red 100
   onErrorContainer: const Color(0xFFB71C1C),
   surface: Colors.white,
-  onSurface: const Color(0xFF1A1A1A),
+  onSurface: const Color(0xFF000000),
   surfaceContainerHighest: const Color(0xFFF0F4F8),
   onSurfaceVariant: const Color(0xFF4A4A4A),
   outline: const Color(0xFFB0BEC5),
@@ -216,7 +216,8 @@ ThemeData mainTheme = ThemeData(
   useMaterial3: true,
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
-  disabledColor: _applyOpacity(_lightColorScheme.outline, 0.7),
+  disabledColor: _applyOpacity(_lightColorScheme.outline, 0.95),
+  // disabledColor: const Color(0xFF3C3C3C),
   scaffoldBackgroundColor: const Color(0xFFECEFF1),
   // Blue Grey 50
   appBarTheme: AppBarTheme(
