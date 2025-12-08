@@ -114,6 +114,55 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             tooltip: 'ماه قبل',
             onPressed: homeController.previousMonth,
           ),
+          // وضعیت ماه بین دو فلش
+          Obx(() {
+            final status = homeController.monthStatus.value;
+            String statusText = '';
+            Color statusColor = Colors.grey;
+            switch (status) {
+              case 'draft':
+                statusText = 'پیش‌نویس';
+                statusColor = Colors.orange;
+                break;
+              case 'submitted_to_general_manager':
+                statusText = 'ارسال به مدیر کل';
+                statusColor = Colors.blue;
+                break;
+              case 'approved':
+                statusText = 'تایید شده';
+                statusColor = Colors.green;
+                break;
+              case 'submitted_to_group_manager':
+                statusText = 'ارسال به مدیر گروه';
+                statusColor = Colors.blueAccent;
+                break;
+              case 'submitted_to_finance':
+                statusText = 'ارسال به امور مالی';
+                statusColor = Colors.purple;
+                break;
+            }
+            return statusText.isNotEmpty
+                ? Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    statusText,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                )
+                : const SizedBox.shrink();
+          }),
           IconButton(
             icon: const Icon(Icons.chevron_right),
             color: textColor,
