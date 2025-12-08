@@ -16,11 +16,15 @@ extension HomeApiAuth on ApiCalls {
       final token = data['token'] as String;
       final userId = data['userId'] as int;
       final role = data['Role'] as String;
+      final firstName = data['farsifirstname'] as String?;
+      final lastName = data['farsilastname'] as String?;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token);
       await prefs.setString('username', username);
       await prefs.setString('Role', role);
       await prefs.setInt('userId', userId);
+      await prefs.setString('firstName', firstName ?? '');
+      await prefs.setString('lastName', lastName ?? '');
       return token;
     }
     if (response.statusCode == 400) {
@@ -38,6 +42,8 @@ extension HomeApiAuth on ApiCalls {
     await prefs.remove('jwt_token');
     await prefs.remove('username');
     await prefs.remove('userId');
+    await prefs.remove('firstName');
+    await prefs.remove('lastName');
   }
 
   // Update api_calls.dart with full loginAs (to store all user info)
@@ -56,11 +62,15 @@ extension HomeApiAuth on ApiCalls {
       final userId = data['userId'] as int;
       final username = data['Username'] as String;
       final role = data['Role'] as String;
+      final firstName = data['farsifirstname'] as String?;
+      final lastName = data['farsilastname'] as String?;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token);
       await prefs.setInt('userId', userId);
       await prefs.setString('username', username);
       await prefs.setString('Role', role);
+      await prefs.setString('firstName', firstName ?? '');
+      await prefs.setString('lastName', lastName ?? '');
       return;
     }
     if (response.statusCode == 403) {

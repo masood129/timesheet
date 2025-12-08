@@ -19,6 +19,8 @@ class AuthController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');
     final username = prefs.getString('username');
+    final firstName = prefs.getString('firstName');
+    final lastName = prefs.getString('lastName');
     final role = prefs.getString('Role');
     final token = prefs.getString('jwt_token');
 
@@ -26,6 +28,8 @@ class AuthController extends GetxController {
       user.value = {
         'userId': userId,
         'Username': username,
+        'firstName': firstName,
+        'lastName': lastName,
         'Role': role,
       };
       this.token.value = token;
@@ -38,11 +42,15 @@ class AuthController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getInt('userId');
       final storedUsername = prefs.getString('username');
+      final firstName = prefs.getString('firstName');
+      final lastName = prefs.getString('lastName');
       final role = prefs.getString('Role');
       if (userId != null && storedUsername != null && role != null) {
         user.value = {
           'userId': userId,
           'Username': storedUsername,
+          'firstName': firstName,
+          'lastName': lastName,
           'Role': role,
         };
         this.token.value = token;

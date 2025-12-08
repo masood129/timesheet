@@ -18,7 +18,12 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
         final year = homeController.currentYear.value;
         final month = homeController.currentMonth.value;
         final monthName = Jalali(year, month).formatter.mN;
+        final firstName = authController.user.value?['firstName'] ?? '';
+        final lastName = authController.user.value?['lastName'] ?? '';
         final username = authController.user.value?['Username'] ?? '';
+        final displayName = (firstName.isNotEmpty || lastName.isNotEmpty)
+            ? '$firstName $lastName'.trim()
+            : username;
         final isCustom = homeController.isCurrentMonthPeriodCustom;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -26,9 +31,9 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
             Text(
               '${'calendar_title'.tr}: $monthName $year${isCustom ? ' (ویرایش شده)' : ''}',
             ),
-            if (username.isNotEmpty)
+            if (displayName.isNotEmpty)
               Text(
-                username,
+                displayName,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
