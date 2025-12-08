@@ -675,37 +675,24 @@ class HomeController extends GetxController {
   }
 
   String getTooltipMessage(Jalali date) {
-    final gregorianDate = date.toGregorian();
-    final formattedDate =
-        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
-    final detail = dailyDetails.firstWhereOrNull(
-      (d) => d.date == formattedDate,
-    );
     final holiday = getHolidayForDate(date);
 
-    if (holiday != null && holiday['isHoliday'] == true) {
+    // فقط نمایش مناسبت‌های تقویم
+    if (holiday != null) {
       final events = holiday['events'] as List<dynamic>? ?? [];
-      final eventDescriptions = events
-          .map((e) => e['description'] as String)
-          .join(', ');
-      return eventDescriptions.isNotEmpty
-          ? 'تعطیل: $eventDescriptions'
-          : 'تعطیل';
+      if (events.isNotEmpty) {
+        final eventDescriptions = events
+            .map((e) => e['description'] as String)
+            .where((desc) => desc.isNotEmpty)
+            .join(', ');
+        if (eventDescriptions.isNotEmpty) {
+          return eventDescriptions;
+        }
+      }
     }
 
-    if (detail == null) {
-      return 'بدون اطلاعات';
-    }
-
-    if (detail.leaveType != LeaveType.work &&
-        detail.leaveType != LeaveType.mission) {
-      // تغییر به enum
-      return detail.leaveType?.displayName ??
-          'بدون اطلاعات'; // استفاده از displayName
-    }
-
-    final isComplete = getCardStatus(date, Get.context!)['isComplete'] as bool;
-    return isComplete ? 'روز کاری: کامل' : 'روز کاری: ناقص';
+    // اگر مناسبت‌ای وجود نداشت، خالی برگردان
+    return '';
   }
 
   Map<String, dynamic> getCardStatus(Jalali date, BuildContext context) {

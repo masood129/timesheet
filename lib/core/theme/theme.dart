@@ -12,6 +12,35 @@ class ThemeController extends GetxController {
   }
 }
 
+// Unified Font Configuration - تنظیمات یکپارچه فونت
+class FontConfig {
+  // Font Families
+  static const String persianFont = 'BNazanin';
+  static const String englishFont = 'Ubuntu';
+  
+  // Font Sizes - اندازه فونت‌ها (بزرگ‌تر)
+  static const double fontSizeDisplayLarge = 36.0;  // بود: 32
+  static const double fontSizeDisplayMedium = 32.0; // بود: 28
+  static const double fontSizeDisplaySmall = 28.0;  // بود: 24
+  static const double fontSizeHeadlineLarge = 24.0; // بود: 20
+  static const double fontSizeHeadlineMedium = 22.0; // بود: 20
+  static const double fontSizeHeadlineSmall = 20.0; // بود: 18
+  static const double fontSizeTitleLarge = 18.0;    // بود: 16
+  static const double fontSizeTitleMedium = 17.0;   // بود: 14
+  static const double fontSizeTitleSmall = 16.0;    // بود: 14
+  static const double fontSizeBodyLarge = 17.0;     // بود: 14
+  static const double fontSizeBodyMedium = 16.0;   // بود: 12
+  static const double fontSizeBodySmall = 14.0;     // بود: 11
+  static const double fontSizeLabelLarge = 16.0;
+  static const double fontSizeLabelMedium = 15.0;
+  static const double fontSizeLabelSmall = 14.0;
+  
+  // Font Weights - وزن فونت‌ها (پررنگ‌تر)
+  static const FontWeight fontWeightNormal = FontWeight.w600;    // بود: normal/w400
+  static const FontWeight fontWeightMedium = FontWeight.w600;   // بود: w500
+  static const FontWeight fontWeightBold = FontWeight.bold;     // بود: w600
+}
+
 // Helper function to apply opacity
 Color _applyOpacity(Color color, double opacity) {
   return Color.fromARGB(
@@ -212,7 +241,7 @@ extension CustomColorSchemeExtension on ColorScheme {
 
 // --- ThemeData Definitions ---
 ThemeData mainTheme = ThemeData(
-  fontFamily: 'BNazanin',
+  fontFamily: FontConfig.persianFont,
   useMaterial3: true,
   colorScheme: _lightColorScheme,
   brightness: Brightness.light,
@@ -225,10 +254,10 @@ ThemeData mainTheme = ThemeData(
     foregroundColor: _lightColorScheme.onPrimary,
     elevation: 1,
     titleTextStyle: TextStyle(
-      fontFamily: 'BNazanin',
+      fontFamily: FontConfig.persianFont,
       color: _lightColorScheme.onPrimary,
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
+      fontSize: FontConfig.fontSizeHeadlineLarge,
+      fontWeight: FontConfig.fontWeightBold,
     ),
   ),
   cardTheme: CardThemeData(
@@ -254,48 +283,131 @@ ThemeData mainTheme = ThemeData(
       borderSide: BorderSide(color: _lightColorScheme.primary, width: 2),
     ),
     labelStyle: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
       color: _lightColorScheme.onSurfaceVariant,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     hintStyle: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
       color: _applyOpacity(_lightColorScheme.onSurfaceVariant, 0.7),
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     errorStyle: TextStyle(color: _lightColorScheme.error),
   ),
-  textTheme: const TextTheme()
-      .apply(
-        bodyColor: _lightColorScheme.onSurface,
-        displayColor: _lightColorScheme.onSurface,
-        fontFamily: 'BNazanin',
-      )
-      .copyWith(
-        titleLarge: TextStyle(
-          color: _lightColorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyMedium: TextStyle(
-          color: _applyOpacity(_lightColorScheme.onSurface, 0.85),
-        ),
-      ),
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplayLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    displayMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplayMedium,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    displaySmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplaySmall,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    headlineLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    headlineMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineMedium,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    headlineSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineSmall,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.onSurface,
+    ),
+    titleLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _lightColorScheme.primary,
+    ),
+    titleMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleMedium,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _lightColorScheme.onSurface,
+    ),
+    titleSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleSmall,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _lightColorScheme.onSurface,
+    ),
+    bodyLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _lightColorScheme.onSurface,
+    ),
+    bodyMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyMedium,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_lightColorScheme.onSurface, 0.85),
+    ),
+    bodySmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodySmall,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_lightColorScheme.onSurface, 0.7),
+    ),
+    labelLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelLarge,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _lightColorScheme.onSurface,
+    ),
+    labelMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelMedium,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _lightColorScheme.onSurface,
+    ),
+    labelSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelSmall,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_lightColorScheme.onSurface, 0.7),
+    ),
+  ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: _lightColorScheme.primary,
       foregroundColor: _lightColorScheme.onPrimary,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      textStyle: const TextStyle(
-        fontFamily: 'BNazanin',
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
+      textStyle: TextStyle(
+        fontFamily: FontConfig.persianFont,
+        fontSize: FontConfig.fontSizeBodyLarge,
+        fontWeight: FontConfig.fontWeightMedium,
       ),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: _lightColorScheme.primary,
-      textStyle: const TextStyle(
-        fontFamily: 'BNazanin',
-        fontWeight: FontWeight.w600,
+      textStyle: TextStyle(
+        fontFamily: FontConfig.persianFont,
+        fontSize: FontConfig.fontSizeBodyLarge,
+        fontWeight: FontConfig.fontWeightMedium,
       ),
     ),
   ),
@@ -328,10 +440,10 @@ ThemeData mainTheme = ThemeData(
   snackBarTheme: SnackBarThemeData(
     backgroundColor: _lightColorScheme.surfaceContainerHighest,
     contentTextStyle: TextStyle(
-      fontFamily: 'BNazanin',
+      fontFamily: FontConfig.persianFont,
       color: _lightColorScheme.onSurface,
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
+      fontSize: FontConfig.fontSizeBodyLarge,
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     behavior: SnackBarBehavior.floating,
@@ -341,7 +453,7 @@ ThemeData mainTheme = ThemeData(
 );
 
 ThemeData darkTheme = ThemeData(
-  fontFamily: 'BNazanin',
+  fontFamily: FontConfig.persianFont,
   useMaterial3: true,
   colorScheme: _darkColorScheme,
   brightness: Brightness.dark,
@@ -352,10 +464,10 @@ ThemeData darkTheme = ThemeData(
     foregroundColor: _darkColorScheme.onSurface,
     elevation: 1,
     titleTextStyle: TextStyle(
-      fontFamily: 'BNazanin',
+      fontFamily: FontConfig.persianFont,
       color: _darkColorScheme.onSurface,
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
+      fontSize: FontConfig.fontSizeHeadlineLarge,
+      fontWeight: FontConfig.fontWeightBold,
     ),
   ),
   cardTheme: CardThemeData(
@@ -381,48 +493,131 @@ ThemeData darkTheme = ThemeData(
       borderSide: BorderSide(color: _darkColorScheme.primary, width: 2),
     ),
     labelStyle: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
       color: _darkColorScheme.onSurfaceVariant,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     hintStyle: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
       color: _applyOpacity(_darkColorScheme.onSurfaceVariant, 0.7),
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     errorStyle: TextStyle(color: _darkColorScheme.error),
   ),
-  textTheme: const TextTheme()
-      .apply(
-        bodyColor: _darkColorScheme.onSurface,
-        displayColor: _darkColorScheme.onSurface,
-        fontFamily: 'BNazanin',
-      )
-      .copyWith(
-        titleLarge: TextStyle(
-          color: _darkColorScheme.primary,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyMedium: TextStyle(
-          color: _applyOpacity(_darkColorScheme.onSurface, 0.85),
-        ),
-      ),
+  textTheme: TextTheme(
+    displayLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplayLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    displayMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplayMedium,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    displaySmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeDisplaySmall,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    headlineLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    headlineMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineMedium,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    headlineSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeHeadlineSmall,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.onSurface,
+    ),
+    titleLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleLarge,
+      fontWeight: FontConfig.fontWeightBold,
+      color: _darkColorScheme.primary,
+    ),
+    titleMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleMedium,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _darkColorScheme.onSurface,
+    ),
+    titleSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeTitleSmall,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _darkColorScheme.onSurface,
+    ),
+    bodyLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyLarge,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _darkColorScheme.onSurface,
+    ),
+    bodyMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodyMedium,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_darkColorScheme.onSurface, 0.85),
+    ),
+    bodySmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeBodySmall,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_darkColorScheme.onSurface, 0.7),
+    ),
+    labelLarge: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelLarge,
+      fontWeight: FontConfig.fontWeightMedium,
+      color: _darkColorScheme.onSurface,
+    ),
+    labelMedium: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelMedium,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _darkColorScheme.onSurface,
+    ),
+    labelSmall: TextStyle(
+      fontFamily: FontConfig.persianFont,
+      fontSize: FontConfig.fontSizeLabelSmall,
+      fontWeight: FontConfig.fontWeightNormal,
+      color: _applyOpacity(_darkColorScheme.onSurface, 0.7),
+    ),
+  ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: _darkColorScheme.primary,
       foregroundColor: _darkColorScheme.onPrimary,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      textStyle: const TextStyle(
-        fontFamily: 'BNazanin',
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
+      textStyle: TextStyle(
+        fontFamily: FontConfig.persianFont,
+        fontSize: FontConfig.fontSizeBodyLarge,
+        fontWeight: FontConfig.fontWeightMedium,
       ),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: _darkColorScheme.primary,
-      textStyle: const TextStyle(
-        fontFamily: 'BNazanin',
-        fontWeight: FontWeight.w600,
+      textStyle: TextStyle(
+        fontFamily: FontConfig.persianFont,
+        fontSize: FontConfig.fontSizeBodyLarge,
+        fontWeight: FontConfig.fontWeightMedium,
       ),
     ),
   ),
@@ -455,10 +650,10 @@ ThemeData darkTheme = ThemeData(
   snackBarTheme: SnackBarThemeData(
     backgroundColor: _darkColorScheme.surfaceContainerHighest,
     contentTextStyle: TextStyle(
-      fontFamily: 'BNazanin',
+      fontFamily: FontConfig.persianFont,
       color: _darkColorScheme.onSurface,
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
+      fontSize: FontConfig.fontSizeBodyLarge,
+      fontWeight: FontConfig.fontWeightNormal,
     ),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     behavior: SnackBarBehavior.floating,

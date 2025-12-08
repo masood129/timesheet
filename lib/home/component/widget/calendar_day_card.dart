@@ -291,8 +291,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     title: Text(
                       '${widget.date.formatter.wN} ${widget.date.day}${isFromOtherMonth ? ' (${widget.date.formatter.mN})' : ''}',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: FontConfig.fontSizeTitleLarge,
+                        fontWeight: FontConfig.fontWeightBold,
+                        fontFamily: FontConfig.persianFont,
                         color:
                             isFromOtherMonth
                                 ? colorScheme.onSurface.withValues(alpha: 0.6)
@@ -305,8 +306,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
                     subtitle: Text(
                       effectiveWork,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        fontSize: FontConfig.fontSizeBodyMedium,
+                        fontWeight: FontConfig.fontWeightNormal,
+                        fontFamily: FontConfig.persianFont,
                         color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -378,7 +380,12 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         if (note != null && note.isNotEmpty) ...[
           Text(
             '${'note'.tr}: $note',
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
+            style: TextStyle(
+              fontSize: FontConfig.fontSizeBodyMedium,
+              fontWeight: FontConfig.fontWeightNormal,
+              fontFamily: FontConfig.persianFont,
+              color: colorScheme.onSurface,
+            ),
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
@@ -406,7 +413,15 @@ class _CalendarDayCardState extends State<CalendarDayCard>
           _buildDetailRow(context, 'description'.tr, detail.description),
           _buildTaskSection(context, detail),
         ] else ...[
-          Text('no_details'.tr, style: TextStyle(color: colorScheme.onSurface)),
+          Text(
+            'no_details'.tr,
+            style: TextStyle(
+              fontSize: FontConfig.fontSizeBodyMedium,
+              fontWeight: FontConfig.fontWeightNormal,
+              fontFamily: FontConfig.persianFont,
+              color: colorScheme.onSurface,
+            ),
+          ),
         ],
       ],
     );
@@ -426,9 +441,10 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         Text(
           isHoliday ? 'holiday'.tr : 'events'.tr,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontConfig.fontWeightBold,
+            fontFamily: FontConfig.persianFont,
             color: isHoliday ? colorScheme.onError : colorScheme.primary,
-            fontSize: 16,
+            fontSize: FontConfig.fontSizeTitleLarge,
           ),
         ),
         ...events.map((event) {
@@ -442,7 +458,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
             child: Text(
               '- $description${additionalDescription.isNotEmpty ? ' ($additionalDescription)' : ''}',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: FontConfig.fontSizeBodyLarge,
+                fontWeight: FontConfig.fontWeightNormal,
+                fontFamily: FontConfig.persianFont,
                 color:
                     isHoliday
                         ? colorScheme.onError
@@ -473,7 +491,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
             ? 'working_day_complete'.tr
             : 'working_day_incomplete'.tr,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: FontConfig.fontSizeBodyMedium,
+          fontWeight: FontConfig.fontWeightNormal,
+          fontFamily: FontConfig.persianFont,
           color:
               cardStatus['isComplete']
                   ? colorScheme.completedStatus
@@ -484,7 +504,12 @@ class _CalendarDayCardState extends State<CalendarDayCard>
     }
     return Text(
       '${'leave_type'.tr}: ${leaveType?.displayName ?? ''}',
-      style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
+      style: TextStyle(
+        fontSize: FontConfig.fontSizeBodyMedium,
+        fontWeight: FontConfig.fontWeightNormal,
+        fontFamily: FontConfig.persianFont,
+        color: colorScheme.onSurface,
+      ),
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -498,7 +523,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
       child: Text(
         '$label: $value',
         style: TextStyle(
-          fontSize: 12,
+          fontSize: FontConfig.fontSizeBodyMedium,
+          fontWeight: FontConfig.fontWeightNormal,
+          fontFamily: FontConfig.persianFont,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         overflow: TextOverflow.ellipsis,
@@ -516,7 +543,9 @@ class _CalendarDayCardState extends State<CalendarDayCard>
       child: Text(
         '${'personal_car_cost'.tr}: ${detail.personalCarCosts.map((cost) => '${cost.kilometers ?? 0} ${'kilometers'.tr}: ${cost.cost ?? 0}').join(', ')}',
         style: TextStyle(
-          fontSize: 12,
+          fontSize: FontConfig.fontSizeBodyMedium,
+          fontWeight: FontConfig.fontWeightNormal,
+          fontFamily: FontConfig.persianFont,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         overflow: TextOverflow.ellipsis,
@@ -537,9 +566,10 @@ class _CalendarDayCardState extends State<CalendarDayCard>
         Text(
           'tasks'.tr,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontConfig.fontWeightBold,
+            fontFamily: FontConfig.persianFont,
             color: colorScheme.primary,
-            fontSize: 14,
+            fontSize: FontConfig.fontSizeBodyLarge,
           ),
         ),
         ...detail.tasks.map((task) {
@@ -547,7 +577,11 @@ class _CalendarDayCardState extends State<CalendarDayCard>
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Text(
               '- ${task.description ?? 'no_description'.tr} (${task.duration ?? 0} ${'minute'.tr})',
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(
+                fontSize: FontConfig.fontSizeBodyMedium,
+                fontWeight: FontConfig.fontWeightNormal,
+                fontFamily: FontConfig.persianFont,
+              ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),

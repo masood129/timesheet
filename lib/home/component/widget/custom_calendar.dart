@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/Get.dart';
+import '../../../core/theme/theme.dart';
 import '../../controller/home_controller.dart';
 import 'grid_calendar_day_card.dart';
 import 'month_summary_dialog.dart';
@@ -16,28 +17,23 @@ class CustomCalendarWidget extends StatelessWidget {
 
         // محاسبه اندازه‌های responsive بر اساس عرض صفحه
         final double maxCalendarWidth;
-        final double headerFontSize;
         final double horizontalPadding;
 
         if (screenWidth > 1400) {
           // صفحات خیلی بزرگ (desktop/web)
           maxCalendarWidth = 1400;
-          headerFontSize = 16;
           horizontalPadding = 16;
         } else if (screenWidth > 1000) {
           // صفحات متوسط به بزرگ
           maxCalendarWidth = 1200;
-          headerFontSize = 15;
           horizontalPadding = 12;
         } else if (screenWidth > 600) {
           // صفحات متوسط (tablets)
           maxCalendarWidth = screenWidth * 0.95;
-          headerFontSize = 14;
           horizontalPadding = 8;
         } else {
           // صفحات کوچک (mobile)
           maxCalendarWidth = screenWidth;
-          headerFontSize = 13;
           horizontalPadding = 6;
         }
 
@@ -53,8 +49,9 @@ class CustomCalendarWidget extends StatelessWidget {
                   Text(
                     'در حال بارگذاری...',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'BNazanin',
+                      fontSize: FontConfig.fontSizeTitleLarge,
+                      fontFamily: FontConfig.persianFont,
+                      fontWeight: FontConfig.fontWeightNormal,
                       color: colorScheme.onSurface,
                     ),
                   ),
@@ -71,8 +68,9 @@ class CustomCalendarWidget extends StatelessWidget {
               child: Text(
                 'روزی برای نمایش وجود ندارد',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'BNazanin',
+                  fontSize: FontConfig.fontSizeTitleLarge,
+                  fontFamily: FontConfig.persianFont,
+                  fontWeight: FontConfig.fontWeightNormal,
                   color: colorScheme.onSurface,
                 ),
               ),
@@ -231,9 +229,9 @@ class CustomCalendarWidget extends StatelessWidget {
                           Text(
                             'خلاصه ماه',
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'BNazanin',
+                              fontSize: FontConfig.fontSizeTitleLarge,
+                              fontWeight: FontConfig.fontWeightBold,
+                              fontFamily: FontConfig.persianFont,
                               color: colorScheme.onPrimary,
                             ),
                           ),

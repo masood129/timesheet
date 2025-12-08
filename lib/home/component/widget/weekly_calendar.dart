@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/Get.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import '../../../model/leavetype_model.dart';
-import '../../../model/day_period_status.dart';
 import '../../../core/theme/theme.dart';
 import '../../controller/home_controller.dart';
+import '../../controller/task_controller.dart';
 import 'grid_calendar_day_card.dart';
 
 class WeeklyCalendarWidget extends StatelessWidget {
@@ -542,15 +542,15 @@ class WeeklyCalendarWidget extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             icon,
             color: colorScheme.onPrimaryContainer,
-            size: fontSize + 4,
+            size: fontSize + 2,
           ),
         ),
         const SizedBox(width: 12),
@@ -559,7 +559,7 @@ class WeeklyCalendarWidget extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
-            fontFamily: 'BNazanin',
+            fontFamily: FontConfig.persianFont,
             color: colorScheme.primary,
           ),
         ),
@@ -636,105 +636,364 @@ class WeeklyCalendarWidget extends StatelessWidget {
 
   void _showDayDetailsDialog(BuildContext context, Jalali date) {
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    Get.defaultDialog(
-      title: 'جزئیات روز ${date.formatter.wN} ${date.day} ${date.formatter.mN}',
-      titleStyle: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        fontFamily: 'BNazanin',
-        color: colorScheme.primary,
-      ),
-      content: Obx(() {
-        final homeController = Get.find<HomeController>();
-        final effectiveWork = homeController.calculateEffectiveWork(date);
-        final holiday = homeController.getHolidayForDate(date);
-        final cardStatus = homeController.getCardStatus(date, context);
-        final note = homeController.getNoteForDate(date);
-        final periodStatus = homeController.getDayPeriodStatus(date);
+    // محاسبه اندازه‌های responsive
+    final double dialogWidth = screenWidth > 700 ? 650 : screenWidth * 0.95;
+    final double titleFontSize = screenWidth > 600 ? 24 : 20;
+    final double headerFontSize = screenWidth > 600 ? 18 : 16;
+    final double itemFontSize = screenWidth > 600 ? 16 : 15;
 
-        return Container(
-          width: MediaQuery.of(context).size.width * 0.8,
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildDetailRow(context, 'کار مفید', effectiveWork),
-                const SizedBox(height: 8),
-                if (homeController.isCurrentMonthPeriodCustom)
-                  _buildDetailRow(
-                    context,
-                    'وضعیت بازه',
-                    periodStatus.displayName,
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Container(
+          width: dialogWidth,
+          constraints: BoxConstraints(maxHeight: screenHeight * 0.9),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // هدر دیالوگ
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      colorScheme.primary,
+                      colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
                   ),
-                const SizedBox(height: 8),
-                if (holiday != null) ...[
-                  _buildHolidaySection(context, holiday),
-                  const SizedBox(height: 8),
-                ],
-                if (note != null && note.isNotEmpty)
-                  _buildDetailRow(context, 'یادداشت', note),
-                _buildDetailRow(
-                  context,
-                  'وضعیت',
-                  cardStatus['leaveType'] == LeaveType.work ||
-                          cardStatus['leaveType'] == LeaveType.mission
-                      ? (cardStatus['isComplete']
-                          ? 'روز کاری: کامل'
-                          : 'روز کاری: ناقص')
-                      : cardStatus['leaveType']?.displayName ?? 'بدون اطلاعات',
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
                 ),
-              ],
-            ),
-          ),
-        );
-      }),
-      backgroundColor: colorScheme.surface,
-      radius: 12,
-      actions: [
-        TextButton(
-          onPressed: () => Get.back(),
-          child: Text(
-            'بستن',
-            style: TextStyle(
-              fontFamily: 'BNazanin',
-              color: colorScheme.error,
-              fontWeight: FontWeight.bold,
-            ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: colorScheme.onPrimary,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'جزئیات روز',
+                            style: TextStyle(
+                              fontSize: titleFontSize,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: FontConfig.persianFont,
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${date.formatter.wN} ${date.day} ${date.formatter.mN}',
+                            style: TextStyle(
+                              fontSize: headerFontSize - 2,
+                              fontFamily: FontConfig.persianFont,
+                              color: colorScheme.onPrimary.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: colorScheme.onPrimary,
+                        size: 28,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // محتوای دیالوگ
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Obx(() {
+                    final homeController = Get.find<HomeController>();
+                    final cardStatus = homeController.getCardStatus(date, context);
+                    final leaveType = cardStatus['leaveType'] as LeaveType?;
+                    final isComplete = cardStatus['isComplete'] as bool;
+
+                    // دریافت daily detail
+                    final gregorianDate = date.toGregorian();
+                    final formattedDate =
+                        '${gregorianDate.year}-${gregorianDate.month.toString().padLeft(2, '0')}-${gregorianDate.day.toString().padLeft(2, '0')}';
+                    
+                    final detail = homeController.dailyDetails.firstWhereOrNull(
+                      (d) => d.date == formattedDate,
+                    );
+
+                    // دریافت TaskController برای دسترسی به پروژه‌ها
+                    TaskController? taskController;
+                    try {
+                      taskController = Get.find<TaskController>();
+                    } catch (e) {
+                      taskController = null;
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // وضعیت روز
+                        _buildSectionHeader(
+                          context,
+                          'وضعیت روز',
+                          Icons.calendar_today_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildStatusCard(
+                          context,
+                          leaveType: leaveType,
+                          isComplete: isComplete,
+                          itemFontSize: itemFontSize,
+                        ),
+
+                        const Divider(height: 32, thickness: 1.5),
+
+                        // ساعت کار شخصی
+                        _buildSectionHeader(
+                          context,
+                          'ساعت کار شخصی',
+                          Icons.person_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildSummaryCard(
+                          context,
+                          icon: Icons.person_rounded,
+                          iconColor: colorScheme.secondary,
+                          label: 'ساعت کار شخصی',
+                          value: detail?.personalTime != null
+                              ? _formatMinutesToHours(detail!.personalTime!)
+                              : '0:00',
+                          itemFontSize: itemFontSize,
+                        ),
+
+                        const Divider(height: 32, thickness: 1.5),
+
+                        // دیرکرد
+                        if (detail?.arrivalTime != null) ...[
+                          _buildSectionHeader(
+                            context,
+                            'دیرکرد',
+                            Icons.schedule_rounded,
+                            headerFontSize,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSummaryCard(
+                            context,
+                            icon: Icons.schedule_rounded,
+                            iconColor: _calculateDelay(detail!.arrivalTime!) > 0
+                                ? colorScheme.error
+                                : Colors.green,
+                            label: 'دیرکرد',
+                            value: _formatDelay(_calculateDelay(detail.arrivalTime!)),
+                            itemFontSize: itemFontSize,
+                          ),
+                          const Divider(height: 32, thickness: 1.5),
+                        ],
+
+                        // پروژه‌ها
+                        _buildSectionHeader(
+                          context,
+                          'پروژه‌ها',
+                          Icons.folder_rounded,
+                          headerFontSize,
+                        ),
+                        const SizedBox(height: 16),
+                        if (detail?.tasks.isNotEmpty == true) ...[
+                          ...detail!.tasks.map((task) {
+                            final project = taskController?.projects.firstWhereOrNull(
+                              (p) => p.id == task.projectId,
+                            );
+                            final projectName = project?.projectName ?? 'پروژه #${task.projectId}';
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: _buildProjectItem(
+                                context,
+                                projectName: projectName,
+                                hours: task.duration != null
+                                    ? _formatMinutesToHours(task.duration!)
+                                    : '0:00',
+                                itemFontSize: itemFontSize,
+                              ),
+                            );
+                          }),
+                        ] else
+                          _buildEmptyState(
+                            context,
+                            'پروژه‌ای ثبت نشده',
+                            itemFontSize,
+                          ),
+
+                        const Divider(height: 32, thickness: 1.5),
+
+                        // مرخصی
+                        if (leaveType != null && leaveType != LeaveType.work) ...[
+                          _buildSectionHeader(
+                            context,
+                            'مرخصی',
+                            Icons.event_available_rounded,
+                            headerFontSize,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildLeaveItem(
+                            context,
+                            leaveType: leaveType,
+                            itemFontSize: itemFontSize,
+                          ),
+                        ],
+                      ],
+                    );
+                  }),
+                ),
+              ),
+
+              // دکمه بستن
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onPrimary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: Text(
+                      'بستن',
+                      style: TextStyle(
+                        fontSize: itemFontSize,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: FontConfig.persianFont,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildDetailRow(BuildContext context, String label, String value) {
+  Widget _buildStatusCard(
+    BuildContext context, {
+    required LeaveType? leaveType,
+    required bool isComplete,
+    required double itemFontSize,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+    
+    String statusText;
+    Color statusColor;
+    IconData statusIcon;
+    
+    if (leaveType == null) {
+      statusText = 'بدون اطلاعات';
+      statusColor = colorScheme.outline;
+      statusIcon = Icons.help_outline_rounded;
+    } else if (leaveType == LeaveType.work || leaveType == LeaveType.mission) {
+      statusText = isComplete ? 'روز کاری: کامل' : 'روز کاری: ناقص';
+      statusColor = isComplete ? Colors.green : colorScheme.error;
+      statusIcon = isComplete ? Icons.check_circle_rounded : Icons.warning_rounded;
+    } else {
+      statusText = leaveType.displayName;
+      switch (leaveType) {
+        case LeaveType.annualLeave:
+          statusColor = colorScheme.annualLeaveColor;
+          statusIcon = Icons.beach_access_rounded;
+          break;
+        case LeaveType.sickLeave:
+          statusColor = colorScheme.sickLeaveColor;
+          statusIcon = Icons.local_hospital_rounded;
+          break;
+        case LeaveType.giftLeave:
+          statusColor = colorScheme.giftLeaveColor;
+          statusIcon = Icons.card_giftcard_rounded;
+          break;
+        case LeaveType.mission:
+          statusColor = colorScheme.missionColor;
+          statusIcon = Icons.flight_takeoff_rounded;
+          break;
+        default:
+          statusColor = colorScheme.outline;
+          statusIcon = Icons.event_rounded;
+      }
+    }
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            statusColor.withValues(alpha: 0.1),
+            statusColor.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$label: ',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'BNazanin',
-              color: colorScheme.primary,
-              fontSize: 14,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              statusIcon,
+              color: statusColor,
+              size: 24,
             ),
           ),
+          const SizedBox(width: 16),
           Expanded(
             child: Text(
-              value,
+              statusText,
               style: TextStyle(
-                fontFamily: 'BNazanin',
+                fontSize: itemFontSize,
+                fontFamily: FontConfig.persianFont,
                 color: colorScheme.onSurface,
-                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
             ),
           ),
         ],
@@ -742,55 +1001,279 @@ class WeeklyCalendarWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHolidaySection(
+  Widget _buildSummaryCard(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required String value,
+    required double itemFontSize,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            iconColor.withValues(alpha: 0.1),
+            iconColor.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: iconColor.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: itemFontSize,
+                fontFamily: FontConfig.persianFont,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: itemFontSize + 2,
+              fontFamily: FontConfig.persianFont,
+              color: iconColor,
+              fontWeight: FontWeight.bold,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProjectItem(
+    BuildContext context, {
+    required String projectName,
+    required String hours,
+    required double itemFontSize,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              projectName,
+              style: TextStyle(
+                fontSize: itemFontSize,
+                fontFamily: FontConfig.persianFont,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            hours,
+            style: TextStyle(
+              fontSize: itemFontSize,
+              fontFamily: FontConfig.persianFont,
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaveItem(
+    BuildContext context, {
+    required LeaveType leaveType,
+    required double itemFontSize,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    // تعیین رنگ و آیکون بر اساس نوع مرخصی
+    Color leaveColor;
+    IconData leaveIcon;
+    
+    switch (leaveType) {
+      case LeaveType.annualLeave:
+        leaveColor = colorScheme.annualLeaveColor;
+        leaveIcon = Icons.beach_access_rounded;
+        break;
+      case LeaveType.sickLeave:
+        leaveColor = colorScheme.sickLeaveColor;
+        leaveIcon = Icons.local_hospital_rounded;
+        break;
+      case LeaveType.giftLeave:
+        leaveColor = colorScheme.giftLeaveColor;
+        leaveIcon = Icons.card_giftcard_rounded;
+        break;
+      case LeaveType.mission:
+        leaveColor = colorScheme.missionColor;
+        leaveIcon = Icons.flight_takeoff_rounded;
+        break;
+      default:
+        leaveColor = colorScheme.outline;
+        leaveIcon = Icons.event_rounded;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: leaveColor.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: leaveColor.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            leaveIcon,
+            color: leaveColor,
+            size: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              leaveType.displayName,
+              style: TextStyle(
+                fontSize: itemFontSize,
+                fontFamily: FontConfig.persianFont,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(
     BuildContext context,
-    Map<String, dynamic> holiday,
+    String message,
+    double itemFontSize,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final events = holiday['events'] as List<dynamic>? ?? [];
-    final isHoliday = holiday['isHoliday'] == true;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          isHoliday ? 'تعطیل' : 'رویدادها',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontFamily: 'BNazanin',
-            color: isHoliday ? colorScheme.error : colorScheme.primary,
-            fontSize: 16,
-          ),
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
         ),
-        ...events.map((event) {
-          final description = event['description'] as String;
-          final additionalDescription =
-              event['additional_description'] as String? ?? '';
-          final isEventHoliday = event['isHoliday'] == true;
-          final isReligious = event['isReligious'] == true;
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Text(
-              '- $description${additionalDescription.isNotEmpty ? ' ($additionalDescription)' : ''}',
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'BNazanin',
-                color:
-                    isHoliday
-                        ? colorScheme.error
-                        : isEventHoliday
-                        ? colorScheme.error
-                        : isReligious
-                        ? colorScheme.secondary
-                        : colorScheme.onSurface,
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.info_outline,
+            color: colorScheme.outline,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: itemFontSize - 1,
+              fontFamily: FontConfig.persianFont,
+              color: colorScheme.outline,
             ),
-          );
-        }),
-      ],
+          ),
+        ],
+      ),
     );
+  }
+
+  String _formatMinutesToHours(int totalMinutes) {
+    if (totalMinutes == 0) return '0:00';
+    
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+    return '$hours:${minutes.toString().padLeft(2, '0')}';
+  }
+
+  int _calculateDelay(String arrivalTime) {
+    try {
+      // فرض: ساعت شروع کار استاندارد 9:00 صبح است
+      // می‌توانید این مقدار را از تنظیمات یا API دریافت کنید
+      const int standardWorkStartHour = 9;
+      const int standardWorkStartMinute = 0;
+      
+      final parts = arrivalTime.split(':');
+      if (parts.length < 2) return 0;
+      
+      final arrivalHour = int.parse(parts[0]);
+      final arrivalMinute = int.parse(parts[1]);
+      
+      final arrivalMinutes = arrivalHour * 60 + arrivalMinute;
+      final standardMinutes = standardWorkStartHour * 60 + standardWorkStartMinute;
+      
+      final delay = arrivalMinutes - standardMinutes;
+      return delay > 0 ? delay : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  String _formatDelay(int delayMinutes) {
+    if (delayMinutes == 0) return 'بدون دیرکرد';
+    
+    final hours = delayMinutes ~/ 60;
+    final minutes = delayMinutes % 60;
+    
+    if (hours > 0 && minutes > 0) {
+      return '$hours ساعت و $minutes دقیقه';
+    } else if (hours > 0) {
+      return '$hours ساعت';
+    } else {
+      return '$minutes دقیقه';
+    }
   }
 }
 
