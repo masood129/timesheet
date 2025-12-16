@@ -748,12 +748,14 @@ class HomeController extends GetxController {
           effectiveWorkMinutes =
               presenceDuration.inMinutes - (detail.personalTime ?? 0);
         }
+        // اگر ساعت 0 باشد و تسک خالی نباشه، روز ناقص حساب میشود
         isComplete =
             hasArrivalTime &&
             hasLeaveTime &&
             effectiveWorkMinutes != null &&
             totalTaskMinutes == effectiveWorkMinutes &&
-            effectiveWorkMinutes > 0;
+            effectiveWorkMinutes > 0 &&
+            !(totalTaskMinutes == 0 && detail.tasks.isNotEmpty);
       }
       // روز کاری یا ماموریت - همیشه وضعیت کامل یا ناقص رو برمی‌گردونه
       return {
