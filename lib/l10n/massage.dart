@@ -144,7 +144,7 @@ class Messages extends Translations {
       'personal_timer': 'تایمر شخصی',
       'enter_username': 'لطفاً نام کاربری را وارد کنید',
       'monthly_report_draft': 'پیش نویس گزارش ماهانه',
-      'yes_submit': 'بله، ارسال کن',
+      'yes_submit': 'ارسال',
       'manage_monthly_report_draft': 'مدیریت پیش‌نویس گزارش ماهانه',
       'no_drafts_found': 'هیچ پیش‌نویسی یافت نشد.',
       'select_month': 'انتخاب ماه',
