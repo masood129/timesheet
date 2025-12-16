@@ -552,15 +552,21 @@ class TaskController extends GetxController {
 
   void addTaskRow() {
     selectedProjects.add(Rx<Project?>(null));
-    durationControllers.add(TextEditingController(text: '00:00'));
+    final durationController = TextEditingController(text: '00:00');
+    durationController.addListener(calculateStats);
+    durationControllers.add(durationController);
     descriptionControllers.add(TextEditingController());
     taskProjectErrors.add(RxBool(false));
   }
 
   void addCarCostRow() {
     selectedCarCostProjects.add(Rx<Project?>(null));
-    carKmControllers.add(TextEditingController());
-    carCostControllers.add(TextEditingController());
+    final carKmController = TextEditingController();
+    carKmController.addListener(calculateStats);
+    carKmControllers.add(carKmController);
+    final carCostController = TextEditingController();
+    carCostController.addListener(calculateStats);
+    carCostControllers.add(carCostController);
     carCostDescriptionControllers.add(TextEditingController());
     carCostProjectErrors.add(RxBool(false));
   }

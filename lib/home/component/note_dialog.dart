@@ -54,7 +54,7 @@ class NoteDialog extends StatelessWidget {
                       indicatorColor: colorScheme.primary,
                       tabs: [
                         Tab(text: 'detail_go_and_return'.tr),
-                        Tab(text: 'project'.tr),
+                        Tab(text: 'projects'.tr),
                         Tab(text: 'personal_car_costs'.tr),
                       ],
                     ),

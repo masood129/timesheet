@@ -4,7 +4,7 @@ class Messages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'fa': {
-      "calculated_cost" : "محاسبه هزینه",
+      "calculated_cost": "محاسبه هزینه",
       "detail_go_and_return": "جزئیات رفت و آمد",
       "failed_to_load_holidays": "خطا در بارگذاری داده‌های تعطیلات",
       "holiday": "تعطیل",
@@ -82,6 +82,7 @@ class Messages extends Translations {
       'invalid_time_format_error': 'فرمت زمان نامعتبر است',
       'calculations_title': 'محاسبات',
       'tasks_title_section': 'وظایف',
+      'costs_title_section': 'هزینه‌ها',
       'add_task_button_label': 'اضافه کردن وظیفه',
       'invalid_cost_error_field': 'هزینه نامعتبر',
       'leave_type_work': 'کاری',
@@ -278,6 +279,7 @@ class Messages extends Translations {
       'invalid_time_format_error': 'Invalid time format',
       'calculations_title': 'Calculations',
       'tasks_title_section': 'Tasks',
+      'costs_title_section': 'Costs',
       'add_task_button_label': 'Add Task',
       'invalid_cost_error_field': 'Invalid cost',
       'leave_type_work': 'Work',
