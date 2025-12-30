@@ -465,9 +465,20 @@ class TaskController extends GetxController {
           LeaveType.work;
 
       for (final task in detail?.tasks ?? []) {
-        final project = projects.firstWhereOrNull(
+        var project = projects.firstWhereOrNull(
           (p) => p.id == task.projectId,
         );
+        
+        // اگر پروژه در لیست نیست اما نام پروژه از بک‌اند آمده
+        if (project == null && task.projectName != null) {
+          // یک Project موقت برای نمایش بسازیم
+          project = Project(
+            id: task.projectId,
+            projectName: '${task.projectName} (بدون دسترسی)',
+            securityLevel: 0,
+          );
+        }
+        
         selectedProjects.add(Rx<Project?>(project));
         durationControllers.add(
           TextEditingController(text: _minutesToHHMM(task.duration)),
@@ -479,9 +490,27 @@ class TaskController extends GetxController {
       }
 
       for (final cost in detail?.personalCarCosts ?? []) {
-        final project = projects.firstWhereOrNull(
+        var project = projects.firstWhereOrNull(
           (p) => p.id == cost.projectId,
         );
+        
+        // اگر پروژه در لیست نیست اما نام پروژه از بک‌اند آمده
+        if (project == null && cost.projectName != null) {
+          // یک Project موقت برای نمایش بسازیم
+          project = Project(
+            id: cost.projectId ?? 0,
+            projectName: '${cost.projectName} (بدون دسترسی)',
+            securityLevel: 0,
+          );
+        } else if (project == null) {
+          // اگر هیچ اطلاعاتی نداریم
+          project = Project(
+            id: cost.projectId ?? 0,
+            projectName: 'پروژه #${cost.projectId} (بدون دسترسی)',
+            securityLevel: 0,
+          );
+        }
+        
         selectedCarCostProjects.add(Rx<Project?>(project));
         carKmControllers.add(
           TextEditingController(text: cost.kilometers.toString()),

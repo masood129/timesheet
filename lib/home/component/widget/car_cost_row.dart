@@ -39,11 +39,44 @@ class CarCostRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 2,
-                child: Tooltip(
-                  message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
-                  child: Obx(
-                        () => isEnabled ? SearchableDropdown<Project>(
-                      value: controller.selectedCarCostProjects[index].value,
+                child: Obx(() {
+                  final selectedProject = controller.selectedCarCostProjects[index].value;
+                  final hasNoAccess = selectedProject?.projectName.contains('بدون دسترسی') ?? false;
+                  
+                  // اگر پروژه بدون دسترسی است، فقط نمایش می‌دهیم (غیرقابل تغییر)
+                  if (hasNoAccess) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.lock, color: colorScheme.error, size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              selectedProject?.projectName ?? 'پروژه بدون دسترسی',
+                              style: TextStyle(
+                                color: colorScheme.error,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  // در غیر این صورت dropdown عادی
+                  return Tooltip(
+                    message: isEnabled ? '' : 'غیرفعال برای مرخصی غیرکاری'.tr,
+                    child: isEnabled ? SearchableDropdown<Project>(
+                      value: selectedProject,
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
                         errorText: controller.carCostProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,
                         errorBorder: OutlineInputBorder(borderSide: BorderSide(color: colorScheme.error, width: 1.5), borderRadius: BorderRadius.circular(12)),
@@ -62,7 +95,7 @@ class CarCostRow extends StatelessWidget {
                         controller.calculateStats();
                       },
                     ) : DropdownButtonFormField<Project>(
-                      initialValue: controller.selectedCarCostProjects[index].value,
+                      initialValue: selectedProject,
                       hint: Text('انتخاب پروژه'.tr, style: TextStyle(color: disabledColor)),
                       decoration: AppStyles.inputDecoration(context, 'select_project', Icons.work, isEnabled).copyWith(
                         errorText: controller.carCostProjectErrors[index].value ? 'پروژه الزامی است'.tr : null,
@@ -79,8 +112,8 @@ class CarCostRow extends StatelessWidget {
                       isDense: true,
                       onChanged: null,
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
               const SizedBox(width: 10),
               Expanded(

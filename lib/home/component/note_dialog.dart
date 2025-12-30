@@ -80,29 +80,40 @@ class NoteDialog extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: controller.saveDailyDetail,
                     icon: Icon(
-                      Icons.save,
+                      Icons.save_rounded,
                       color: colorScheme.onPrimary,
-                      size: 24,
+                      size: 22,
                     ),
-                    label: Text(
-                      'save'.tr,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    label: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ذخیره و بستن',
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.check_circle_rounded,
+                          color: colorScheme.onPrimary,
+                          size: 20,
+                        ),
+                      ],
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 15,
+                        vertical: 14,
+                        horizontal: 20,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      elevation: 4,
-                      shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+                      elevation: 5,
+                      shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                     ),
                   ),
                 ),

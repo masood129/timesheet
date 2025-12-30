@@ -3,6 +3,7 @@ class Task {
   final String? date;
   final int? userId;
   final int projectId;
+  final String? projectName; // اضافه شد برای نمایش نام پروژه
   final int? duration;
   final String? description;
 
@@ -11,6 +12,7 @@ class Task {
     this.date,
     this.userId,
     required this.projectId,
+    this.projectName,
     this.duration,
     this.description,
   });
@@ -21,6 +23,7 @@ class Task {
       date: json['Date'],
       userId: json['UserId'],
       projectId: json['ProjectId'],
+      projectName: json['ProjectName'], // اضافه شد
       duration: json['Duration'],
       description: json['Description'],
     );

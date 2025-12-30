@@ -16,7 +16,6 @@ class _CalculationSummaryState extends State<CalculationSummary>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _iconTurns;
-  // ignore: unused_field
   bool _isExpanded = false;
 
   @override
@@ -24,7 +23,7 @@ class _CalculationSummaryState extends State<CalculationSummary>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
     );
     _iconTurns = _animationController.drive(
       Tween<double>(begin: 0.0, end: 0.5),
@@ -42,83 +41,186 @@ class _CalculationSummaryState extends State<CalculationSummary>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Obx(
-      () => ExpansionTile(
-        title: Text(
-          widget.controller.summaryReport.value.isEmpty
-              ? 'calculations_title'.tr
-              : widget.controller.summaryReport.value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: colorScheme.primary,
+      () => Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: colorScheme.tertiary.withValues(alpha: 0.3),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.tertiary.withValues(alpha: 0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        leading: Icon(Icons.calculate, color: colorScheme.primary, size: 20),
-        trailing: RotationTransition(
-          turns: _iconTurns,
-          child: Icon(
-            Icons.expand_less,
-            color: colorScheme.primary,
-            size: 24,
-          ),
+        child: Column(
+          children: [
+            // هدر با گرادیانت زیبا
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+                if (_isExpanded) {
+                  _animationController.forward();
+                } else {
+                  _animationController.reverse();
+                }
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colorScheme.tertiaryContainer,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.tertiary.withValues(alpha: 0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.tertiary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.calculate_rounded,
+                        color: colorScheme.onTertiaryContainer,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        widget.controller.summaryReport.value.isEmpty
+                            ? 'calculations_title'.tr
+                            : widget.controller.summaryReport.value,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: colorScheme.onTertiaryContainer,
+                        ),
+                      ),
+                    ),
+                    RotationTransition(
+                      turns: _iconTurns,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: colorScheme.onTertiaryContainer,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // محتوای قابل باز شدن
+            AnimatedCrossFade(
+              firstChild: const SizedBox.shrink(),
+              secondChild: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // زمان حضور و کار موثر
+                    _buildTimeInfoCard(
+                      context,
+                      Icons.access_time_rounded,
+                      widget.controller.presenceDuration.value,
+                      colorScheme.primaryContainer,
+                      colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildTimeInfoCard(
+                      context,
+                      Icons.work_rounded,
+                      widget.controller.effectiveWork.value,
+                      colorScheme.secondaryContainer,
+                      colorScheme.onSecondaryContainer,
+                    ),
+
+                    const Divider(height: 20, thickness: 1),
+
+                    // بخش پروژه‌ها
+                    _buildSectionHeader(
+                      context,
+                      'tasks_title_section'.tr,
+                      Icons.task_alt_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildTaskList(context),
+
+                    const Divider(height: 20, thickness: 1),
+
+                    // بخش هزینه‌ها
+                    _buildSectionHeader(
+                      context,
+                      'costs_title_section'.tr,
+                      Icons.monetization_on_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildCostList(context),
+                  ],
+                ),
+              ),
+              crossFadeState: _isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 300),
+            ),
+          ],
         ),
-        backgroundColor: colorScheme.surfaceContainer,
-        collapsedBackgroundColor: colorScheme.surfaceContainer,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        collapsedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
+  Widget _buildTimeInfoCard(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color backgroundColor,
+    Color textColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: textColor.withValues(alpha: 0.2),
+          width: 1,
         ),
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-        onExpansionChanged: (bool expanding) {
-          setState(() {
-            _isExpanded = expanding;
-          });
-          if (expanding) {
-            _animationController.forward();
-          } else {
-            _animationController.reverse();
-          }
-        },
+      ),
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Divider(color: colorScheme.outlineVariant, height: 16),
-                _buildSummaryRow(
-                  context,
-                  Icons.access_time,
-                  widget.controller.presenceDuration.value,
-                ),
-                _buildSummaryRow(
-                  context,
-                  Icons.work,
-                  widget.controller.effectiveWork.value,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${'tasks_title_section'.tr}:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildTaskList(context),
-                const SizedBox(height: 8),
-                Text(
-                  '${'costs_title_section'.tr}:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildCostList(context),
-              ],
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: textColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Icon(icon, color: textColor, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text.isEmpty ? 'no_effective_work'.tr : text,
+              style: TextStyle(
+                fontSize: 14,
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -126,15 +228,34 @@ class _CalculationSummaryState extends State<CalculationSummary>
     );
   }
 
-  Widget _buildSummaryRow(BuildContext context, IconData icon, String text) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, color: colorScheme.secondary, size: 18),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: colorScheme.tertiaryContainer,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(
+            icon,
+            color: colorScheme.onTertiaryContainer,
+            size: 16,
+          ),
+        ),
         const SizedBox(width: 8),
         Text(
-          text.isEmpty ? 'no_effective_work'.tr : text,
-          style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.tertiary,
+          ),
         ),
       ],
     );
@@ -143,89 +264,150 @@ class _CalculationSummaryState extends State<CalculationSummary>
   Widget _buildTaskList(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Obx(
-      () => Column(
-        children:
-            widget.controller.taskDetails.isNotEmpty
-                ? widget.controller.taskDetails
-                    .map(
-                      (task) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.task,
-                              color: colorScheme.secondary,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                task,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+      () => widget.controller.taskDetails.isNotEmpty
+          ? Column(
+              children: widget.controller.taskDetails
+                  .map(
+                    (task) => Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: _buildDetailItem(
+                        context,
+                        Icons.check_circle_rounded,
+                        task,
+                        colorScheme.tertiaryContainer,
+                        colorScheme.onTertiaryContainer,
                       ),
-                    )
-                    .toList()
-                : [
-                  Text(
-                    'no_tasks_recorded'.tr,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurface,
                     ),
-                  ),
-                ],
-      ),
+                  )
+                  .toList(),
+            )
+          : _buildEmptyState(
+              context,
+              'no_tasks_recorded'.tr,
+              Icons.task_outlined,
+            ),
     );
   }
 
   Widget _buildCostList(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Obx(
-      () => Column(
-        children:
-            widget.controller.costDetails.isNotEmpty
-                ? widget.controller.costDetails
-                    .map(
-                      (cost) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.monetization_on,
-                              color: colorScheme.secondary,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                cost,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+      () => widget.controller.costDetails.isNotEmpty
+          ? Column(
+              children: widget.controller.costDetails
+                  .map(
+                    (cost) => Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: _buildDetailItem(
+                        context,
+                        Icons.attach_money_rounded,
+                        cost,
+                        colorScheme.errorContainer,
+                        colorScheme.onErrorContainer,
                       ),
-                    )
-                    .toList()
-                : [
-                  Text(
-                    'no_costs_recorded'.tr,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.onSurface,
                     ),
-                  ),
-                ],
+                  )
+                  .toList(),
+            )
+          : _buildEmptyState(
+              context,
+              'no_costs_recorded'.tr,
+              Icons.money_off_rounded,
+            ),
+    );
+  }
+
+  Widget _buildDetailItem(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color backgroundColor,
+    Color iconColor,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(7),
+              border: Border.all(
+                color: iconColor.withValues(alpha: 0.3),
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: backgroundColor.withValues(alpha: 0.25),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Icon(icon, size: 16, color: iconColor),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(
+    BuildContext context,
+    String message,
+    IconData icon,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+          style: BorderStyle.solid,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
+            size: 16,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 13,
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
       ),
     );
   }

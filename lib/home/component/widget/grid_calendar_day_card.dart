@@ -861,13 +861,14 @@ class _GridCalendarDayCardState extends State<GridCalendarDayCard>
                             const SizedBox(height: 16),
                             if (detail?.tasks.isNotEmpty == true) ...[
                               ...detail!.tasks.map((task) {
-                                final project = taskController?.projects
-                                    .firstWhereOrNull(
-                                      (p) => p.id == task.projectId,
-                                    );
-                                final projectName =
-                                    project?.projectName ??
-                                    'پروژه #${task.projectId}';
+                                // اگر projectName از بک‌اند آمده باشد، از آن استفاده می‌کنیم
+                                // در غیر این صورت از لیست projects جستجو می‌کنیم
+                                final projectName = task.projectName ??
+                                    taskController?.projects
+                                        .firstWhereOrNull(
+                                          (p) => p.id == task.projectId,
+                                        )?.projectName ??
+                                    'پروژه حذف شده #${task.projectId}';
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: _buildProjectItem(

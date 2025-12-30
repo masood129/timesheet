@@ -578,10 +578,13 @@ class MonthSummaryDialog extends StatelessWidget {
             totalWorkMinutes += task.duration!;
             
             // گروه‌بندی بر اساس پروژه
-            final project = taskController?.projects.firstWhereOrNull(
-              (p) => p.id == task.projectId,
-            );
-            final projectName = project?.projectName ?? 'پروژه #${task.projectId}';
+            // اگر projectName از بک‌اند آمده باشد، از آن استفاده می‌کنیم
+            final projectName = task.projectName ??
+                taskController?.projects
+                    .firstWhereOrNull(
+                      (p) => p.id == task.projectId,
+                    )?.projectName ??
+                'پروژه حذف شده #${task.projectId}';
             projectHours[projectName] = (projectHours[projectName] ?? 0) + task.duration!;
           }
         }
