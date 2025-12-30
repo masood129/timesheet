@@ -517,7 +517,10 @@ class HomeController extends GetxController {
         date,
         Get.context!,
       ); // Assuming Get.context is available; adjust if needed
-      if (status['leaveType'] == LeaveType.work &&
+      // روزهای "بدون عملکرد" را نادیده می‌گیریم
+      final isNoActivity = status['isNoActivity'] as bool? ?? false;
+      if (!isNoActivity &&
+          status['leaveType'] == LeaveType.work &&
           !(status['isComplete'] as bool)) {
         hasIncompleteDays = true;
         errorMessage += '${date.day}, ';
@@ -721,6 +724,7 @@ class HomeController extends GetxController {
         'avatarIconColor': colorScheme.onNoDataStatus,
         'leaveType': null,
         'isComplete': false,
+        'isNoActivity': true, // flag برای شناسایی روزهای بدون عملکرد
       };
     }
 
@@ -728,11 +732,33 @@ class HomeController extends GetxController {
     // اگر روز کاری یا ماموریت است
     if (detail.leaveType == LeaveType.work ||
         detail.leaveType == LeaveType.mission) {
+      // بررسی اینکه آیا ساعت ورود و خروج هر دو null هستند
+      final hasArrivalTime =
+          detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
+      final hasLeaveTime =
+          detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
+      final hasNoWorkingHours = !hasArrivalTime && !hasLeaveTime;
+      
+      // بررسی اینکه آیا هیچ فعالیتی ثبت نشده است
+      final hasNoTasks = detail.tasks.isEmpty;
+      final hasNoCarCosts = detail.personalCarCosts.isEmpty;
+      final hasNoGoReturnCosts = (detail.goCost ?? 0) == 0 && (detail.returnCost ?? 0) == 0;
+      final hasNoActivity = hasNoTasks && hasNoCarCosts && hasNoGoReturnCosts;
+      
+      // اگر ساعت ورود و خروج null باشند و هیچ فعالیتی ثبت نشده باشد،
+      // روز را به عنوان "بدون عملکرد" نمایش می‌دهیم
+      if (hasNoWorkingHours && hasNoActivity) {
+        return {
+          'avatarColor': colorScheme.noDataStatus,
+          'avatarIcon': Icons.calendar_today,
+          'avatarIconColor': colorScheme.onNoDataStatus,
+          'leaveType': null, // null می‌کنیم تا در اعتبارسنجی نادیده گرفته شود
+          'isComplete': false,
+          'isNoActivity': true, // flag برای شناسایی روزهای بدون عملکرد
+        };
+      }
+      
       if (hasWorkingHours) {
-        final hasArrivalTime =
-            detail.arrivalTime != null && detail.arrivalTime!.isNotEmpty;
-        final hasLeaveTime =
-            detail.leaveTime != null && detail.leaveTime!.isNotEmpty;
         final totalTaskMinutes = detail.tasks.fold<int>(
           0,
           (sum, task) => sum + (task.duration ?? 0),
@@ -770,6 +796,7 @@ class HomeController extends GetxController {
                 : colorScheme.onIncompleteStatus,
         'leaveType': detail.leaveType, // work یا mission
         'isComplete': isComplete,
+        'isNoActivity': false, // روزهای کاری/ماموریت همیشه فعالیت دارند
       };
     }
 
@@ -818,6 +845,7 @@ class HomeController extends GetxController {
         'avatarIconColor': avatarIconColor,
         'leaveType': detail.leaveType, // enum برمی‌گرداند
         'isComplete': isComplete,
+        'isNoActivity': false, // روزهای مرخصی/ماموریت همیشه فعالیت دارند
       };
     }
 

@@ -713,11 +713,35 @@ class TaskController extends GetxController {
     final cappedGoCost = goCost > 40000 ? 40000 : goCost;
     final cappedReturnCost = returnCost > 40000 ? 40000 : returnCost;
 
+    // بررسی اینکه آیا ساعت ورود و خروج خالی یا 00:00 هستند
+    final arrivalTimeText = arrivalTimeController.text.trim();
+    final leaveTimeText = leaveTimeController.text.trim();
+    final isArrivalTimeEmpty = arrivalTimeText.isEmpty || arrivalTimeText == '00:00';
+    final isLeaveTimeEmpty = leaveTimeText.isEmpty || leaveTimeText == '00:00';
+    
+    // بررسی اینکه آیا هیچ فعالیتی ثبت نشده است
+    final hasNoTasks = tasks.isEmpty;
+    final hasNoCarCosts = personalCarCosts.isEmpty;
+    final hasNoGoReturnCosts = cappedGoCost == 0 && cappedReturnCost == 0;
+    final hasNoActivity = hasNoTasks && hasNoCarCosts && hasNoGoReturnCosts;
+    
+    // اگر ساعت ورود و خروج خالی باشند و هیچ فعالیتی ثبت نشده باشد،
+    // ساعت‌ها را null می‌کنیم تا روز به عنوان "بدون عملکرد" ثبت شود
+    String? finalArrivalTime;
+    String? finalLeaveTime;
+    if (isArrivalTimeEmpty && isLeaveTimeEmpty && hasNoActivity) {
+      finalArrivalTime = null;
+      finalLeaveTime = null;
+    } else {
+      finalArrivalTime = _toIsoTime(arrivalTimeController.text, currentDate);
+      finalLeaveTime = _toIsoTime(leaveTimeController.text, currentDate);
+    }
+
     final detail = DailyDetail(
       date: currentDate!.toDateTime().toIso8601String().split('T')[0],
       userId: 1,
-      arrivalTime: _toIsoTime(arrivalTimeController.text, currentDate),
-      leaveTime: _toIsoTime(leaveTimeController.text, currentDate),
+      arrivalTime: finalArrivalTime,
+      leaveTime: finalLeaveTime,
       leaveTypeString: leaveType.value.apiValue,
       // تغییر به apiValue برای ارسال string به API
       personalTime: _hhmmToMinutes(personalTimeController.text),
