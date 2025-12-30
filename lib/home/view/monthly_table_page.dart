@@ -23,6 +23,8 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   late int _jalaliMonth;
   int? _userId;
   List<ProjectAccess> _allProjects = [];
+  List<MonthlyTableRowModel> _allData = [];
+  bool _isLoading = false;
 
   // Filter states
   String _searchQuery = '';
@@ -82,12 +84,26 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   }
 
   Future<List<MonthlyTableRowModel>> _fetchData() async {
-    final data = await _homeApi.getUserMonthlyTableData(
-      _userId!,
-      _jalaliYear,
-      _jalaliMonth,
-    );
-    return data;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final data = await _homeApi.getUserMonthlyTableData(
+        _userId!,
+        _jalaliYear,
+        _jalaliMonth,
+      );
+      setState(() {
+        _allData = data;
+        _isLoading = false;
+      });
+      return data;
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      rethrow;
+    }
   }
 
   Future<List<ProjectAccess>> _fetchProjects() async {
@@ -97,27 +113,25 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   }
 
   void _previousMonth() {
-    setState(() {
-      if (_jalaliMonth == 1) {
-        _jalaliMonth = 12;
-        _jalaliYear--;
-      } else {
-        _jalaliMonth--;
-      }
-      _dataFuture = _fetchData();
-    });
+    if (_jalaliMonth == 1) {
+      _jalaliMonth = 12;
+      _jalaliYear--;
+    } else {
+      _jalaliMonth--;
+    }
+    setState(() {});
+    _dataFuture = _fetchData();
   }
 
   void _nextMonth() {
-    setState(() {
-      if (_jalaliMonth == 12) {
-        _jalaliMonth = 1;
-        _jalaliYear++;
-      } else {
-        _jalaliMonth++;
-      }
-      _dataFuture = _fetchData();
-    });
+    if (_jalaliMonth == 12) {
+      _jalaliMonth = 1;
+      _jalaliYear++;
+    } else {
+      _jalaliMonth++;
+    }
+    setState(() {});
+    _dataFuture = _fetchData();
   }
 
   String _formatTime(String? isoTime) {
@@ -211,18 +225,8 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'جدول ماهانه - $_jalaliYear/${_jalaliMonth.toString().padLeft(2, '0')}',
-        ),
+        title: const Text('جدول ماهانه'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: _previousMonth,
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: _nextMonth,
-          ),
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () async {
@@ -280,7 +284,7 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
           return FutureBuilder<List<dynamic>>(
             future: Future.wait([_dataFuture, _projectsFuture]),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting && _allData.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('خطا: ${snapshot.error}'));
@@ -288,9 +292,12 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
                 return const Center(child: Text('هیچ داده‌ای موجود نیست'));
               }
 
-              final allData = snapshot.data![0] as List<MonthlyTableRowModel>;
+              final allDataFromSnapshot = snapshot.data![0] as List<MonthlyTableRowModel>;
               final projects = snapshot.data![1] as List<ProjectAccess>;
-              final filteredData = _filterData(allData);
+              
+              // Use cached data if available, otherwise use snapshot data
+              final dataToFilter = _allData.isNotEmpty ? _allData : allDataFromSnapshot;
+              final filteredData = _filterData(dataToFilter);
               final sortedProjectIds =
                   projects.map((p) => p.id).toList()..sort();
 
@@ -308,6 +315,30 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
+                            // Month Selection
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_back),
+                                  onPressed: _previousMonth,
+                                  tooltip: 'ماه قبل',
+                                ),
+                                Text(
+                                  '$_jalaliYear/${_jalaliMonth.toString().padLeft(2, '0')}',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.arrow_forward),
+                                  onPressed: _nextMonth,
+                                  tooltip: 'ماه بعد',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                             // Search
                             TextField(
                               controller: _searchController,
@@ -420,6 +451,12 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
                       ),
                     ),
                   ),
+                  // Loading indicator for table
+                  if (_isLoading)
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: LinearProgressIndicator(),
+                    ),
                   // Table Header (Sticky)
                   SingleChildScrollView(
                     controller: _headerScrollController,
@@ -444,35 +481,37 @@ class _MonthlyTablePageState extends State<MonthlyTablePage> {
                   ),
                   // Table Body (Scrollable)
                   Expanded(
-                    child: Scrollbar(
-                      controller: _bodyScrollController,
-                      thumbVisibility: true,
-                      child: SingleChildScrollView(
-                        controller: _bodyScrollController,
-                        scrollDirection: Axis.horizontal,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: DataTable(
-                            border: TableBorder.all(
-                              color: Colors.grey.shade300,
-                              width: 1,
+                    child: _isLoading && _allData.isEmpty
+                        ? const Center(child: CircularProgressIndicator())
+                        : Scrollbar(
+                            controller: _bodyScrollController,
+                            thumbVisibility: true,
+                            child: SingleChildScrollView(
+                              controller: _bodyScrollController,
+                              scrollDirection: Axis.horizontal,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: DataTable(
+                                  border: TableBorder.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  ),
+                                  headingRowHeight: 0,
+                                  columnSpacing: 0,
+                                  horizontalMargin: 0,
+                                  columns: _buildColumns(sortedProjectIds, projects),
+                                  rows:
+                                      filteredData.map((row) {
+                                        return _buildDataRow(
+                                          row,
+                                          sortedProjectIds,
+                                          projects,
+                                        );
+                                      }).toList(),
+                                ),
+                              ),
                             ),
-                            headingRowHeight: 0,
-                            columnSpacing: 0,
-                            horizontalMargin: 0,
-                            columns: _buildColumns(sortedProjectIds, projects),
-                            rows:
-                                filteredData.map((row) {
-                                  return _buildDataRow(
-                                    row,
-                                    sortedProjectIds,
-                                    projects,
-                                  );
-                                }).toList(),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               );
