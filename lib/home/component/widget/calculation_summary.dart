@@ -75,11 +75,15 @@ class _CalculationSummaryState extends State<CalculationSummary>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer,
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.outline.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.tertiary.withValues(alpha: 0.15),
+                      color: colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -90,12 +94,12 @@ class _CalculationSummaryState extends State<CalculationSummary>
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: colorScheme.tertiary.withValues(alpha: 0.2),
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.calculate_rounded,
-                        color: colorScheme.onTertiaryContainer,
+                        color: colorScheme.onSurface,
                         size: 20,
                       ),
                     ),
@@ -108,7 +112,7 @@ class _CalculationSummaryState extends State<CalculationSummary>
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: colorScheme.onTertiaryContainer,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -116,7 +120,7 @@ class _CalculationSummaryState extends State<CalculationSummary>
                       turns: _iconTurns,
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: colorScheme.onTertiaryContainer,
+                        color: colorScheme.onSurface,
                         size: 24,
                       ),
                     ),
@@ -133,21 +137,13 @@ class _CalculationSummaryState extends State<CalculationSummary>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // زمان حضور و کار موثر
+                    // زمان حضور
                     _buildTimeInfoCard(
                       context,
                       Icons.access_time_rounded,
                       widget.controller.presenceDuration.value,
-                      colorScheme.primaryContainer,
-                      colorScheme.onPrimaryContainer,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTimeInfoCard(
-                      context,
-                      Icons.work_rounded,
-                      widget.controller.effectiveWork.value,
-                      colorScheme.secondaryContainer,
-                      colorScheme.onSecondaryContainer,
+                      colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                      colorScheme.onSurface,
                     ),
 
                     const Divider(height: 20, thickness: 1),
@@ -239,12 +235,12 @@ class _CalculationSummaryState extends State<CalculationSummary>
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: colorScheme.tertiaryContainer,
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
             icon,
-            color: colorScheme.onTertiaryContainer,
+            color: colorScheme.onSurface,
             size: 16,
           ),
         ),
@@ -254,7 +250,7 @@ class _CalculationSummaryState extends State<CalculationSummary>
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: colorScheme.tertiary,
+            color: colorScheme.onSurface,
           ),
         ),
       ],
@@ -274,8 +270,8 @@ class _CalculationSummaryState extends State<CalculationSummary>
                         context,
                         Icons.check_circle_rounded,
                         task,
-                        colorScheme.tertiaryContainer,
-                        colorScheme.onTertiaryContainer,
+                        colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        colorScheme.onSurface,
                       ),
                     ),
                   )

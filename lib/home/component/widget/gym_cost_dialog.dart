@@ -40,7 +40,9 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
   showDialog(
     context: context,
     builder: (context) {
-      return AlertDialog(
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
         title: Text(
           'register_monthly_gym_cost'.tr,
           textAlign: TextAlign.center,
@@ -73,7 +75,7 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
               const SizedBox(height: 16),
               // انتخاب ماه با نام‌های شمسی و پیش‌فرض جاری (فقط ماه‌های جاری و قبلی)
               SearchableDropdown<int>(
-                value: currentMonth,
+                value: int.tryParse(monthController.text) ?? currentMonth,
                 decoration: InputDecoration(
                   labelText: 'month'.tr,
                   border: OutlineInputBorder(
@@ -90,7 +92,9 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                     }).toList(),
                 onChanged: (value) {
                   if (value != null) {
-                    monthController.text = value.toString();
+                    setState(() {
+                      monthController.text = value.toString();
+                    });
                   }
                 },
               ),
@@ -109,18 +113,13 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   // فقط اعداد
-                  LengthLimitingTextInputFormatter(7),
-                  // حداکثر 7 رقم (برای 400,000)
+                  LengthLimitingTextInputFormatter(10),
+                  // حداکثر 10 رقم
                 ],
                 onChanged: (value) {
                   // حذف کاماها برای پردازش
                   String newValue = value.replaceAll(',', '');
                   if (newValue.isNotEmpty) {
-                    int cost = int.parse(newValue);
-                    if (cost > 400000) {
-                      cost = 400000;
-                      newValue = cost.toString();
-                    }
                     // اعمال فرمت کاما
                     final formatted = numberFormatter.format(
                       int.parse(newValue),
@@ -187,6 +186,8 @@ void showGymCostDialog(BuildContext context, HomeController homeController) {
             child: Text('submit'.tr),
           ),
         ],
+          );
+        },
       );
     },
   );

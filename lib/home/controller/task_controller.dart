@@ -916,8 +916,7 @@ class TaskController extends GetxController {
           '${'live_calc_effective_work_prefix'.tr}${effectiveMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${effectiveMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       presenceDuration.value =
           '${'live_calc_presence_duration_prefix'.tr}${presence.inHours}${'live_calc_hours_and_suffix'.tr}${presence.inMinutes % 60}${'live_calc_minutes_suffix'.tr}';
-      effectiveWork.value =
-          '${'live_calc_effective_work_prefix'.tr}${effectiveMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${effectiveMinutes % 60}${'live_calc_minutes_suffix'.tr}';
+      effectiveWork.value = '';
       taskTotalTime.value =
           '${'live_calc_total_task_time_prefix'.tr}${totalTaskMinutes ~/ 60}${'live_calc_hours_and_suffix'.tr}${totalTaskMinutes % 60}${'live_calc_minutes_suffix'.tr}';
       totalCost.value =

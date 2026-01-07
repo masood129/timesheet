@@ -8,12 +8,12 @@ import '../../../core/widgets/searchable_dropdown.dart';
 void showMonthlyReportDialog(
   BuildContext context,
   HomeController homeController,
-) {
+) async {
   final currentYear = Jalali.now().year;
   final currentMonth = Jalali.now().month;
 
-  // ماه‌های شمسی تا ماه جاری
-  final months = List.generate(currentMonth, (index) => index + 1);
+  // همه ماه‌های شمسی (12 ماه)
+  final allMonths = List.generate(12, (index) => index + 1);
   final monthNames = [
     'فروردین',
     'اردیبهشت',
@@ -29,8 +29,30 @@ void showMonthlyReportDialog(
     'اسفند',
   ];
 
-  // متغیر انتخاب‌شده برای ماه (پیشفرض: جاری)
-  var selectedMonth = currentMonth.obs;
+  // دریافت لیست گزارش‌های ارسال‌شده
+  final drafts = await homeController.fetchMyDrafts();
+
+  // استخراج ماه‌های ارسال‌شده برای سال جاری
+  final submittedMonths =
+      drafts
+          .where(
+            (draft) =>
+                draft.jalaliYear == currentYear && draft.jalaliMonth != null,
+          )
+          .map((draft) => draft.jalaliMonth!)
+          .toSet();
+
+  // فیلتر کردن ماه‌های ارسال‌شده از لیست ماه‌های موجود
+  final availableMonths =
+      allMonths.where((month) => !submittedMonths.contains(month)).toList();
+
+  // اگر ماه جاری ارسال شده بود، اولین ماه موجود را انتخاب کن
+  var selectedMonth =
+      availableMonths.contains(currentMonth)
+          ? currentMonth.obs
+          : (availableMonths.isNotEmpty
+              ? availableMonths.first.obs
+              : currentMonth.obs);
 
   Get.dialog(
     AlertDialog(
@@ -61,7 +83,7 @@ void showMonthlyReportDialog(
               ),
             ),
             const SizedBox(height: 16),
-            // انتخاب ماه با نام‌های شمسی و محدود به ماه جاری
+            // انتخاب ماه با نام‌های شمسی (ماه‌های ارسال‌شده disable هستند)
             Obx(
               () => SearchableDropdown<int>(
                 value: selectedMonth.value,
@@ -73,14 +95,34 @@ void showMonthlyReportDialog(
                 ),
                 searchHint: 'جستجوی ماه...',
                 items:
-                    months.map((month) {
+                    allMonths.map((month) {
+                      final isSubmitted = submittedMonths.contains(month);
+                      final isFutureMonth = month > currentMonth;
+                      final isDisabled = isSubmitted || isFutureMonth;
                       return DropdownMenuItem(
                         value: month,
-                        child: Text(monthNames[month - 1]),
+                        enabled: !isDisabled,
+                        child: IgnorePointer(
+                          ignoring: isDisabled,
+                          child: MouseRegion(
+                            cursor:
+                                isDisabled
+                                    ? SystemMouseCursors.basic
+                                    : SystemMouseCursors.click,
+                            child: Text(
+                              monthNames[month - 1],
+                              style: TextStyle(
+                                color: isDisabled ? Colors.grey : null,
+                              ),
+                            ),
+                          ),
+                        ),
                       );
                     }).toList(),
                 onChanged: (newMonth) {
-                  if (newMonth != null) {
+                  if (newMonth != null &&
+                      !submittedMonths.contains(newMonth) &&
+                      newMonth <= currentMonth) {
                     selectedMonth.value = newMonth;
                   }
                 },
