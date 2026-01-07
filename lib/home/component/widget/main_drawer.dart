@@ -8,6 +8,7 @@ import '../../controller/home_controller.dart';
 import '../../view/monthly_table_page.dart';
 import '../../view/logs_viewer_page.dart';
 import '../../view/project_access_page.dart';
+import '../../view/employee_time_records_page.dart';
 import 'draft_reports_dialog.dart';
 import 'gym_cost_dialog.dart';
 import 'monthly_report_dialog.dart';
@@ -167,6 +168,26 @@ class MainDrawer extends StatelessWidget {
                       onTap: () {
                         Navigator.pop(context);
                         Get.to(() => UserListView());
+                      },
+                    )
+                    : const SizedBox.shrink(),
+          ),
+          Obx(
+            () =>
+                authController.user.value != null &&
+                        [
+                          'group_manager',
+                          'general_manager',
+                        ].contains(authController.user.value!['Role'])
+                    ? ListTile(
+                      leading: Icon(Icons.access_time, color: colorScheme.primary),
+                      title: Text(
+                        'ساعت‌های ورود و خروج کارمندان',
+                        style: TextStyle(color: colorScheme.onSurface),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.to(() => const EmployeeTimeRecordsPage());
                       },
                     )
                     : const SizedBox.shrink(),
