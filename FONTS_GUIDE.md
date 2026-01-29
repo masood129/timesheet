@@ -78,23 +78,9 @@ Text(
 )
 ```
 
-### 4. استفاده با Google Fonts (فقط برای admin panel)
-
-در پروژه `timesheet_admin_panel` می‌توانید از پکیج `google_fonts` نیز استفاده کنید:
-
-```dart
-import 'package:google_fonts/google_fonts.dart';
-
-Text(
-  'Hello World',
-  style: GoogleFonts.roboto(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-  ),
-)
-```
-
 ## نکات مهم / Important Notes
+
+⚠️ **استفاده بدون اینترنت**: این پروژه برای اجرا در محیط بدون اینترنت طراحی شده است. تمام فونت‌ها به صورت محلی در پوشه `assets/fonts/` قرار دارند و نیازی به دانلود آنلاین ندارند.
 
 1. **استفاده در TextField**:
 
@@ -205,3 +191,50 @@ class FontExamplePage extends StatelessWidget {
 - `assets/fonts/Ubuntu-Regular.ttf` - Ubuntu عادی
 - `assets/fonts/Ubuntu-Bold.ttf` - Ubuntu Bold
 - `assets/fonts/Ubuntu-Italic.ttf` - Ubuntu Italic
+
+## فونت‌های فارسی پیشنهادی برای اضافه کردن / Recommended Persian Fonts
+
+اگر می‌خواهید فونت‌های فارسی بیشتری اضافه کنید:
+
+### 1. Vazir Font
+- **ویژگی**: مدرن، خوانا، سبک
+- **مناسب برای**: متون عادی، رابط کاربری
+- **دانلود**: https://github.com/rastikerdar/vazir-font/releases
+
+### 2. IRANSans
+- **ویژگی**: حرفه‌ای، زیبا
+- **مناسب برای**: عناوین، متون رسمی
+- **دانلود**: https://github.com/rastikerdar/iran-sans/releases
+
+### 3. Yekan
+- **ویژگی**: خوانایی بالا، مناسب صفحه نمایش
+- **مناسب برای**: عناوین، دکمه‌ها
+
+### نحوه افزودن فونت جدید:
+
+1. فایل `.ttf` فونت را دانلود کنید
+2. فایل را در `assets/fonts/` کپی کنید
+3. در `pubspec.yaml` فونت را اضافه کنید:
+
+```yaml
+fonts:
+  - family: Vazir
+    fonts:
+      - asset: assets/fonts/Vazir-Regular.ttf
+      - asset: assets/fonts/Vazir-Bold.ttf
+        weight: 700
+```
+
+4. دستور `flutter pub get` را اجرا کنید
+5. در کد از فونت استفاده کنید:
+
+```dart
+Text(
+  'متن با فونت وزیر',
+  style: TextStyle(fontFamily: 'Vazir'),
+)
+```
+
+## راهنمای کامل استفاده بدون اینترنت
+
+برای اطلاعات کامل درباره استفاده از فونت‌ها در محیط بدون اینترنت، به فایل `OFFLINE_FONTS_GUIDE.md` مراجعه کنید.
