@@ -855,7 +855,7 @@ class TaskController extends GetxController {
           final hours = minutes ~/ 60;
           final mins = minutes % 60;
           taskDetails.add(
-            '${selectedProjects[i].value!.projectName}: ${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}',
+            '${selectedProjects[i].value!.projectName} (${selectedProjects[i].value!.id}): ${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}',
           );
         }
       }
@@ -882,7 +882,7 @@ class TaskController extends GetxController {
         if (kilometers > 0) {
           final cost = calculateCarCost(kilometers);
           costDetails.add(
-            'هزینه خودرو (${selectedCarCostProjects[i].value!.projectName} - $kilometers کیلومتر): ${ThousandSeparatorInputFormatter()._formatNumber(cost)}',
+            'هزینه خودرو (${selectedCarCostProjects[i].value!.projectName} (${selectedCarCostProjects[i].value!.id}) - $kilometers کیلومتر): ${ThousandSeparatorInputFormatter()._formatNumber(cost)}',
           );
         }
       }

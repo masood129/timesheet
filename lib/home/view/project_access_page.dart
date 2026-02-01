@@ -93,7 +93,7 @@ class ProjectAccessPage extends StatelessWidget {
                       ),
                     ),
                     title: Text(
-                      project.projectName,
+                      '${project.projectName} (${project.id})',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

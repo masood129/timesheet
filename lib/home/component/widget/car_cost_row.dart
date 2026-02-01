@@ -58,7 +58,7 @@ class CarCostRow extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              selectedProject?.projectName ?? 'پروژه بدون دسترسی',
+                              selectedProject != null ? '${selectedProject.projectName} (${selectedProject.id})' : 'پروژه بدون دسترسی',
                               style: TextStyle(
                                 color: colorScheme.error,
                                 fontSize: 14,
@@ -86,7 +86,7 @@ class CarCostRow extends StatelessWidget {
                       items: controller.projects.map<DropdownMenuItem<Project>>((project) {
                         return DropdownMenuItem<Project>(
                           value: project,
-                          child: Text(project.projectName, style: TextStyle(color: colorScheme.onSurface, overflow: TextOverflow.ellipsis)),
+                          child: Text('${project.projectName} (${project.id})', style: TextStyle(color: colorScheme.onSurface, overflow: TextOverflow.ellipsis)),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -106,7 +106,7 @@ class CarCostRow extends StatelessWidget {
                         return DropdownMenuItem<Project>(
                           value: project,
                           enabled: false,
-                          child: Text(project.projectName, style: TextStyle(color: disabledColor, overflow: TextOverflow.ellipsis)),
+                          child: Text('${project.projectName} (${project.id})', style: TextStyle(color: disabledColor, overflow: TextOverflow.ellipsis)),
                         );
                       }).toList(),
                       isDense: true,
